@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 
-public class IncomingMessageHandlers<T> extends Handlers<T> {
+class IncomingMessageHandlers<T> extends Handlers<T> {
   private IncomingMessageHandlers(AggregateBehavior<T> aggregateBehavior) {
     super(aggregateBehavior.incomingMessageHandlers());
   }

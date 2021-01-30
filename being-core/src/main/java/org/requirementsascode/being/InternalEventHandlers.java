@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 
-public class InternalEventHandlers<T> extends Handlers<T>{
+class InternalEventHandlers<T> extends Handlers<T>{
   private AggregateBehavior<T> aggregateBehavior;
 
   private InternalEventHandlers(AggregateBehavior<T> aggregateBehavior) {
