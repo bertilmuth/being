@@ -3,7 +3,6 @@
 
 The goal of being is to maximize developer joy and productivity when building message-driven, event sourced services.
 
-## code examples
 # service interface
 ``` java
 public interface GreetUserService extends AggregateService {  
