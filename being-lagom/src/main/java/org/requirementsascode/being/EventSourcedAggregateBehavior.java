@@ -4,9 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 
-import org.requirementsascode.being.handler.IncomingMessageHandlers;
-import org.requirementsascode.being.handler.InternalEventHandlers;
-
 import akka.actor.typed.ActorRef;
 import akka.cluster.sharding.typed.javadsl.EntityContext;
 import akka.persistence.typed.PersistenceId;

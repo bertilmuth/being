@@ -1,10 +1,8 @@
-package org.requirementsascode.being.handler;
+package org.requirementsascode.being;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
-
-import org.requirementsascode.being.AggregateBehavior;
 
 public class IncomingMessageHandlers<T> extends Handlers<T> {
   private IncomingMessageHandlers(AggregateBehavior<T> aggregateBehavior) {

@@ -1,4 +1,4 @@
-package org.requirementsascode.being.handler;
+package org.requirementsascode.being;
 
 import static java.util.Objects.requireNonNull;
 

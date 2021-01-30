@@ -3,4 +3,4 @@
  * 
  * @author b_muth
  */
-package org.requirementsascode.being.test;
+package org.requirementsascode.being;

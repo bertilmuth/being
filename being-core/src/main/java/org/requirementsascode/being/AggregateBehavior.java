@@ -29,7 +29,7 @@ public abstract class AggregateBehavior<T>{
    * 
    * @param aggregateRoot the root object of the aggregate
    */
-  public void setAggregateRoot(T aggregateRoot) {
+  void setAggregateRoot(T aggregateRoot) {
     this.aggregateRoot = aggregateRoot;
   }
   

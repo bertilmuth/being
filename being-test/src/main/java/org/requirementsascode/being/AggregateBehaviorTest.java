@@ -1,4 +1,4 @@
-package org.requirementsascode.being.test;
+package org.requirementsascode.being;
 
 import static java.util.Objects.requireNonNull;
 
@@ -7,10 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
-import org.requirementsascode.being.AggregateBehavior;
-import org.requirementsascode.being.handler.IncomingMessageHandlers;
-import org.requirementsascode.being.handler.InternalEventHandlers;
 
 public class AggregateBehaviorTest<T> {
   private final IncomingMessageHandlers<T> incomingMessageHandlers;

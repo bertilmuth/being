@@ -1,16 +1,15 @@
 package org.requirementsascode.being;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import static java.util.Arrays.asList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.requirementsascode.Model;
-import org.requirementsascode.being.test.AggregateBehaviorTest;
 
 public class SimpleBehaviorTest {
   private static final TestEvent NEW_AGGREGATE_ROOT_EVENT = new TestEvent("New aggregate root");
