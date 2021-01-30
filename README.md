@@ -9,7 +9,7 @@ Being is based on the [Lagom framework](https://www.lagomframework.com/).
 ``` java
 public interface GreetUserService extends AggregateService {  
   @Override
-  default String name() {
+  default String uniqueName() {
     return "GreetUserService";
   }
   
@@ -29,6 +29,17 @@ public interface GreetUserService extends AggregateService {
   }
 }
 ```
+Example URL for GET/POST requests: 
+
+http://localhost:9000/api/greet/Joe
+
+GET request will get you the response defined by the aggregate behavior's `responseMessage()` method (see below).
+
+Use POST requests for commands. The JSON must contain a `@type` property with simple class name of command, e.g. `ChangeGreetingText`.
+Example JSON:
+
+`{"@type":"ChangeGreetingText", "newText":"Guten Tag"}`
+
 # command
 ``` java
 @Value @Properties
@@ -90,7 +101,6 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   }
   
   // Internal event classes
-  
   @Value @Properties
   static final class GreetingTextChanged{
     String text;
