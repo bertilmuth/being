@@ -1,0 +1,39 @@
+allprojects{
+	group = 'org.requirementsascode'
+	version = '0.0.1.0-SNAPSHOT'
+	
+	apply plugin: 'java-library'
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+	apply plugin: "jacoco"
+	
+	compileJava {
+	  sourceCompatibility = '1.8'
+	  targetCompatibility = '1.8'
+	}
+	
+	repositories {
+		mavenCentral()
+		maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+	}
+	
+	gradle.projectsEvaluated {
+		tasks.withType(JavaCompile) {
+   			options.compilerArgs << "-parameters"
+   		}
+	}
+	
+	test {
+		finalizedBy jacocoTestReport
+	}
+
+	jacocoTestReport {
+    	reports {
+        	xml.enabled false
+        	csv.enabled false
+        	html.destination file("${buildDir}/jacocoHtml")
+    	}
+	}
+}

@@ -1,0 +1,108 @@
+plugins {
+    id 'maven'
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'being-core',
+                   'Implementation-Version': version
+    }
+}
+
+dependencies {
+  api 'org.requirementsascode:requirementsascodecore:1.9.2'
+  implementation 'com.lightbend.lagom:lagom-javadsl-server_2.12:1.6.5-RC1'    
+  implementation 'com.lightbend.lagom:lagom-javadsl-persistence_2.12:1.6.5-RC1' 
+
+  testImplementation 'com.typesafe.play:play-akka-http-server_2.12:2.8.2' 
+  testImplementation 'com.lightbend.lagom:lagom-javadsl-persistence-cassandra_2.12:1.6.5-RC1' 
+  testImplementation 'com.lightbend.lagom:lagom-logback_2.12:1.6.5-RC1'   
+  testImplementation 'com.lightbend.lagom:lagom-javadsl-testkit_2.12:1.6.5-RC1' 
+  
+  testImplementation 'org.projectlombok:lombok:1.18.16'
+  testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+}
+
+jar {
+    enabled = true
+    manifest {
+        attributes 'Implementation-Title': 'commandsourcingcore',
+                   'Implementation-Version': version
+  }
+}
+
+task javadocJar(type: Jar) {
+  classifier = 'javadoc'
+  from javadoc
+}
+
+task sourcesJar(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+artifacts {
+  archives javadocJar, sourcesJar
+}
+
+test {
+  finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+  reports {
+    xml.enabled false
+    csv.enabled false
+    html.destination file("${buildDir}/jacocoHtml")
+  }
+}
+
+if (project.hasProperty("signing.keyId")) {
+  apply plugin: 'signing'
+
+  signing {
+      sign configurations.archives
+  }
+  
+  uploadArchives {
+      repositories {
+          mavenDeployer {
+              beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+              repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                 authentication(userName: sonatypeUsername, password: sonatypePassword)
+              }
+              snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                 authentication(userName: sonatypeUsername, password: sonatypePassword)
+              } 
+              
+              pom.project {
+                 name 'being-core'
+                 packaging 'jar'
+                 description 'Describe and test behavior, based on the requirements as code project.'
+                 url 'http://requirementsascode.org/'
+  
+                 scm {
+                     url 'scm:git@github.com:bertilmuth/requirementsascode.git'
+                     connection 'scm:git@github.com:bertilmuth/requirementsascode.git'
+                     developerConnection 'scm:git@github.com:bertilmuth/requirementsascode.git'
+                 }
+  
+                 licenses {
+                     license {
+                         name 'The Apache Software License, Version 2.0'
+                         url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                         distribution 'repo'
+                     }
+                 }
+  
+                 developers {
+                     developer {
+                         id 'bertilmuth'
+                         name 'Bertil Muth'
+                     }
+                 }
+             }
+          }
+      }
+  }
+}
