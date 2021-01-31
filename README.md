@@ -4,6 +4,8 @@
 
 The goal of being is to maximize developer joy and productivity when building message-driven, event-sourced services.
 
+The easiest way to get started is by [cloning a sample project](https://github.com/bertilmuth/being-samples).
+
 Being is based on the [Lagom framework](https://www.lagomframework.com/).
 
 # service interface
@@ -30,16 +32,6 @@ public interface GreetUserService extends AggregateService {
   }
 }
 ```
-Example URL for GET/POST requests: 
-
-http://localhost:9000/api/greet/Joe
-
-GET request will get you the response defined by the aggregate behavior's `responseMessage()` method (see below).
-
-Use POST requests for commands. The JSON must contain a `@type` property with simple class name of command, e.g. `ChangeGreetingText`.
-Example JSON:
-
-`{"@type":"ChangeGreetingText", "newText":"Guten Tag"}`
 
 # command
 ``` java
