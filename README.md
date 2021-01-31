@@ -1,5 +1,6 @@
 # being
 [![Gitter](https://badges.gitter.im/requirementsascode/community.svg)](https://gitter.im/requirementsascode/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Build Status](https://travis-ci.com/bertilmuth/being.svg?token=c2UbYMyGmqssmcwQYeAn&branch=main)](https://travis-ci.com/bertilmuth/being)
 
 The goal of being is to maximize developer joy and productivity when building message-driven, event-sourced services.
 
