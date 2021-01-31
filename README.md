@@ -8,6 +8,9 @@ The easiest way to get started is by [cloning a sample project](https://github.c
 
 Being is based on the [Lagom framework](https://www.lagomframework.com/).
 
+# code examples
+You can find a runnable sample project containing the code [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
+
 # service interface
 ``` java
 public interface GreetUserService extends AggregateService {  
@@ -40,6 +43,13 @@ public class ChangeGreetingText{
   String newText;
 }
 ```
+# response
+``` java
+@Value @Properties
+public class GreetingResponse{
+  String text;
+}
+```
 # service implementation
 ``` java
 class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements GreetUserService{
@@ -51,6 +61,25 @@ class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements Gre
   @Override
   public AggregateBehavior<Greeting> aggregateBehavior() {
     return new GreetUserBehavior();
+  }
+}
+```
+# aggregate root (POJO)
+``` java
+@EqualsAndHashCode
+class Greeting{
+  public final String id;
+  public final String text;
+  public final String timestamp;
+
+  private Greeting(String id, String text, String timestamp) {
+    this.id = id;
+    this.text = requireNonNull(text, "text must be non-null");
+    this.timestamp = requireNonNull(timestamp, "timestamp must be non-null");
+  }
+
+  public static Greeting create(String id, String text) {
+    return new Greeting(id, text, LocalDateTime.now().toString());
   }
 }
 ```
@@ -67,6 +96,7 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
     return new GreetingResponse(aggregateRoot().text + ", " + aggregateRoot().id + "!");
   }
   
+  // Handle incoming commands, publish internal event(s) to be persisted transparently
   @Override
   public Model incomingMessageHandlers() {
     Model model = Model.builder()
@@ -75,6 +105,7 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
     return model;
   }
   
+  // Handle internal events, publish state change
   @Override
   public Model internalEventHandlers() {
     Model model = Model.builder()
@@ -100,23 +131,5 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   }
 }
 ```
-# aggregate root
-``` java
-@EqualsAndHashCode
-class Greeting{
-  public final String id;
-  public final String text;
-  public final String timestamp;
 
-  private Greeting(String id, String text, String timestamp) {
-    this.id = id;
-    this.text = requireNonNull(text, "text must be non-null");
-    this.timestamp = requireNonNull(timestamp, "timestamp must be non-null");
-  }
-
-  public static Greeting create(String id, String text) {
-    return new Greeting(id, text, LocalDateTime.now().toString());
-  }
-}
-```
 
