@@ -4,13 +4,13 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDateTime;
 
-import lombok.EqualsAndHashCode;
+import lombok.Value;
 
-@EqualsAndHashCode
+@Value
 class Greeting{
-  public final String id;
-  public final String text;
-  public final String timestamp;
+  String id;
+  String text;
+  String timestamp;
 
   private Greeting(String id, String text, String timestamp) {
     this.id = id;
