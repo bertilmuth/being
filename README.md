@@ -66,17 +66,11 @@ class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements Gre
 ```
 # aggregate root (POJO)
 ``` java
-@EqualsAndHashCode
+@Value
 class Greeting{
-  public final String id;
-  public final String text;
-  public final String timestamp;
-
-  private Greeting(String id, String text, String timestamp) {
-    this.id = id;
-    this.text = requireNonNull(text, "text must be non-null");
-    this.timestamp = requireNonNull(timestamp, "timestamp must be non-null");
-  }
+  String id;
+  String text;
+  String timestamp;
 
   public static Greeting create(String id, String text) {
     return new Greeting(id, text, LocalDateTime.now().toString());
@@ -93,10 +87,9 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   
   @Override
   public Object responseMessage() {
-    return new GreetingResponse(aggregateRoot().text + ", " + aggregateRoot().id + "!");
+    return new GreetingResponse(aggregateRoot().getText() + ", " + aggregateRoot().getId() + "!");
   }
   
-  // Handle incoming commands, publish internal event(s) to be persisted transparently
   @Override
   public Model incomingMessageHandlers() {
     Model model = Model.builder()
@@ -105,11 +98,10 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
     return model;
   }
   
-  // Handle internal events, publish state change
   @Override
   public Model internalEventHandlers() {
     Model model = Model.builder()
-      .on(GreetingTextChanged.class).systemPublish(gtc -> Greeting.create(aggregateRoot().id, gtc.text))
+      .on(GreetingTextChanged.class).systemPublish(gtc -> Greeting.create(aggregateRoot().getId(), gtc.getText()))
       .build();
     return model;
   }
@@ -125,6 +117,7 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   }
   
   // Internal event classes
+  
   @Value @Properties
   static final class GreetingTextChanged{
     String text;
