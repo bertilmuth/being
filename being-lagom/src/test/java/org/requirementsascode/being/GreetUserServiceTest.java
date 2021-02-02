@@ -13,9 +13,9 @@ import org.junit.Test;
 import org.requirementsascode.being.testservice.api.GreetUserService;
 import org.requirementsascode.being.testservice.api.GreetingResponse;
 import org.requirementsascode.being.testservice.api.command.ChangeGreetingText;
-import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRoot;
 import org.requirementsascode.being.testservice.api.command.IgnoredCommand;
-import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRoot;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextList;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextSet;
 import org.requirementsascode.being.testservice.api.command.UnknownCommand;
@@ -122,13 +122,13 @@ public class GreetUserServiceTest {
   }
   
   private Done postIgnoredUpdateAggregateRootCommand(GreetUserService service, String id) throws Exception {
-	  IgnoredUpdateAggregateRootCommand command = new IgnoredUpdateAggregateRootCommand();
+	  IgnoredUpdateAggregateRoot command = new IgnoredUpdateAggregateRoot();
 	    Done done = service.httpPost(id).invoke(command).toCompletableFuture().get(5, SECONDS);
 	    return done;
 	  }
   
   private Done postFailingUpdateAggregateRootCommand(GreetUserService service, String id) throws Exception {
-    FailingUpdateAggregateRootCommand command = new FailingUpdateAggregateRootCommand();
+    FailingUpdateAggregateRoot command = new FailingUpdateAggregateRoot();
     Done done = service.httpPost(id).invoke(command).toCompletableFuture().get(5, SECONDS);
     return done;
   }

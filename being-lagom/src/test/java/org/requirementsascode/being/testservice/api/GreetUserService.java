@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.requirementsascode.being.AggregateService;
 import org.requirementsascode.being.testservice.api.command.ChangeGreetingText;
-import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRoot;
 import org.requirementsascode.being.testservice.api.command.IgnoredCommand;
-import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRoot;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextList;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextSet;
 
@@ -25,8 +25,8 @@ public interface GreetUserService extends AggregateService {
   @Override
   default List<Class<?>> incomingMessageTypes() {
     return asList(ChangeGreetingText.class, PublishChangeGreetingTextList.class, PublishChangeGreetingTextSet.class,
-        IgnoredCommand.class, IgnoredUpdateAggregateRootCommand.class,
-        FailingUpdateAggregateRootCommand.class);
+        IgnoredCommand.class, IgnoredUpdateAggregateRoot.class,
+        FailingUpdateAggregateRoot.class);
   }
 
   @Override

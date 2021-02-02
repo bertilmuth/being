@@ -8,12 +8,11 @@ import java.util.Set;
 import org.requirementsascode.Model;
 import org.requirementsascode.being.AggregateBehavior;
 import org.requirementsascode.being.Properties;
-import org.requirementsascode.being.testservice.api.FailingUpdateAggregateRootEvent;
 import org.requirementsascode.being.testservice.api.GreetingResponse;
 import org.requirementsascode.being.testservice.api.command.ChangeGreetingText;
-import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRoot;
 import org.requirementsascode.being.testservice.api.command.IgnoredCommand;
-import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRoot;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextList;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextSet;
 
@@ -37,8 +36,8 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
       .user(ChangeGreetingText.class).systemPublish(this::greetingTextChanged)
       .user(PublishChangeGreetingTextList.class).systemPublish(this::publishChangeGreetingTextList)
       .user(PublishChangeGreetingTextSet.class).systemPublish(this::publishChangeGreetingTextSet)
-      .on(FailingUpdateAggregateRootCommand.class).systemPublish(ev -> new FailingUpdateAggregateRootEvent())
-      .on(IgnoredUpdateAggregateRootCommand.class).systemPublish(ev -> new IgnoredUpdateAggregateRootEvent())
+      .on(FailingUpdateAggregateRoot.class).systemPublish(ev -> new FailingUpdateAggregateRootEvent())
+      .on(IgnoredUpdateAggregateRoot.class).systemPublish(ev -> new IgnoredUpdateAggregateRootEvent())
       .build();
     return model;
   }
@@ -82,6 +81,10 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   @Value @Properties
   static final class GreetingTextChanged{
     String text;
+  }
+  
+  @Properties
+  static class FailingUpdateAggregateRootEvent {
   }
   
   @Properties
