@@ -9,12 +9,13 @@ import org.requirementsascode.Model;
 import org.requirementsascode.being.AggregateBehavior;
 import org.requirementsascode.being.Properties;
 import org.requirementsascode.being.testservice.api.ChangeGreetingText;
+import org.requirementsascode.being.testservice.api.FailingUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.FailingUpdateAggregateRootEvent;
 import org.requirementsascode.being.testservice.api.GreetingResponse;
 import org.requirementsascode.being.testservice.api.IgnoredCommand;
+import org.requirementsascode.being.testservice.api.IgnoredUpdateAggregateRootCommand;
 import org.requirementsascode.being.testservice.api.PublishChangeGreetingTextList;
 import org.requirementsascode.being.testservice.api.PublishChangeGreetingTextSet;
-import org.requirementsascode.being.testservice.api.TestFailingUpdateAggregateRootCommand;
-import org.requirementsascode.being.testservice.api.TestFailingUpdateAggregateRootEvent;
 
 import lombok.Value;
 
@@ -36,7 +37,8 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
       .user(ChangeGreetingText.class).systemPublish(this::greetingTextChanged)
       .user(PublishChangeGreetingTextList.class).systemPublish(this::publishChangeGreetingTextList)
       .user(PublishChangeGreetingTextSet.class).systemPublish(this::publishChangeGreetingTextSet)
-      .on(TestFailingUpdateAggregateRootCommand.class).systemPublish(ev -> new TestFailingUpdateAggregateRootEvent())
+      .on(FailingUpdateAggregateRootCommand.class).systemPublish(ev -> new FailingUpdateAggregateRootEvent())
+      .on(IgnoredUpdateAggregateRootCommand.class).systemPublish(ev -> new IgnoredUpdateAggregateRootEvent())
       .build();
     return model;
   }
@@ -45,7 +47,8 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   public Model internalEventHandlers() {
     Model model = Model.builder()
       .on(GreetingTextChanged.class).systemPublish(gtc -> Greeting.create(aggregateRoot().getId(), gtc.getText()))
-      .on(TestFailingUpdateAggregateRootEvent.class).systemPublish(ev -> "This should be an aggregate root, so it will fail!")
+      .on(FailingUpdateAggregateRootEvent.class).systemPublish(ev -> "This should be an aggregate root, so it will fail!")
+      .on(IgnoredUpdateAggregateRootEvent.class).system(ev -> {})
       .build();
     return model;
   }
@@ -79,5 +82,9 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   @Value @Properties
   static final class GreetingTextChanged{
     String text;
+  }
+  
+  @Properties
+  static final class IgnoredUpdateAggregateRootEvent{
   }
 }

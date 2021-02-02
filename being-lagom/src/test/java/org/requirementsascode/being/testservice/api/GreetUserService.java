@@ -19,7 +19,8 @@ public interface GreetUserService extends AggregateService {
   @Override
   default List<Class<?>> incomingMessageTypes() {
     return asList(ChangeGreetingText.class, PublishChangeGreetingTextList.class, PublishChangeGreetingTextSet.class,
-        IgnoredCommand.class, TestFailingUpdateAggregateRootCommand.class);
+        IgnoredCommand.class, IgnoredUpdateAggregateRootCommand.class,
+        FailingUpdateAggregateRootCommand.class);
   }
 
   @Override

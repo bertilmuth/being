@@ -11,12 +11,13 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
 import org.requirementsascode.being.testservice.api.ChangeGreetingText;
+import org.requirementsascode.being.testservice.api.FailingUpdateAggregateRootCommand;
 import org.requirementsascode.being.testservice.api.GreetUserService;
 import org.requirementsascode.being.testservice.api.GreetingResponse;
 import org.requirementsascode.being.testservice.api.IgnoredCommand;
+import org.requirementsascode.being.testservice.api.IgnoredUpdateAggregateRootCommand;
 import org.requirementsascode.being.testservice.api.PublishChangeGreetingTextList;
 import org.requirementsascode.being.testservice.api.PublishChangeGreetingTextSet;
-import org.requirementsascode.being.testservice.api.TestFailingUpdateAggregateRootCommand;
 import org.requirementsascode.being.testservice.api.UnknownCommand;
 
 import com.lightbend.lagom.javadsl.api.deser.DeserializationException;
@@ -52,6 +53,12 @@ public class GreetUserServiceTest {
       assertEquals("Hello, Bob!", response5.getText()); // default greeting remains
       
       postIgnoredCommand(service, "This should have no consequence, i.e. throw no Exception.");
+      
+      postIgnoredUpdateAggregateRootCommand(service, "This should have no consequence, i.e. throw no Exception.");
+      
+      GreetingResponse response6 = get(service, "Bob");
+      assertEquals("Hello, Bob!", response6.getText()); // default greeting remains
+
       
       try {
         postUnknownCommand(service, "This should throw an exception"); 
@@ -114,8 +121,14 @@ public class GreetUserServiceTest {
     return done;
   }
   
+  private Done postIgnoredUpdateAggregateRootCommand(GreetUserService service, String id) throws Exception {
+	  IgnoredUpdateAggregateRootCommand command = new IgnoredUpdateAggregateRootCommand();
+	    Done done = service.httpPost(id).invoke(command).toCompletableFuture().get(5, SECONDS);
+	    return done;
+	  }
+  
   private Done postFailingUpdateAggregateRootCommand(GreetUserService service, String id) throws Exception {
-    TestFailingUpdateAggregateRootCommand command = new TestFailingUpdateAggregateRootCommand();
+    FailingUpdateAggregateRootCommand command = new FailingUpdateAggregateRootCommand();
     Done done = service.httpPost(id).invoke(command).toCompletableFuture().get(5, SECONDS);
     return done;
   }
