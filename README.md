@@ -11,7 +11,7 @@ Being is based on the [Lagom framework](https://www.lagomframework.com/).
 # code examples
 You can find a runnable sample project containing the code [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
 
-# service interface
+## service interface
 ``` java
 public interface GreetUserService extends AggregateService {  
   @Override
@@ -36,21 +36,21 @@ public interface GreetUserService extends AggregateService {
 }
 ```
 
-# command
+## command
 ``` java
 @Value @Properties
 public class ChangeGreetingText{
   String newText;
 }
 ```
-# response
+## response
 ``` java
 @Value @Properties
 public class GreetingResponse{
   String text;
 }
 ```
-# service implementation
+## service implementation
 ``` java
 class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements GreetUserService{
   @Override
@@ -64,20 +64,38 @@ class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements Gre
   }
 }
 ```
-# aggregate root (POJO)
+## aggregate root
 ``` java
-@Value
+@EqualsAndHashCode
 class Greeting{
-  String id;
-  String text;
-  String timestamp;
+  private final String id;
+  private final String text;
+  private final String timestamp;
+  
+  private Greeting(String id, String text, String timestamp) {
+    this.id = id;
+    this.text = text;
+    this.timestamp = timestamp;
+  }
 
   public static Greeting create(String id, String text) {
     return new Greeting(id, text, LocalDateTime.now().toString());
   }
+  
+  public String getId() {
+    return id;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public String getTimestamp() {
+    return timestamp;
+  }
 }
 ```
-# aggregate behavior (event sourced)
+## aggregate behavior (event sourced)
 ``` java
 class GreetUserBehavior extends AggregateBehavior<Greeting>{
   @Override
@@ -101,7 +119,7 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   @Override
   public Model internalEventHandlers() {
     Model model = Model.builder()
-      .on(GreetingTextChanged.class).systemPublish(gtc -> Greeting.create(aggregateRoot().getId(), gtc.getText()))
+      .on(GreetingTextChanged.class).systemPublish(this::newGreeting)
       .build();
     return model;
   }
@@ -114,6 +132,10 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
     
     GreetingTextChanged event = new GreetingTextChanged(newText);
     return event;
+  }
+  
+  private Greeting newGreeting(GreetingTextChanged event) {
+    return Greeting.create(aggregateRoot().getId(), event.getText()); 
   }
   
   // Internal event classes

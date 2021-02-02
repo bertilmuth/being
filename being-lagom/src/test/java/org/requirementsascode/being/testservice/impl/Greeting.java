@@ -1,24 +1,34 @@
 package org.requirementsascode.being.testservice.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import java.time.LocalDateTime;
 
-import lombok.Value;
+import lombok.EqualsAndHashCode;
 
-@Value
+@EqualsAndHashCode
 class Greeting{
-  String id;
-  String text;
-  String timestamp;
-
+  private final String id;
+  private final String text;
+  private final String timestamp;
+  
   private Greeting(String id, String text, String timestamp) {
     this.id = id;
-    this.text = requireNonNull(text, "text must be non-null");
-    this.timestamp = requireNonNull(timestamp, "timestamp must be non-null");
+    this.text = text;
+    this.timestamp = timestamp;
   }
 
   public static Greeting create(String id, String text) {
     return new Greeting(id, text, LocalDateTime.now().toString());
+  }
+  
+  public String getId() {
+    return id;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public String getTimestamp() {
+    return timestamp;
   }
 }

@@ -45,7 +45,7 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   @Override
   public Model internalEventHandlers() {
     Model model = Model.builder()
-      .on(GreetingTextChanged.class).systemPublish(gtc -> Greeting.create(aggregateRoot().getId(), gtc.getText()))
+      .on(GreetingTextChanged.class).systemPublish(this::newGreeting)
       .on(FailingUpdateAggregateRootEvent.class).systemPublish(ev -> "This should be an aggregate root, so it will fail!")
       .on(IgnoredUpdateAggregateRootEvent.class).system(ev -> {})
       .build();
@@ -60,6 +60,10 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
     
     GreetingTextChanged event = new GreetingTextChanged(newText);
     return event;
+  }
+  
+  private Greeting newGreeting(GreetingTextChanged event) {
+    return Greeting.create(aggregateRoot().getId(), event.getText()); 
   }
   
   private List<GreetingTextChanged> publishChangeGreetingTextList(PublishChangeGreetingTextList command) {
