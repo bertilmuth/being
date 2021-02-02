@@ -105,9 +105,10 @@ class EventSourcedAggregateBehavior<T> extends EventSourcedBehaviorWithEnforcedR
     EventHandlerBuilder<AggregateState, EventContainer> builder = newEventHandlerBuilder();
 
     builder.forAnyState().onEvent(EventContainer.class, (aggregateState, eventContainer) -> {
-      aggregateBehavior.setAggregateRoot((T)aggregateState.aggregateRoot());
+      T aggregateRoot = (T)aggregateState.aggregateRoot();
+      aggregateBehavior.setAggregateRoot(aggregateRoot);
       Object event = eventContainer.event();
-      Object newAggregateRoot = internalEventHandlers.reactTo(event).orElse(aggregateState);
+      Object newAggregateRoot = internalEventHandlers.reactTo(event).orElse(aggregateRoot);
       return new AggregateState(newAggregateRoot);
     });
     return builder.build();

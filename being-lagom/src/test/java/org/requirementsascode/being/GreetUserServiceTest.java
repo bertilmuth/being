@@ -52,9 +52,9 @@ public class GreetUserServiceTest {
       GreetingResponse response5 = get(service, "Bob");
       assertEquals("Hello, Bob!", response5.getText()); // default greeting remains
       
-      postIgnoredCommand(service, "This should have no consequence, i.e. throw no Exception.");
-      
-      postIgnoredUpdateAggregateRootCommand(service, "This should have no consequence, i.e. throw no Exception.");
+      // The next two lines must not have an effect on Bob
+      postIgnoredCommand(service, "Bob");
+      postIgnoredUpdateAggregateRootCommand(service, "Bob");
       
       GreetingResponse response6 = get(service, "Bob");
       assertEquals("Hello, Bob!", response6.getText()); // default greeting remains
