@@ -8,14 +8,14 @@ import java.util.Set;
 import org.requirementsascode.Model;
 import org.requirementsascode.being.AggregateBehavior;
 import org.requirementsascode.being.Properties;
-import org.requirementsascode.being.testservice.api.ChangeGreetingText;
-import org.requirementsascode.being.testservice.api.FailingUpdateAggregateRootCommand;
 import org.requirementsascode.being.testservice.api.FailingUpdateAggregateRootEvent;
 import org.requirementsascode.being.testservice.api.GreetingResponse;
-import org.requirementsascode.being.testservice.api.IgnoredCommand;
-import org.requirementsascode.being.testservice.api.IgnoredUpdateAggregateRootCommand;
-import org.requirementsascode.being.testservice.api.PublishChangeGreetingTextList;
-import org.requirementsascode.being.testservice.api.PublishChangeGreetingTextSet;
+import org.requirementsascode.being.testservice.api.command.ChangeGreetingText;
+import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextList;
+import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextSet;
 
 import lombok.Value;
 

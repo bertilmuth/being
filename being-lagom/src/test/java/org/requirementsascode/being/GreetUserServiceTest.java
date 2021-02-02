@@ -10,15 +10,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
-import org.requirementsascode.being.testservice.api.ChangeGreetingText;
-import org.requirementsascode.being.testservice.api.FailingUpdateAggregateRootCommand;
 import org.requirementsascode.being.testservice.api.GreetUserService;
 import org.requirementsascode.being.testservice.api.GreetingResponse;
-import org.requirementsascode.being.testservice.api.IgnoredCommand;
-import org.requirementsascode.being.testservice.api.IgnoredUpdateAggregateRootCommand;
-import org.requirementsascode.being.testservice.api.PublishChangeGreetingTextList;
-import org.requirementsascode.being.testservice.api.PublishChangeGreetingTextSet;
-import org.requirementsascode.being.testservice.api.UnknownCommand;
+import org.requirementsascode.being.testservice.api.command.ChangeGreetingText;
+import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextList;
+import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextSet;
+import org.requirementsascode.being.testservice.api.command.UnknownCommand;
 
 import com.lightbend.lagom.javadsl.api.deser.DeserializationException;
 import com.lightbend.lagom.javadsl.api.transport.BadRequest;

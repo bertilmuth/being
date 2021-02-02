@@ -4,6 +4,12 @@ import static java.util.Arrays.*;
 import java.util.List;
 
 import org.requirementsascode.being.AggregateService;
+import org.requirementsascode.being.testservice.api.command.ChangeGreetingText;
+import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredCommand;
+import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRootCommand;
+import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextList;
+import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextSet;
 
 public interface GreetUserService extends AggregateService {
   @Override
