@@ -10,6 +10,7 @@ import org.requirementsascode.being.testservice.api.command.IgnoredCommand;
 import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggregateRoot;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextList;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextSet;
+import org.requirementsascode.being.testservice.api.response.GreetingResponse;
 
 public interface GreetUserService extends AggregateService {
   @Override

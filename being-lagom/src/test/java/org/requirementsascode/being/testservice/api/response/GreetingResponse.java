@@ -1,4 +1,4 @@
-package org.requirementsascode.being.testservice.api;
+package org.requirementsascode.being.testservice.api.response;
 
 import org.requirementsascode.being.*;
 

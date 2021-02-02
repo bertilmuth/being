@@ -11,7 +11,6 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
 import org.requirementsascode.being.testservice.api.GreetUserService;
-import org.requirementsascode.being.testservice.api.GreetingResponse;
 import org.requirementsascode.being.testservice.api.command.ChangeGreetingText;
 import org.requirementsascode.being.testservice.api.command.FailingUpdateAggregateRoot;
 import org.requirementsascode.being.testservice.api.command.IgnoredCommand;
@@ -19,6 +18,7 @@ import org.requirementsascode.being.testservice.api.command.IgnoredUpdateAggrega
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextList;
 import org.requirementsascode.being.testservice.api.command.PublishChangeGreetingTextSet;
 import org.requirementsascode.being.testservice.api.command.UnknownCommand;
+import org.requirementsascode.being.testservice.api.response.GreetingResponse;
 
 import com.lightbend.lagom.javadsl.api.deser.DeserializationException;
 import com.lightbend.lagom.javadsl.api.transport.BadRequest;
