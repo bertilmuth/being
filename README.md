@@ -7,7 +7,7 @@ The goal of Being is to maximize developer joy and productivity when building me
 This is manifested in the following principles:
 * **Reduce cognitive load.** By using a convention-over-configuration approach, Being reduces the number of concepts to learn. There's a clear separation between infrastructure and domain logic, enabling you to be productive. And whenever possible, the Being API uses POJOs. 
 * **Avoid concurrency issues by design.** Even if multiple users access the same aggregate instance, no concurrency issues will occur. Instead of relying on optimistic locking, Being manages each aggregate instance as an actor with its own inbox. Concurrency issues are avoided before they occur.
-* **Support mutable and immutable aggregates.** You can choose whether you create a new aggregate instance when processing an event, or mutate the existing one. Both options are equally simple to implement.
+* **Make immutability optional.** You can choose whether you create a new aggregate instance when processing an event, or mutate the existing one. Both options are equally simple to implement.
 * **Support fast and isolated behavior tests.** The aggregate behavior can be tested without the underlying framework, using synchronous calls. Of course, you can also test the service as a whole, by sending GET and POST requests to it.
 
 The easiest way to get started is by [cloning a sample project](https://github.com/bertilmuth/being-samples).
