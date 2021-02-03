@@ -15,7 +15,7 @@ Being is based on the [Lagom framework](https://www.lagomframework.com/).
 # Getting started
 The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
 You need to:
-* Define a service interface and implementation
+* Define a service interface and implementation.
 * Create the aggregate and describe its event-sourced behavior.
 * Adapt a few configuration settings.
 Then you can run your service.
