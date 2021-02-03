@@ -56,9 +56,7 @@ public interface GreetUserService extends AggregateService {
 ```
 
 ### GETting information about the aggregate
-To receive a greeting, you send a GET request to the address defined in the service interface.
-
-In development mode:
+To receive a greeting, you send a GET request to the address defined in the service interface, for example:
 
 Unix: `curl http://localhost:9000/api/greet/Joe`
 
@@ -66,28 +64,28 @@ Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe`
 
 As you can see, the `address()` method defines the relative URL of the GET request.
 The `:id` part of the URL will be replaced by the string that you supplied in your GET request.
-That's how you can change the name. Try something different than `Joe`, maybe your name.
+That's how you can change the name. 
 
 Where does the response *Hello, Joe!* come from? It's defined in the `responseMessage()` method
 of your aggregate's behavior in the service implementation. [Take a peek](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java), if you want to.
 We'll come back to it.
 
-The class of the response must also be returned by the `outgoingMessageTypes()` so that Being is aware of it, for serialization to JSON.
+The class of the response must also be returned by the `outgoingMessageTypes()`.
 
 ### POSTing a command to the aggregate
 To change *Hello* do a different greeting, you need to send a POST request to the same address. Its JSON body must contain a `@type` property with the simple class name of a command, e.g. `ChangeGreetingText`. All commands must be listed by the `incomingMessageTypes()` method of the service interface. 
 
-Example: To change the greeting text from *Hello, Joe!* to *Hi, Joe!*, send the following POST request,
+Example: To change the greeting text from *Hello, Joe!* to *Hi, Joe!*, send the following POST request:
 
 Unix: `curl -H "Content-Type: application/json" -X POST -d '{"@type": "ChangeGreetingText", "newText":"Hi"}' http://localhost:9000/api/greet/Joe`
 
 Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe -Method 'POST' -Headers @{'Content-Type' = 'application/json'} -Body '{"@type": "ChangeGreetingText", "newText":"Hi"}'`
 
-Each POST request will be processed by the `incomingMessageHandlers()` of the [aggregate behavior](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java).
-The persisted events will change the aggregate state. Further GET requests will return the new greeting.
+Each POST request is processed by the `incomingMessageHandlers()` of the [aggregate behavior](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java).
+The persisted events cause the aggregate state to change. Further GET requests return the new greeting.
 
 ### Commands & responses
-Commands and responses are simple POJOs. They need to be serializable to JSON with the Jackson library.
+Commands and responses are simple POJOs. They need to be serializable to JSON with the [Jackson](https://github.com/FasterXML/jackson) library.
 The most concise way to define a command or response is to use [Lombok](https://projectlombok.org/)'s `@Value` annotation
 that creates an all arguments constructor, getters for the fields, `equals()` and `hashCode()` methods etc.
 Being's `@Properties` annotation makes sure the object is serialized correctly.
@@ -114,6 +112,8 @@ either:
 * Mark the constructor with the `@JsonCreator` annotation.
 
 ## Service implementation
+The service implementation defines the aggregate root class,
+and creates the aggregate behavior that's resonsible for handling the incoming messages.
 ``` java
 class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements GreetUserService{
   @Override
@@ -128,6 +128,9 @@ class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements Gre
 }
 ```
 ## Aggregate root
+An aggregate root, together with its contained elements,
+represents the state of the service. It needs to be serializable to JSON as well,
+for snapshots to be taken of the aggregate state from time to time.
 ``` java
 @EqualsAndHashCode
 class Greeting{
@@ -159,6 +162,19 @@ class Greeting{
 }
 ```
 ## Aggregate behavior (event sourced)
+The aggregate behavior is the heart of Being.
+
+The `createAggregateRoot()` creates the initial instance of the aggregate root,
+before any messages have been processed.
+
+The `responseMessage()`message creates a response to a GET request.
+
+The `incomingMessageHandlers()` handle incoming commands and publish service internal events.
+Being transparenly persists these events, by default to [Apache Cassandra](https://cassandra.apache.org/).
+
+The `internalEventHandlers()` handles each event, and produces a new version of the aggregate root.
+Use `.system()` instead of `.systemPublish` for mutuable state. In that case, no new version of the aggregate root is published.
+
 ``` java
 class GreetUserBehavior extends AggregateBehavior<Greeting>{
   @Override
