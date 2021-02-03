@@ -12,12 +12,25 @@ This is manifested in the following principles:
 
 Being is based on the [Lagom framework](https://www.lagomframework.com/).
 
+# Getting started
 The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
+You need to:
+* Define a service interface and implementation
+* Create the aggregate and describe its event-sourced behavior.
+* Adapt a few configuration settings.
+Then you can run your service.
 
-# Code examples
-You can find a runnable sample project containing the code [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
+You can find a runnable sample project containing the code below [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
 
+# Define a service interface and implementation
 ## Service interface
+Let's define the service interface for a simple service that responds 
+to a GET request with the greeting *Hello, Joe!*
+
+You can change the name with every GET request.
+You can also change *Hello* to a different greeting with a POST request,
+and the service will remember that greeting associated with the name.
+  
 ``` java
 public interface GreetUserService extends AggregateService {  
   @Override
@@ -42,13 +55,52 @@ public interface GreetUserService extends AggregateService {
 }
 ```
 
-## Command
+### GETting information about the aggregate
+To receive a greeting, you send a GET request to the address defined in the service interface.
+
+In development mode:
+
+Unix: `curl http://localhost:9000/api/greet/Joe`
+
+Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe`
+
+As you can see, the `address()` method defines the relative URL of the GET request.
+The `:id` part of the URL will be replaced by the string that you supplied in your GET request.
+That's how you can change the name. Try something different than `Joe`, maybe your name.
+
+Where does the response *Hello, Joe!* come from? It's defined in the `responseMessage()` method
+of your aggregate's behavior in the service implementation. [Take a peek](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java), if you want to.
+We'll come back to it.
+
+The class of the response must also be returned by the `outgoingMessageTypes()` so that Being is aware of it, for serialization to JSON.
+
+### POSTing a command to the aggregate
+To change *Hello* do a different greeting, you need to send a POST request to the same address. Its JSON body must contain a `@type` property with the simple class name of a command, e.g. `ChangeGreetingText`. All commands must be listed by the `incomingMessageTypes()` method of the service interface. 
+
+Example: To change the greeting text from *Hello, Joe!* to *Hi, Joe!*, send the following POST request,
+
+Unix: `curl -H "Content-Type: application/json" -X POST -d '{"@type": "ChangeGreetingText", "newText":"Hi"}' http://localhost:9000/api/greet/Joe`
+
+Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe -Method 'POST' -Headers @{'Content-Type' = 'application/json'} -Body '{"@type": "ChangeGreetingText", "newText":"Hi"}'`
+
+Each POST request will be processed by the `incomingMessageHandlers()` of the [aggregate behavior](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java).
+The persisted events will change the aggregate state. Further GET requests will return the new greeting.
+
+### Commands & responses
+Commands and responses are simple POJOs. They need to be serializable to JSON with the Jackson library.
+The most concise way to define a command or response is to use [Lombok](https://projectlombok.org/)'s `@Value` annotation
+that creates an all arguments constructor, getters for the fields, `equals()` and `hashCode()` methods etc.
+Being's `@Properties` annotation makes sure the object is serialized correctly.
+
+Command example:
 ``` java
 @Value @Properties
 public class ChangeGreetingText{
   String newText;
 }
 ```
+
+Response example:
 ## Response
 ``` java
 @Value @Properties
@@ -56,6 +108,12 @@ public class GreetingResponse{
   String text;
 }
 ```
+
+If you don't want to use Lombok, and prefer hand-written POJOs, 
+either:
+* Provide a private, no-arguments constructor, or
+* Mark the constructor with the `@JsonCreator` annotation.
+
 ## Service implementation
 ``` java
 class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements GreetUserService{
