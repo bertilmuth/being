@@ -101,7 +101,6 @@ public class ChangeGreetingText{
 ```
 
 Response example:
-## Response
 ``` java
 @Value @Properties
 public class GreetingResponse{
