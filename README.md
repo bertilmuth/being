@@ -14,17 +14,17 @@ Being is based on the [Lagom framework](https://www.lagomframework.com/).
 
 # Getting started
 The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
-You need:
-* A service interface and implementation
-* An aggregate and its event-sourced behavior
+You need to define:
+* The service API and implementation
+* The aggregate and its event-sourced behavior
 * A few configuration settings
 
 Then you can run your service.
 
 You can find a runnable sample project containing the code below [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
 
-# The service interface and implementation
-## Service interface
+# The service API and implementation
+## The service API
 Let's define the service interface for a simple service that responds 
 to a GET request with the greeting *Hello, Joe!*
 
@@ -92,6 +92,7 @@ that creates an all arguments constructor, getters for the fields, `equals()` an
 Being's `@Properties` annotation makes sure the object is serialized correctly.
 
 Command example:
+
 ``` java
 @Value @Properties
 public class ChangeGreetingText{
@@ -100,6 +101,7 @@ public class ChangeGreetingText{
 ```
 
 Response example:
+
 ``` java
 @Value @Properties
 public class GreetingResponse{
@@ -112,9 +114,10 @@ either:
 * Provide a private, no-arguments constructor, or
 * Mark the constructor with the `@JsonCreator` annotation.
 
-## Service implementation
+## The service implementation
 The service implementation defines the aggregate root class,
 and creates the aggregate behavior that's resonsible for handling the incoming messages.
+
 ``` java
 class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements GreetUserService{
   @Override
@@ -134,6 +137,7 @@ class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements Gre
 An aggregate root, together with its contained elements,
 represents the state of the service. It needs to be serializable to JSON as well,
 for snapshots to be taken of the aggregate state from time to time.
+
 ``` java
 @EqualsAndHashCode
 class Greeting{
@@ -176,6 +180,7 @@ The `incomingMessageHandlers()` handle incoming commands and publish service int
 Being transparently persists these events, by default to [Apache Cassandra](https://cassandra.apache.org/).
 
 The `internalEventHandlers()` handle each event, and publish an updated version of the aggregate root.
+
 Use `.system()` instead of `.systemPublish` for mutuable state (see the [counter sample](https://github.com/bertilmuth/being-samples/blob/main/counter/counter-impl/src/main/java/org/requirementsascode/being/counter/impl/CounterBehavior.java)'s behavior as example).
 
 ``` java
