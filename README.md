@@ -22,7 +22,7 @@ Then you can run your service.
 
 You can find a runnable sample project containing the code below [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
 
-# Service interface and implementation
+# The service interface and implementation
 ## Service interface
 Let's define the service interface for a simple service that responds 
 to a GET request with the greeting *Hello, Joe!*
@@ -128,7 +128,7 @@ class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements Gre
 }
 ```
 
-# Aggregate and its event-sourced behavior
+# The aggregate and its event-sourced behavior
 ## Aggregate root
 An aggregate root, together with its contained elements,
 represents the state of the service. It needs to be serializable to JSON as well,
