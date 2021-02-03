@@ -18,6 +18,7 @@ You need:
 * A service interface and implementation
 * An aggregate and its event-sourced behavior
 * A few configuration settings
+
 Then you can run your service.
 
 You can find a runnable sample project containing the code below [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
