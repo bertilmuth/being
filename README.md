@@ -14,15 +14,15 @@ Being is based on the [Lagom framework](https://www.lagomframework.com/).
 
 # Getting started
 The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
-You need to:
-* Define a service interface and implementation.
-* Create the aggregate and describe its event-sourced behavior.
-* Adapt a few configuration settings.
+You need:
+* A service interface and implementation
+* An aggregate and its event-sourced behavior
+* A few configuration settings
 Then you can run your service.
 
 You can find a runnable sample project containing the code below [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
 
-# Define a service interface and implementation
+# Service interface and implementation
 ## Service interface
 Let's define the service interface for a simple service that responds 
 to a GET request with the greeting *Hello, Joe!*
@@ -127,6 +127,8 @@ class GreetUserServiceImpl extends AggregateServiceImpl<Greeting> implements Gre
   }
 }
 ```
+
+# Aggregate and its event-sourced behavior
 ## Aggregate root
 An aggregate root, together with its contained elements,
 represents the state of the service. It needs to be serializable to JSON as well,
@@ -162,7 +164,7 @@ class Greeting{
 }
 ```
 ## Aggregate behavior (event sourced)
-The aggregate behavior is the heart of Being.
+The aggregate behavior defines how the service reacts to incoming messages.
 
 The `createAggregateRoot()` creates the initial instance of the aggregate root,
 before any messages have been processed.
