@@ -71,7 +71,7 @@ Where does the response *Hello, Joe!* come from? It's defined in the `responseMe
 of your aggregate's behavior in the service implementation. [Take a peek](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java), if you want to.
 We'll come back to it.
 
-The class of the response must also be returned by the `outgoingMessageTypes()`.
+The class of the response must also be listed in the `outgoingMessageTypes()`.
 
 ### POSTing a command to the aggregate
 To change *Hello* do a different greeting, you need to send a POST request to the same address. Its JSON body must contain a `@type` property with the simple class name of a command, e.g. `ChangeGreetingText`. All commands must be listed by the `incomingMessageTypes()` method of the service interface. 
