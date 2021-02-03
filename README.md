@@ -10,9 +10,9 @@ This is manifested in the following principles:
 * **Make immutability optional.** You can choose whether you create a new aggregate instance when processing an event, or mutate the existing one. Both options are equally simple to implement.
 * **Support fast and isolated behavior tests.** The aggregate behavior can be tested without the underlying framework, using synchronous calls. Of course, you can also test the service as a whole, by sending GET and POST requests to it.
 
-The easiest way to get started is by [cloning a sample project](https://github.com/bertilmuth/being-samples).
-
 Being is based on the [Lagom framework](https://www.lagomframework.com/).
+
+The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
 
 # Code examples
 You can find a runnable sample project containing the code [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
