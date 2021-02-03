@@ -172,7 +172,7 @@ The `responseMessage()`message creates a response to a GET request.
 The `incomingMessageHandlers()` handle incoming commands and publish service internal events.
 Being transparenly persists these events, by default to [Apache Cassandra](https://cassandra.apache.org/).
 
-The `internalEventHandlers()` handles each event, and produces a new version of the aggregate root.
+The `internalEventHandlers()` handle each event, and produce a new version of the aggregate root.
 Use `.system()` instead of `.systemPublish` for mutuable state. In that case, no new version of the aggregate root is published.
 
 ``` java
