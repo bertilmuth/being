@@ -170,13 +170,13 @@ The aggregate behavior defines how the service reacts to incoming messages.
 The `createAggregateRoot()` creates the initial instance of the aggregate root,
 before any messages have been processed.
 
-The `responseMessage()`message creates a response to a GET request.
+The `responseMessage()` method creates a response to a GET request.
 
 The `incomingMessageHandlers()` handle incoming commands and publish service internal events.
-Being transparenly persists these events, by default to [Apache Cassandra](https://cassandra.apache.org/).
+Being transparently persists these events, by default to [Apache Cassandra](https://cassandra.apache.org/).
 
-The `internalEventHandlers()` handle each event, and produce a new version of the aggregate root.
-Use `.system()` instead of `.systemPublish` for mutuable state. In that case, no new version of the aggregate root is published.
+The `internalEventHandlers()` handle each event, and publish an updated version of the aggregate root.
+Use `.system()` instead of `.systemPublish` for mutuable state (see the [counter sample](https://github.com/bertilmuth/being-samples/blob/main/counter/counter-impl/src/main/java/org/requirementsascode/being/counter/impl/CounterBehavior.java)'s behavior as example).
 
 ``` java
 class GreetUserBehavior extends AggregateBehavior<Greeting>{
