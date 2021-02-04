@@ -4,10 +4,9 @@
 
 The goal of Being is to maximize developer joy and productivity when building message-driven, event-sourced services.
 
-This is manifested in the following principles:
-* **Reduce cognitive load.** By using a convention-over-configuration approach, Being reduces the number of concepts to learn. There's a clear separation between infrastructure and domain logic, enabling you to be productive. And whenever possible, the Being API uses POJOs. 
-* **Make immutability optional.** You can choose whether you create a new aggregate instance when processing an event, or mutate the existing one. Both options are equally simple to implement.
-* **Support fast and isolated behavior tests.** The aggregate behavior can be tested without the underlying framework, using synchronous calls. Of course, you can also test the service as a whole, by sending GET and POST requests to it.
+By using a convention-over-configuration approach, Being reduces the number of concepts to learn. There's a clear separation between infrastructure and domain logic. And whenever possible, the Being API uses POJOs. 
+
+The aggregate behavior can be tested without the underlying framework, using synchronous calls. Of course, you can also test the service as a whole, by sending GET and POST requests to it.
 
 Being is based on the [Lagom framework](https://www.lagomframework.com/).
 Here's Lagom's statement on the [advantages of event sourcing](https://www.lagomframework.com/documentation/1.6.x/java/ESAdvantage.html).
