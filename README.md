@@ -6,8 +6,6 @@ The goal of Being is to maximize developer joy and productivity when building me
 
 By using a convention-over-configuration approach, Being reduces the number of concepts to learn. That enables you to focus on building domain logic. And whenever possible, the Being API uses POJOs. 
 
-The aggregate behavior can be tested without the underlying framework, using synchronous calls. Of course, you can also test the service as a whole, by sending GET and POST requests to it.
-
 Being is based on the [Lagom framework](https://www.lagomframework.com/).
 Here's Lagom's statement on the [advantages of event sourcing](https://www.lagomframework.com/documentation/1.6.x/java/ESAdvantage.html).
 
