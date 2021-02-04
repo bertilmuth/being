@@ -4,7 +4,7 @@
 
 The goal of Being is to maximize developer joy and productivity when building message-driven, event-sourced services.
 
-By using a convention-over-configuration approach, Being reduces the number of concepts to learn. There's a clear separation between infrastructure and domain logic. And whenever possible, the Being API uses POJOs. 
+By using a convention-over-configuration approach, Being reduces the number of concepts to learn. That enables you to focus on building domain logic. And whenever possible, the Being API uses POJOs. 
 
 The aggregate behavior can be tested without the underlying framework, using synchronous calls. Of course, you can also test the service as a whole, by sending GET and POST requests to it.
 
