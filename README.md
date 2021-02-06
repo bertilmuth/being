@@ -29,11 +29,7 @@ You can find a runnable sample project containing the code below [here](https://
 # The service API and implementation
 ## The service API
 Let's define the service interface for a simple service that responds 
-to a GET request with the greeting *Hello, Joe!*
-
-You can change the name with every GET request.
-You can also change *Hello* to a different greeting with a POST request,
-and the service will remember that greeting associated with the name.
+to a GET request with a greeting.
   
 ``` java
 public interface GreetUserService extends AggregateService {  
@@ -60,15 +56,14 @@ public interface GreetUserService extends AggregateService {
 ```
 
 ### GETting information about the aggregate
-To receive a greeting, you send a GET request to the address defined in the service interface, for example:
+To receive a greeting, you send a GET request to the address defined in the service interface, 
+replacing the `:id` part with the id of the aggregate that you want to contact. For example:
 
 Unix: `curl http://localhost:9000/api/greet/Joe`
 
 Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe`
 
-As you can see, the `address()` method defines the relative URL of the GET request.
-The `:id` part of the URL will be replaced by the string that you supplied in your GET request.
-That's how you can change the name. 
+In this example, the aggregate id is used for the name in the greeting, so the response will be *Hello, Joe!*.
 
 Where does the response *Hello, Joe!* come from? It's defined in the `responseToGet()` method
 of your aggregate's behavior in the service implementation. [Take a peek](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java), if you want to.
