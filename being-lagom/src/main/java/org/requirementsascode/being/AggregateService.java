@@ -23,7 +23,7 @@ import akka.NotUsed;
  * The service will react to GET and POST requests to the {@link #address()} URL.
  * </p>
  * <p>
- * Provide a default implementation for the following methods:  {@link #address()}, {@link #uniqueName()}, {@link #commandTypes()}, {@link #responseTypes()}.
+ * Provide a default implementation for the following methods:  {@link #address()}, {@link #id()}, {@link #commandTypes()}, {@link #responseTypes()}.
  * </p>
  * 
  * @author b_muth
@@ -49,7 +49,7 @@ public interface AggregateService extends Service {
    */
   @Override
   default Descriptor descriptor() {
-    String name = requireNonNull(uniqueName(), "name must be non-null");
+    String name = requireNonNull(id(), "name must be non-null");
     String address = requireNonNull(address(), "address must be non-null");
 
     JacksonMessageMappers messageMappers = new JacksonMessageMappers(commandTypes(), responseTypes());
@@ -61,12 +61,12 @@ public interface AggregateService extends Service {
   }
 
   /**
-   * Define the name of the service, uniquely identifying the service.
-   * IMPORTANT NOTE: Being requires that name to be immutable over time!
+   * Define the id of the service, uniquely identifying the service.
+   * IMPORTANT: Being requires that id to be immutable over time!
    * 
-   * @return the immutable service name
+   * @return the immutable service id
    */
-  String uniqueName();
+  String id();
 
   /**
    * <p>

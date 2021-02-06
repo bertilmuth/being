@@ -14,7 +14,7 @@ import org.requirementsascode.being.testservice.api.response.GreetingResponse;
 
 public interface GreetUserService extends AggregateService {
   @Override
-  default String uniqueName() {
+  default String id() {
     return "GreetUserService";
   }
 

@@ -38,7 +38,7 @@ and the service will remember that greeting associated with the name.
 ``` java
 public interface GreetUserService extends AggregateService {  
   @Override
-  default String uniqueName() {
+  default String id() {
     return "GreetUserService";
   }
   

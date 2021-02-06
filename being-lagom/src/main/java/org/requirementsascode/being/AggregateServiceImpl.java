@@ -107,7 +107,7 @@ public abstract class AggregateServiceImpl<T> implements AggregateService{
 
   private EntityTypeKey<JsonMessage> entityTypeKey() {
     if (entityTypeKey == null) {
-      entityTypeKey = EntityTypeKey.create(JsonMessage.class, uniqueName());
+      entityTypeKey = EntityTypeKey.create(JsonMessage.class, id());
     }
     return entityTypeKey;
   }
