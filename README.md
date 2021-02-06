@@ -56,7 +56,7 @@ public interface GreetUserService extends AggregateService {
 ```
 
 ### GETting information about the aggregate
-To receive a greeting, you send a GET request to the address defined in the service interface, 
+You send a GET request to the address defined in the service interface, 
 replacing the `:id` part with the id of the aggregate that you want to contact. For example:
 
 Unix: `curl http://localhost:9000/api/greet/Joe`
@@ -71,8 +71,8 @@ We'll come back to it.
 
 The class of the response must also be listed in the `responseTypes()`.
 
-### POSTing a command to the aggregate
-To change *Hello* do a different greeting, you need to send a POST request to the same address. Its JSON body must contain a `@type` property with the simple class name of a command, e.g. `ChangeGreetingText`. All commands must be listed by the `commandTypes()` method of the service interface. 
+### POSTing a command to the aggregate to change aggregate state
+To change the aggregate's state, send a POST request to the same address. Its JSON body must contain a `@type` property with the simple class name of a command, e.g. `ChangeGreetingText`. All commands must be listed by the `commandTypes()` method of the service interface. 
 
 Example: To change the greeting text from *Hello, Joe!* to *Hi, Joe!*, send the following POST request:
 
@@ -81,7 +81,10 @@ Unix: `curl -H "Content-Type: application/json" -X POST -d '{"@type": "ChangeGre
 Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe -Method 'POST' -Headers @{'Content-Type' = 'application/json'} -Body '{"@type": "ChangeGreetingText", "newText":"Hi"}'`
 
 Each POST request is processed by the `commandHandlers()` of the [aggregate behavior](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java).
-The persisted events cause the aggregate state to change. Further GET requests return the new greeting.
+
+This triggery the creation of internal events, that then trigger the state change.
+
+After the state has changed, further GET requests return the new state, for example the new greeting.
 
 ### Commands & responses
 Commands and responses are simple POJOs. They need to be serializable to JSON with the [Jackson](https://github.com/FasterXML/jackson) library.
