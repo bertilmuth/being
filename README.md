@@ -20,6 +20,10 @@ You need to define:
 
 Then you can run your service.
 
+If you don't know what an aggregate is, please read the [following description](https://www.martinfowler.com/bliki/DDD_Aggregate.html).
+
+An aggregate root entity and its contained elements constitute the state of the service.
+
 You can find a runnable sample project containing the code below [here](https://github.com/bertilmuth/being-samples/tree/main/greetuser).
 
 # The service API and implementation
