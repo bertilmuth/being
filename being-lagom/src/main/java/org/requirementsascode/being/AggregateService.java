@@ -23,7 +23,7 @@ import akka.NotUsed;
  * The service will react to GET and POST requests to the {@link #address()} URL.
  * </p>
  * <p>
- * Provide a default implementation for the following methods:  {@link #address()}, {@link #uniqueName()}, {@link #commandTypes()}, {@link #outgoingMessageTypes()}.
+ * Provide a default implementation for the following methods:  {@link #address()}, {@link #uniqueName()}, {@link #commandTypes()}, {@link #responseTypes()}.
  * </p>
  * 
  * @author b_muth
@@ -52,7 +52,7 @@ public interface AggregateService extends Service {
     String name = requireNonNull(uniqueName(), "name must be non-null");
     String address = requireNonNull(address(), "address must be non-null");
 
-    JacksonMessageMappers messageMappers = new JacksonMessageMappers(commandTypes(), outgoingMessageTypes());
+    JacksonMessageMappers messageMappers = new JacksonMessageMappers(commandTypes(), responseTypes());
     ObjectSerialization objectSerialization = new ObjectSerialization(messageMappers);
     JsonMessageSerialization jsonMessageSerialization = new JsonMessageSerialization(messageMappers);
 
@@ -86,7 +86,7 @@ public interface AggregateService extends Service {
    * will be directed to the aggregate with the id <code>Joe</code>.
    * <p>
    * The content of a response to a GET request is defined by {@link AggregateBehavior#responseToGet()}.
-   * The response class must be part of the {@link #outgoingMessageTypes()}.
+   * The response class must be part of the {@link #responseTypes()}.
    * </p>
    * <p>
    * Which POST requests you can send to the address is defined by the {@link #commandTypes()}.
@@ -114,12 +114,12 @@ public interface AggregateService extends Service {
 
 
   /**
-   * Provide the classes of messages that go out of the service.
-   * Typical examples are responses to GET requests, or event messages sent to other services.
-   * The message classes need to be serializable to JSON by the Jackson library
+   * Provide the classes of responses (to GET requests).
+   * In a future version of being, you will be able to post queries.
+   * The response classes need to be serializable to JSON by the Jackson library
    * (<a>https://github.com/FasterXML/jackson</a>).
    * 
    * @return the classes of outgoing messages
    */
-  List<Class<?>> outgoingMessageTypes();
+  List<Class<?>> responseTypes();
 }

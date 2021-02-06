@@ -31,7 +31,7 @@ public interface GreetUserService extends AggregateService {
   }
 
   @Override
-  default List<Class<?>> outgoingMessageTypes() {
+  default List<Class<?>> responseTypes() {
     return asList(GreetingResponse.class,
         // Duplicate class ChangeGreetingText, only for testing purposes,+
         // DON'T DO THAT IN YOUR PROJECTS
