@@ -17,7 +17,7 @@ import akka.persistence.typed.javadsl.ReplyEffect;
 class EventSourcedAggregateBehavior<T> extends EventSourcedBehaviorWithEnforcedReplies<JsonMessage, EventContainer, AggregateState> {
   private final EntityContext<JsonMessage> entityContext;
   private final AggregateBehavior<T> aggregateBehavior;
-  private final IncomingMessageHandlers<T> incomingMessageHandlers;
+  private final CommandHandlers<T> commandHandlers;
   private final InternalEventHandlers<T> internalEventHandlers;
 
   EventSourcedAggregateBehavior(EntityContext<JsonMessage> entityContext, AggregateBehavior<T> aggregateBehavior) {
@@ -25,7 +25,7 @@ class EventSourcedAggregateBehavior<T> extends EventSourcedBehaviorWithEnforcedR
     this.entityContext = requireNonNull(entityContext, "entityContext must be non-null");
     this.aggregateBehavior = requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");
 
-    this.incomingMessageHandlers = IncomingMessageHandlers.fromBehavior(aggregateBehavior);
+    this.commandHandlers = CommandHandlers.fromBehavior(aggregateBehavior);
     this.internalEventHandlers = InternalEventHandlers.fromBehavior(aggregateBehavior);
   }
 
@@ -68,7 +68,7 @@ class EventSourcedAggregateBehavior<T> extends EventSourcedBehaviorWithEnforcedR
   @SuppressWarnings("unchecked")
   private ReplyEffect<EventContainer, AggregateState> handleGetRequest(IncomingMessage incomingMessage) {
     ActorRef<JsonMessage> replyTo = (ActorRef<JsonMessage>) incomingMessage.replyTo;
-    return Effect().none().thenReply(replyTo, aggregateRoot -> new JsonMessage(aggregateBehavior.responseMessage()));
+    return Effect().none().thenReply(replyTo, aggregateRoot -> new JsonMessage(aggregateBehavior.responseToGet()));
   }
 
   @SuppressWarnings("unchecked")
@@ -78,7 +78,7 @@ class EventSourcedAggregateBehavior<T> extends EventSourcedBehaviorWithEnforcedR
 
     Optional<Object> optionalInternalEvent = null;
     try {
-      optionalInternalEvent = incomingMessageHandlers.reactTo(message);
+      optionalInternalEvent = commandHandlers.reactTo(message);
     } catch (Exception e) {
       return rejectMessage(replyTo, e);
     }

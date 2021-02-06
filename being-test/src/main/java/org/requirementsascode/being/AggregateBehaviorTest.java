@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class AggregateBehaviorTest<T> {
-  private final IncomingMessageHandlers<T> incomingMessageHandlers;
+  private final CommandHandlers<T> incomingMessageHandlers;
   private final InternalEventHandlers<T> internalEventHandlers;
   private List<Object> internalEvents;
 
   private AggregateBehaviorTest(AggregateBehavior<T> aggregateBehavior) {
     clearInternalEvents();   
-    this.incomingMessageHandlers = IncomingMessageHandlers.fromBehavior(aggregateBehavior);
+    this.incomingMessageHandlers = CommandHandlers.fromBehavior(aggregateBehavior);
     this.internalEventHandlers = InternalEventHandlers.fromBehavior(aggregateBehavior);
     
     createInitialAggregateRootFrom(aggregateBehavior);
@@ -62,7 +62,7 @@ public class AggregateBehaviorTest<T> {
     return UUID.randomUUID().toString();
   }
   
-  private IncomingMessageHandlers<T> incomingMessageHandlers() {
+  private CommandHandlers<T> incomingMessageHandlers() {
     return incomingMessageHandlers;
   }
 

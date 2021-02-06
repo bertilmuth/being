@@ -23,7 +23,7 @@ import akka.NotUsed;
  * The service will react to GET and POST requests to the {@link #address()} URL.
  * </p>
  * <p>
- * Provide a default implementation for the following methods:  {@link #address()}, {@link #uniqueName()}, {@link #incomingMessageTypes()}, {@link #outgoingMessageTypes()}.
+ * Provide a default implementation for the following methods:  {@link #address()}, {@link #uniqueName()}, {@link #commandTypes()}, {@link #outgoingMessageTypes()}.
  * </p>
  * 
  * @author b_muth
@@ -52,7 +52,7 @@ public interface AggregateService extends Service {
     String name = requireNonNull(uniqueName(), "name must be non-null");
     String address = requireNonNull(address(), "address must be non-null");
 
-    JacksonMessageMappers messageMappers = new JacksonMessageMappers(incomingMessageTypes(), outgoingMessageTypes());
+    JacksonMessageMappers messageMappers = new JacksonMessageMappers(commandTypes(), outgoingMessageTypes());
     ObjectSerialization objectSerialization = new ObjectSerialization(messageMappers);
     JsonMessageSerialization jsonMessageSerialization = new JsonMessageSerialization(messageMappers);
 
@@ -85,11 +85,11 @@ public interface AggregateService extends Service {
    * to <code>http://localhost:9000/api/greet/Joe</code> in the dev environment
    * will be directed to the aggregate with the id <code>Joe</code>.
    * <p>
-   * The content of a response to a GET request is defined by {@link AggregateBehavior#responseMessage()}.
+   * The content of a response to a GET request is defined by {@link AggregateBehavior#responseToGet()}.
    * The response class must be part of the {@link #outgoingMessageTypes()}.
    * </p>
    * <p>
-   * Which POST requests you can send to the address is defined by the {@link #incomingMessageTypes()}.
+   * Which POST requests you can send to the address is defined by the {@link #commandTypes()}.
    * </p>
    * 
    * @return the web service endpoint that accepts requests.
@@ -98,20 +98,19 @@ public interface AggregateService extends Service {
   String address();
 
   /**
-   * Provide the classes of messages that go into the service.
-   * Typical examples are command messages, or event messages sent by other services.
+   * Provide the classes of commands that go into the service.
    * <p>
-   * The message classes need to be serializable to JSON by the Jackson library
+   * The command classes need to be serializable to JSON by the Jackson library
    * (<a>https://github.com/FasterXML/jackson</a>).
    * </p>
    * <p>
-   * These messages can be sent to the service via POST requests to the {@link #address()} URL.
+   * Commands can be sent to the service via POST requests to the {@link #address()} URL.
    * The JSON body of each POST request needs to contain an additional <code>@type</code> property
-   * that contains the simple name of the incoming message's class.
+   * that contains the simple name of the command's class.
    * </p>
-   * @return the classes of incoming messages
+   * @return the command classes
    */
-  List<Class<?>> incomingMessageTypes();
+  List<Class<?>> commandTypes();
 
 
   /**

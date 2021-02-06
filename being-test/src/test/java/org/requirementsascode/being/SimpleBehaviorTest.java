@@ -175,7 +175,7 @@ public class SimpleBehaviorTest {
 
   private static class TestAggregateBehavior extends AggregateBehavior<TestAggregateRoot> {
     @Override
-    public Model incomingMessageHandlers() {
+    public Model commandHandlers() {
       return Model.builder()
           .user(TestCommand.class).systemPublish(cmd -> new TestEvent(cmd.name))
           .user(TestCommandForEventList.class).systemPublish(cmd -> {return asList(new TestEvent(cmd.name), new TestEvent(cmd.name));})
@@ -205,7 +205,7 @@ public class SimpleBehaviorTest {
     }
 
     @Override
-    public Object responseMessage() {
+    public Object responseToGet() {
       return aggregateRoot();
     }
   }

@@ -4,7 +4,7 @@ import org.requirementsascode.Model;
 
 /**
  * <p>
- * Core class for defining how an aggregate reacts to incoming messages,
+ * Core class for defining how an aggregate reacts to commands,
  * and how events are persisted via event sourcing.
  * </p>
  * @author b_muth
@@ -48,16 +48,16 @@ public abstract class AggregateBehavior<T>{
    * 
    * @return information about the aggregate.
    */
-  public abstract Object responseMessage();
+  public abstract Object responseToGet();
  
   /**
-   * Provide a model with incoming message handlers. A handler consumes an incoming message and publishes the internal event(s) to be persisted.
-   * In the model or one of its referenced methods, you can call {@link #aggregateRoot}<code>()</code> to get access to the current aggregate root instance.
+   * Provide a model defining command handlers. A handler consumes an incoming command and publishes the internal event(s) to be persisted.
+   * In the handler methods you can call {@link #aggregateRoot}<code>()</code> to get access to the current aggregate root instance.
    * 
    * Here's an example implementation:
    * <pre>
    * &#64;Override
-   * public Model incomingMessageHandlers() {
+   * public Model commandHandlers() {
    *   Model model = Model.builder()
    *    .user(ChangeGreetingText.class).systemPublish(this::greetingTextChanged)
    *    .user(PublishChangeGreetingTextList.class).systemPublish(this::publishChangeGreetingTextList)
@@ -71,7 +71,6 @@ public abstract class AggregateBehavior<T>{
    * }
    * </pre>
    * <code>user(..)</code> defines the class of an incoming command message to be handled.
-   * Use <code>on(..)</code> instead of <code>user(..)</code> for incoming event messages.
    * <p>
    * <code>systemPublish(..)</code> defines the handler function that takes a message instance,
    * and returns a single internal event or a list of internal events to be persisted.
@@ -79,11 +78,11 @@ public abstract class AggregateBehavior<T>{
    * 
    * @return the model
    */
-  public abstract Model incomingMessageHandlers();
+  public abstract Model commandHandlers();
   
   /**
-   * Provide a model with internal event handlers. A handler consumes a persisted internal event and (optionally) publishes a new aggregate
-   * root instance. In the model or one of its referenced methods, you can call
+   * Provide a model defining internal event handlers. A handler consumes a persisted internal event and (optionally) publishes a new aggregate
+   * root instance. In handler methods, you can call
    * {@link #aggregateRoot}<code>()</code> to get access to the current aggregate root instance.
    * 
    * Here's an example implementation: <pre>
@@ -97,7 +96,7 @@ public abstract class AggregateBehavior<T>{
    * </pre>
    * 
    * <code>on(..)</code> defines the class of an internal event to be handled.
-   * The internal events are replayed from the persisted events, produced by {@link #incomingMessageHandlers()}.
+   * The internal events are replayed from the persisted events, produced by {@link #commandHandlers()}.
    * <p>
    * <code>systemPublish(..)</code> defines the handler function the takes an event
    * instance, and returns a new aggregate root instance. Use this syntax if

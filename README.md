@@ -70,14 +70,14 @@ As you can see, the `address()` method defines the relative URL of the GET reque
 The `:id` part of the URL will be replaced by the string that you supplied in your GET request.
 That's how you can change the name. 
 
-Where does the response *Hello, Joe!* come from? It's defined in the `responseMessage()` method
+Where does the response *Hello, Joe!* come from? It's defined in the `responseToGet()` method
 of your aggregate's behavior in the service implementation. [Take a peek](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java), if you want to.
 We'll come back to it.
 
 The class of the response must also be listed in the `outgoingMessageTypes()`.
 
 ### POSTing a command to the aggregate
-To change *Hello* do a different greeting, you need to send a POST request to the same address. Its JSON body must contain a `@type` property with the simple class name of a command, e.g. `ChangeGreetingText`. All commands must be listed by the `incomingMessageTypes()` method of the service interface. 
+To change *Hello* do a different greeting, you need to send a POST request to the same address. Its JSON body must contain a `@type` property with the simple class name of a command, e.g. `ChangeGreetingText`. All commands must be listed by the `commandTypes()` method of the service interface. 
 
 Example: To change the greeting text from *Hello, Joe!* to *Hi, Joe!*, send the following POST request:
 
@@ -85,7 +85,7 @@ Unix: `curl -H "Content-Type: application/json" -X POST -d '{"@type": "ChangeGre
 
 Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe -Method 'POST' -Headers @{'Content-Type' = 'application/json'} -Body '{"@type": "ChangeGreetingText", "newText":"Hi"}'`
 
-Each POST request is processed by the `incomingMessageHandlers()` of the [aggregate behavior](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java).
+Each POST request is processed by the `commandHandlers()` of the [aggregate behavior](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java).
 The persisted events cause the aggregate state to change. Further GET requests return the new greeting.
 
 ### Commands & responses
@@ -177,9 +177,9 @@ The aggregate behavior defines how the service reacts to incoming messages.
 The `createAggregateRoot()` creates the initial instance of the aggregate root,
 before any messages have been processed.
 
-The `responseMessage()` method creates a response to a GET request.
+The `responseToGet()` method creates a response to a GET request.
 
-The `incomingMessageHandlers()` handle incoming commands and publish service internal events.
+The `commandHandlers()` handle incoming commands and publish service internal events.
 Being transparently persists these events, by default to [Apache Cassandra](https://cassandra.apache.org/).
 
 The `internalEventHandlers()` handle each event, and publish an updated version of the aggregate root.
@@ -194,12 +194,12 @@ class GreetUserBehavior extends AggregateBehavior<Greeting>{
   }
   
   @Override
-  public Object responseMessage() {
+  public Object responseToGet() {
     return new GreetingResponse(aggregateRoot().getText() + ", " + aggregateRoot().getId() + "!");
   }
   
   @Override
-  public Model incomingMessageHandlers() {
+  public Model commandHandlers() {
     Model model = Model.builder()
       .user(ChangeGreetingText.class).systemPublish(this::greetingTextChanged)
       .build();
