@@ -63,7 +63,7 @@ Unix: `curl http://localhost:9000/api/greet/Joe`
 
 Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe`
 
-In this example, the aggregate id is used for the name in the greeting, so the response will be *Hello, Joe!*.
+In this example, the aggregate id is used for the name in the greeting, so the response will be *Hello, Joe!*
 
 Where does the response *Hello, Joe!* come from? It's defined in the `responseToGet()` method
 of your aggregate's behavior in the service implementation. [Take a peek](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java), if you want to.
