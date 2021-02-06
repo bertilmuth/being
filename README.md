@@ -9,6 +9,8 @@ By using a convention-over-configuration approach, Being reduces the number of c
 Being is based on the [Lagom framework](https://www.lagomframework.com/).
 Here's Lagom's statement on the [advantages of event sourcing](https://www.lagomframework.com/documentation/1.6.x/java/ESAdvantage.html).
 
+*This project has just recently been made public. The API is likely to change.*
+
 # Getting started
 The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
 You need to define:
