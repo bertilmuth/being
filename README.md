@@ -81,9 +81,7 @@ Unix: `curl -H "Content-Type: application/json" -X POST -d '{"@type": "ChangeGre
 Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe -Method 'POST' -Headers @{'Content-Type' = 'application/json'} -Body '{"@type": "ChangeGreetingText", "newText":"Hi"}'`
 
 Each POST request is processed by the `commandHandlers()` of the [aggregate behavior](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java).
-
-This triggery the creation of internal events, that then trigger the state change.
-
+A command handler transforms the command into an internal event. The event causes the state change.
 After the state has changed, further GET requests return the new state, for example the new greeting.
 
 ### Commands & responses
