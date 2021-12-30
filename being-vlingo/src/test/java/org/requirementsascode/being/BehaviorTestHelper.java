@@ -8,30 +8,30 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-class AggregateBehaviorTest<T> {
-  private final CommandHandlers<T> incomingMessageHandlers;
+class BehaviorTestHelper<T> {
+  private final CommandHandlers<T> commandHandlers;
   private final InternalEventHandlers<T> internalEventHandlers;
   private List<Object> internalEvents;
 
-  private AggregateBehaviorTest(AggregateBehavior<T> aggregateBehavior) {
+  private BehaviorTestHelper(AggregateBehavior<T> aggregateBehavior) {
     clearInternalEvents();   
-    this.incomingMessageHandlers = CommandHandlers.fromBehavior(aggregateBehavior);
+    this.commandHandlers = CommandHandlers.fromBehavior(aggregateBehavior);
     this.internalEventHandlers = InternalEventHandlers.fromBehavior(aggregateBehavior);
     
     createInitialAggregateRootFrom(aggregateBehavior);
   }
 
-  public static <T> AggregateBehaviorTest<T> of(AggregateBehavior<T> aggregateBehavior) {
-    return new AggregateBehaviorTest<>(aggregateBehavior);
+  public static <T> BehaviorTestHelper<T> of(AggregateBehavior<T> aggregateBehavior) {
+    return new BehaviorTestHelper<>(aggregateBehavior);
   }
   
-  public AggregateBehaviorTest<T> givenEvents(Object... internalEvents) {
+  public BehaviorTestHelper<T> givenEvents(Object... internalEvents) {
     Arrays.stream(internalEvents).forEach(internalEventHandlers()::reactTo);
     clearInternalEvents();
     return this;
   }
   
-  public AggregateBehaviorTest<T> when(Object message){
+  public BehaviorTestHelper<T> when(Object message){
     incomingMessageHandlers()
       .reactTo(message)
       .ifPresent(publishedEvent -> {
@@ -63,7 +63,7 @@ class AggregateBehaviorTest<T> {
   }
   
   private CommandHandlers<T> incomingMessageHandlers() {
-    return incomingMessageHandlers;
+    return commandHandlers;
   }
 
   private InternalEventHandlers<T> internalEventHandlers() {
