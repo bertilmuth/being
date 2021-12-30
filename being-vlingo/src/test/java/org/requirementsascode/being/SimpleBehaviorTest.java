@@ -26,28 +26,28 @@ class SimpleBehaviorTest {
   @Test
   public void noGivenEvents() {
     assertEquals(new ArrayList<>(), behaviorTest.internalEvents());
-    assertEquals(new ArrayList<>(), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(new ArrayList<>(), testAggregateBehavior.state().appliedEvents());
   }
 
   @Test
   public void emptyGivenEvents() {
     behaviorTest.givenEvents();
     assertEquals(new ArrayList<>(), behaviorTest.internalEvents());
-    assertEquals(new ArrayList<>(), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(new ArrayList<>(), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
   public void unknownGivenEventsIsIgnored() {
     behaviorTest.givenEvents("I should be ignored");
     assertEquals(new ArrayList<>(), behaviorTest.internalEvents());
-    assertEquals(new ArrayList<>(), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(new ArrayList<>(), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
   public void commandHandlerThatDoesntPublishEventsIsIgnored() {
     behaviorTest.givenEvents(new NoOpTestCommand());
     assertEquals(new ArrayList<>(), behaviorTest.internalEvents());
-    assertEquals(new ArrayList<>(), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(new ArrayList<>(), testAggregateBehavior.state().appliedEvents());
   }
 
   @Test
@@ -57,7 +57,7 @@ class SimpleBehaviorTest {
       .givenEvents(givenEvent);
     
     assertEquals(asList(), behaviorTest.internalEvents());
-    assertEquals(asList(givenEvent), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(givenEvent), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -69,7 +69,7 @@ class SimpleBehaviorTest {
       .givenEvents(givenEvent1, givenEvent2);
     
     assertEquals(asList(), behaviorTest.internalEvents());
-    assertEquals(asList(givenEvent1, givenEvent2), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(givenEvent1, givenEvent2), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -80,7 +80,7 @@ class SimpleBehaviorTest {
     behaviorTest.when(command);
     
     assertEquals(asList(resultingEvent), behaviorTest.internalEvents());
-    assertEquals(asList(resultingEvent), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(resultingEvent), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -94,7 +94,7 @@ class SimpleBehaviorTest {
       .when(command);
     
     assertEquals(asList(resultingEvent), behaviorTest.internalEvents());
-    assertEquals(asList(givenEvent, resultingEvent), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(givenEvent, resultingEvent), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -108,7 +108,7 @@ class SimpleBehaviorTest {
       .when(command);
     
     assertEquals(asList(resultingEvent, resultingEvent), behaviorTest.internalEvents());
-    assertEquals(asList(givenEvent, resultingEvent, resultingEvent), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(givenEvent, resultingEvent, resultingEvent), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -123,7 +123,7 @@ class SimpleBehaviorTest {
       .when(command);
     
     assertEquals(asList(resultingEvent, resultingEvent, resultingEvent, resultingEvent), behaviorTest.internalEvents());
-    assertEquals(asList(givenEvent, resultingEvent, resultingEvent, resultingEvent, resultingEvent), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(givenEvent, resultingEvent, resultingEvent, resultingEvent, resultingEvent), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -141,7 +141,7 @@ class SimpleBehaviorTest {
       .when(command);
     
     assertEquals(asList(event1, event2), behaviorTest.internalEvents());
-    assertEquals(asList(givenEvent, event1, event2), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(givenEvent, event1, event2), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -149,7 +149,7 @@ class SimpleBehaviorTest {
     behaviorTest.when(new TestUpdateAggregateRootCommand());
 
     assertEquals(asList(new TestUpdateAggregateRootEvent()), behaviorTest.internalEvents());
-    assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -165,7 +165,7 @@ class SimpleBehaviorTest {
       .when(command2);
 
     assertEquals(asList(expectedEvent1, expectedEvent2), behaviorTest.internalEvents());
-    assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT, expectedEvent2), testAggregateBehavior.aggregateRoot().appliedEvents());
+    assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT, expectedEvent2), testAggregateBehavior.state().appliedEvents());
   }
   
   /*@Test(expected = AggregateBehavior.IllegalSystemPublish.class)
@@ -189,9 +189,9 @@ class SimpleBehaviorTest {
     }
 
     @Override
-    public Model internalEventHandlers() {
+    public Model eventHandlers() {
       return Model.builder()
-          .on(TestEvent.class).system(ev -> aggregateRoot().addEvent(ev))
+          .on(TestEvent.class).system(ev -> state().addEvent(ev))
           .on(TestUpdateAggregateRootEvent.class).systemPublish(ev -> new TestAggregateRoot().addEvent(NEW_AGGREGATE_ROOT_EVENT))
           .on(TestFailingUpdateAggregateRootEvent.class).systemPublish(ev -> "This should be an aggregate root, so it will fail!")
           // The following line should not be handled, because it should not be published to this model in the first place
@@ -200,13 +200,8 @@ class SimpleBehaviorTest {
     }
 
     @Override
-    public TestAggregateRoot createAggregateRoot(String aggregateId) {
+    public TestAggregateRoot initialState(String aggregateId) {
       return new TestAggregateRoot();
-    }
-
-    @Override
-    public Object responseToGet() {
-      return aggregateRoot();
     }
   }
 

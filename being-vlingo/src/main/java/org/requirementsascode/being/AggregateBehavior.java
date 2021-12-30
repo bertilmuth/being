@@ -9,50 +9,42 @@ import org.requirementsascode.Model;
  * </p>
  * @author b_muth
  *
- * @param <STATE> the aggregate root class
+ * @param <STATE> the state of the aggregate
  */
 public abstract class AggregateBehavior<STATE>{
-  private STATE aggregateRoot;
+  private STATE state;
   
   /**
-   * Create a new instance of the aggregate root in an "empty" state.
-   * Don't share that instance.
+   * Creates the very first state of the aggregate.
    * 
    * @param aggregateId the id of the aggregate to be created
-   * @return the initial instance of the aggregate root class
+   * @return the initial state of the aggregate
    */
-  public abstract STATE createAggregateRoot(String aggregateId);
+  public abstract STATE initialState(String aggregateId);
 
   /**
    * Don't call this method yourself.
-   * Called by the library to inform about updated aggregate root.
+   * Called by the library to inform about updated state of the aggregate.
    * 
-   * @param aggregateRoot the root object of the aggregate
+   * @param state the root object of the aggregate
    */
-  void setAggregateRoot(STATE aggregateRoot) {
-    this.aggregateRoot = aggregateRoot;
+  void setState(STATE state) {
+    this.state = state;
   }
   
   /**
-   * Call this method to access the current state of the aggregate root,
+   * Call this method to access the current state of the aggregate,
    * typically within a model or its referenced methods.
    * 
-   * @return the root object of the aggregate
+   * @return the state of the aggregate
    */
-  public STATE aggregateRoot() {
-    return aggregateRoot;
+  public STATE state() {
+    return state;
   }
-  
-  /**
-   * Provide a response to a GET request to the address defined in the service interface.
-   * 
-   * @return information about the aggregate.
-   */
-  public abstract Object responseToGet();
  
   /**
    * Provide a model defining command handlers. A handler consumes an incoming command and publishes the internal event(s) to be persisted.
-   * In the handler methods you can call {@link #aggregateRoot}<code>()</code> to get access to the current aggregate root instance.
+   * In the handler methods you can call {@link #state}<code>()</code> to get access to the current aggregate root instance.
    * 
    * Here's an example implementation:
    * <pre>
@@ -83,7 +75,7 @@ public abstract class AggregateBehavior<STATE>{
   /**
    * Provide a model defining internal event handlers. A handler consumes a persisted internal event and (optionally) publishes a new aggregate
    * root instance. In handler methods, you can call
-   * {@link #aggregateRoot}<code>()</code> to get access to the current aggregate root instance.
+   * {@link #state}<code>()</code> to get access to the current aggregate root instance.
    * 
    * Here's an example implementation: <pre>
    * &#64;Override
@@ -109,7 +101,7 @@ public abstract class AggregateBehavior<STATE>{
    * 
    * @return the model
    */
-  public abstract Model internalEventHandlers();
+  public abstract Model eventHandlers();
   
   /** 
    * Exception thrown by the library when a systemPublish() statement inside a AggregateBehavior's model

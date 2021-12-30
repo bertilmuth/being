@@ -21,14 +21,14 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 		this.commandHandlers = CommandHandlers.fromBehavior(aggregateBehavior);
 		this.internalEventHandlers = InternalEventHandlers.fromBehavior(aggregateBehavior);
 
-	    initializeEmptyState(entityId, aggregateBehavior);
+	    createAggregate(entityId, aggregateBehavior);
 		
 		registerEvents();
 	}
 
 	@SuppressWarnings("unchecked")
 	private void registerEvents() {
-		aggregateBehavior.internalEventHandlers().getSteps().stream()
+		aggregateBehavior.eventHandlers().getSteps().stream()
 			.map(Step::getMessageClass)
 			.map(clazz -> (Class<? extends IdentifiedDomainEvent>)clazz)
 			.forEach(clazz -> registerEventHandlerFor(clazz));		
@@ -40,9 +40,9 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 		});
 	}
 
-	private void initializeEmptyState(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
-		STATE aggregateRoot = aggregateBehavior.createAggregateRoot(entityId);
-	    aggregateBehavior.setAggregateRoot(aggregateRoot);
+	private void createAggregate(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
+		STATE state = aggregateBehavior.initialState(entityId);
+	    aggregateBehavior.setState(state);
 	}
 
 	public Completes<STATE> reactTo(Object message) {
@@ -51,6 +51,6 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 		IdentifiedDomainEvent event = optionalEvent.map(ev -> (IdentifiedDomainEvent) ev)
 				.orElseThrow(() -> new RuntimeException("Command handler didn't create event!"));
 
-		return apply(event, () -> aggregateBehavior.aggregateRoot());
+		return apply(event, () -> aggregateBehavior.state());
 	}
 }

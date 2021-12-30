@@ -54,8 +54,8 @@ class AggregateBehaviorTest<T> {
   
   private void createInitialAggregateRootFrom(AggregateBehavior<T> aggregateBehavior){
     requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");
-    T aggregateRoot = aggregateBehavior.createAggregateRoot(randomId());
-    aggregateBehavior.setAggregateRoot(aggregateRoot);
+    T aggregateRoot = aggregateBehavior.initialState(randomId());
+    aggregateBehavior.setState(aggregateRoot);
   }
 
   private String randomId() {
