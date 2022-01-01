@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 
 import io.vlingo.xoom.symbio.Source;
 
-public class EventHandlers {
-	private final List<EventHandler<?>> eventHandlers;
+public class EventHandlers<STATE> {
+	private final List<EventHandler<?, STATE>> eventHandlers;
 
-	public static EventHandlers are(EventHandler<?>... eventHandlers) {
-		return new EventHandlers(eventHandlers);
+	public static <STATE> EventHandlers<STATE> are(EventHandler<?, STATE>... eventHandlers) {
+		return new EventHandlers<>(eventHandlers);
 	}
 	
-	private EventHandlers(EventHandler<?>... eventHandlers) {
+	private EventHandlers(EventHandler<?, STATE>... eventHandlers) {
 		Objects.requireNonNull(eventHandlers, "eventHandlers must be non-null!");
 		this.eventHandlers = Arrays.asList(eventHandlers);
 	}

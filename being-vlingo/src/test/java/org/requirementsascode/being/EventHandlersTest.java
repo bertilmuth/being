@@ -15,7 +15,7 @@ import io.vlingo.xoom.symbio.Source;
 class EventHandlersTest {
 	@Test
 	void createsEmptyEventHandlers() {
-		EventHandlers eventHandlers = EventHandlers.are();
+		EventHandlers<State> eventHandlers = EventHandlers.are();
 		
 		List<Class<? extends Source<?>>> events = eventHandlers.getEventClasses();
 		assertTrue(events.isEmpty());
@@ -26,8 +26,8 @@ class EventHandlersTest {
 
 	@Test
 	void createsOneEventHandler() {
-		final Function<SampleEvent1, ?> handler = event -> new State(event.id);
-		EventHandlers eventHandlers = EventHandlers.are(
+		final Function<SampleEvent1, State> handler = event -> new State(event.id);
+		EventHandlers<State> eventHandlers = EventHandlers.are(
 			on(SampleEvent1.class, handler)
 		);
 		
@@ -42,12 +42,12 @@ class EventHandlersTest {
 	
 	@Test
 	void createsTwoEventHandlers() {
-		final Function<SampleEvent1, ?> handler1 = event -> new State(event.id);
-		EventHandler<SampleEvent1> eventHandler = on(SampleEvent1.class, handler1);
-		final Function<SampleEvent2, ?> handler2 = event -> new State(event.id + "0");
-		EventHandler<SampleEvent2> eventHandler2 = on(SampleEvent2.class, handler2);
+		final Function<SampleEvent1, State> handler1 = event -> new State(event.id);
+		EventHandler<SampleEvent1, State> eventHandler = on(SampleEvent1.class, handler1);
+		final Function<SampleEvent2, State> handler2 = event -> new State(event.id + "0");
+		EventHandler<SampleEvent2, State> eventHandler2 = on(SampleEvent2.class, handler2);
 
-		EventHandlers eventHandlers = EventHandlers.are(eventHandler, eventHandler2);
+		EventHandlers<State> eventHandlers = EventHandlers.are(eventHandler, eventHandler2);
 		List<Class<? extends Source<?>>> events = eventHandlers.getEventClasses();
 		assertEquals(2, events.size());
 		assertEquals(SampleEvent1.class, events.get(0));

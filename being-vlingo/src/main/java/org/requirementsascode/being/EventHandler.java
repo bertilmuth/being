@@ -5,24 +5,24 @@ import java.util.function.Function;
 
 import io.vlingo.xoom.symbio.Source;
 
-public class EventHandler<T extends Source<?>> {
-	private final Class<T> eventClass;
-	private final Function<T, ?> handler;
+public class EventHandler<EVENT extends Source<?>, STATE> {
+	private final Class<EVENT> eventClass;
+	private final Function<EVENT, ?> handler;
 
-	public static <T extends Source<?>> EventHandler<T> on(Class<T> eventClass, Function<T, ?> handler) {
+	public static <EVENT extends Source<?>, STATE> EventHandler<EVENT, STATE> on(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
 		return new EventHandler<>(eventClass, handler);
 	}
 	
-	private EventHandler(Class<T> eventClass, Function<T, ?> handler) {
+	private EventHandler(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
 		this.eventClass = Objects.requireNonNull(eventClass, "eventClass must be non-null!");
 		this.handler = Objects.requireNonNull(handler, "handler must be non-null!");
 	}
 
-	public Class<T> getEventClass() {
+	public Class<EVENT> getEventClass() {
 		return eventClass;
 	}
 
-	public Function<T, ?> getHandler() {
+	public Function<EVENT, ?> getHandler() {
 		return handler;
 	}
 }
