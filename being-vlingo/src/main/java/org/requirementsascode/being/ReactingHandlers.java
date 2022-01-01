@@ -8,10 +8,10 @@ import org.requirementsascode.Model;
 
 import static java.util.Objects.requireNonNull;
 
-abstract class Handlers<T> {
+abstract class ReactingHandlers<T> {
   private Actor handlers;
 
-  protected Handlers(Model handlersModel) {
+  protected ReactingHandlers(Model handlersModel) {
     Actor handlers = newHandlers(requireNonNull(handlersModel, "handlersModel must be non-null"));
     setHandlers(handlers);
     deactivatePublishingEvents(handlers);

@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.UUID;
 
 class BehaviorTestHelper<T> {
-  private final CommandHandlers<T> commandHandlers;
-  private final InternalEventHandlers<T> internalEventHandlers;
+  private final ReactingCommandHandlers<T> commandHandlers;
+  private final ReactingEventHandlers<T> internalEventHandlers;
   private List<Object> internalEvents;
 
   private BehaviorTestHelper(AggregateBehavior<T> aggregateBehavior) {
     clearInternalEvents();   
-    this.commandHandlers = CommandHandlers.fromBehavior(aggregateBehavior);
-    this.internalEventHandlers = InternalEventHandlers.fromBehavior(aggregateBehavior);
+    this.commandHandlers = ReactingCommandHandlers.from(aggregateBehavior);
+    this.internalEventHandlers = ReactingEventHandlers.of(aggregateBehavior);
     
-    createInitialAggregateRootFrom(aggregateBehavior);
+    createInitialStateOf(aggregateBehavior);
   }
 
   public static <T> BehaviorTestHelper<T> of(AggregateBehavior<T> aggregateBehavior) {
@@ -32,7 +32,7 @@ class BehaviorTestHelper<T> {
   }
   
   public BehaviorTestHelper<T> when(Object message){
-    incomingMessageHandlers()
+    commandHandlers()
       .reactTo(message)
       .ifPresent(publishedEvent -> {
         internalEvents().addAll(toEventList(publishedEvent));
@@ -52,21 +52,21 @@ class BehaviorTestHelper<T> {
     return eventList;
   }
   
-  private void createInitialAggregateRootFrom(AggregateBehavior<T> aggregateBehavior){
+  private void createInitialStateOf(AggregateBehavior<T> aggregateBehavior){
     requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");
-    T aggregateRoot = aggregateBehavior.initialState(randomId());
-    aggregateBehavior.setState(aggregateRoot);
+    T initialState = aggregateBehavior.initialState(randomId());
+    aggregateBehavior.setState(initialState);
   }
 
   private String randomId() {
     return UUID.randomUUID().toString();
   }
   
-  private CommandHandlers<T> incomingMessageHandlers() {
+  private ReactingCommandHandlers<T> commandHandlers() {
     return commandHandlers;
   }
 
-  private InternalEventHandlers<T> internalEventHandlers() {
+  private ReactingEventHandlers<T> internalEventHandlers() {
     return internalEventHandlers;
   }
 

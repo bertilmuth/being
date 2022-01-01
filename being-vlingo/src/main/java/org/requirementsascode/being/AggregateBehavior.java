@@ -111,8 +111,8 @@ public abstract class AggregateBehavior<STATE>{
    *
    */
   @SuppressWarnings("serial")
-  public static class IllegalSystemPublish extends IllegalArgumentException{
-    public IllegalSystemPublish(String message) {
+  public static class IllegalEventHandlerResult extends IllegalArgumentException{
+    public IllegalEventHandlerResult(String message) {
       super(message);
     }
   }

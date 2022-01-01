@@ -12,14 +12,14 @@ import io.vlingo.xoom.lattice.model.sourcing.EventSourced;
 
 public class EventSourcedAggregateBehavior<STATE> extends EventSourced implements CompletableBehavior<STATE> {
 	private final AggregateBehavior<STATE> aggregateBehavior;
-	private final CommandHandlers<STATE> commandHandlers;
-	private final InternalEventHandlers<STATE> internalEventHandlers;
+	private final ReactingCommandHandlers<STATE> reactingCommandHandlers;
+	private final ReactingEventHandlers<STATE> reactingEventHandlers;
 
 	public EventSourcedAggregateBehavior(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
 		super(entityId);
 		this.aggregateBehavior = requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");	    
-		this.commandHandlers = CommandHandlers.fromBehavior(aggregateBehavior);
-		this.internalEventHandlers = InternalEventHandlers.fromBehavior(aggregateBehavior);
+		this.reactingCommandHandlers = ReactingCommandHandlers.from(aggregateBehavior);
+		this.reactingEventHandlers = ReactingEventHandlers.of(aggregateBehavior);
 
 	    createAggregate(entityId, aggregateBehavior);
 		
@@ -36,7 +36,7 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 
 	private void registerEventHandlerFor(Class<? extends IdentifiedDomainEvent> eventClass) {
 		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (b, ev) -> {
-			internalEventHandlers.reactTo(ev);
+			reactingEventHandlers.reactTo(ev);
 		});
 	}
 
@@ -46,7 +46,7 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 	}
 
 	public Completes<STATE> reactTo(Object message) {
-		Optional<Object> optionalEvent = commandHandlers.reactTo(message);
+		Optional<Object> optionalEvent = reactingCommandHandlers.reactTo(message);
 
 		IdentifiedDomainEvent event = optionalEvent.map(ev -> (IdentifiedDomainEvent) ev)
 				.orElseThrow(() -> new RuntimeException("Command handler didn't create event!"));
