@@ -20,18 +20,19 @@ public class QueryModelStateStoreProvider<T> {
   public final StateStore store;
   public final Queries queries;
 
-  public static <T> QueryModelStateStoreProvider using(final Stage stage, Class<T> dataType, T emptyData) {
-    return using(stage, dataType, emptyData, new NoOpDispatcher());
+  public static <T> QueryModelStateStoreProvider using(final Stage stage, T emptyData) {
+    return using(stage, emptyData, new NoOpDispatcher());
   }
 
-  public static <T> QueryModelStateStoreProvider using(final Stage stage,  Class<T> dataType, T emptyData, final Dispatcher ...dispatchers) {
+  public static <T> QueryModelStateStoreProvider using(final Stage stage,  T emptyData, final Dispatcher ...dispatchers) {
     if (ComponentRegistry.has(QueryModelStateStoreProvider.class)) {
       return ComponentRegistry.withType(QueryModelStateStoreProvider.class);
     }
 
     new EntryAdapterProvider(stage.world()); // future use
 
-    StateTypeStateStoreMap.stateTypeToStoreName(dataType, dataType.getSimpleName());
+    final Class<? extends T> dataType = (Class<? extends T>) emptyData.getClass();
+	StateTypeStateStoreMap.stateTypeToStoreName(dataType, dataType.getSimpleName());
 
     final StateStore store =
             StoreActorBuilder.from(stage, Model.QUERY, Arrays.asList(dispatchers), StorageType.STATE_STORE, Settings.properties(), true);
