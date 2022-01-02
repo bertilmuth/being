@@ -28,7 +28,7 @@ class EventHandlersTest {
 	void createsOneEventHandler() {
 		final Function<SampleEvent1, State> handler = event -> new State(event.id);
 		EventHandlers<State> eventHandlers = EventHandlers.are(
-			eventsOf(SampleEvent1.class, handler)
+			eventsOf(SampleEvent1.class).toState(handler)
 		);
 		
 		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
@@ -43,9 +43,9 @@ class EventHandlersTest {
 	@Test
 	void createsTwoEventHandlers() {
 		final Function<SampleEvent1, State> handler1 = event -> new State(event.id);
-		EventHandler<SampleEvent1, State> eventHandler = eventsOf(SampleEvent1.class, handler1);
+		EventHandler<SampleEvent1, State> eventHandler = eventsOf(SampleEvent1.class).toState(handler1);
 		final Function<SampleEvent2, State> handler2 = event -> new State(event.id + "0");
-		EventHandler<SampleEvent2, State> eventHandler2 = eventsOf(SampleEvent2.class, handler2);
+		EventHandler<SampleEvent2, State> eventHandler2 = eventsOf(SampleEvent2.class).toState(handler2);
 
 		EventHandlers<State> eventHandlers = EventHandlers.are(eventHandler, eventHandler2);
 		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();

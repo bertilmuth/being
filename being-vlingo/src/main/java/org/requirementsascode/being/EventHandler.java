@@ -8,9 +8,21 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE> {
 	private final Class<EVENT> eventClass;
 	private final Function<EVENT, STATE> handler;
-
-	public static <EVENT extends IdentifiedDomainEvent, STATE> EventHandler<EVENT, STATE> eventsOf(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
-		return new EventHandler<>(eventClass, handler);
+	
+	public static <EVENT extends IdentifiedDomainEvent> EventsOf<EVENT> eventsOf(Class<EVENT> eventClass) {
+		return new EventsOf<EVENT>(eventClass);
+	}
+	
+	public static class EventsOf<EVENT extends IdentifiedDomainEvent>{
+		private final Class<EVENT> eventClass;
+		
+		private EventsOf(Class<EVENT> eventClass){
+			this.eventClass = eventClass;
+		}
+		
+		<STATE> EventHandler<EVENT, STATE> toState(Function<EVENT, STATE> handler){
+			return new EventHandler<>(eventClass, handler);
+		}
 	}
 	
 	private EventHandler(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
