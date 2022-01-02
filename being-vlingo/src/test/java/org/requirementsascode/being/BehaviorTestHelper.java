@@ -10,13 +10,13 @@ import java.util.UUID;
 
 class BehaviorTestHelper<T> {
   private final ReactingCommandHandlers<T> commandHandlers;
-  private final ReactingEventHandlers<T> internalEventHandlers;
-  private List<Object> internalEvents;
+  private final ReactingEventHandlers<T> reactingEventHandlers;
+  private List<Object> events;
 
   private BehaviorTestHelper(AggregateBehavior<T> aggregateBehavior) {
-    clearInternalEvents();   
+    clearEvents();   
     this.commandHandlers = ReactingCommandHandlers.from(aggregateBehavior);
-    this.internalEventHandlers = ReactingEventHandlers.of(aggregateBehavior);
+    this.reactingEventHandlers = ReactingEventHandlers.of(aggregateBehavior);
     
     createInitialStateOf(aggregateBehavior);
   }
@@ -26,8 +26,8 @@ class BehaviorTestHelper<T> {
   }
   
   public BehaviorTestHelper<T> givenEvents(Object... internalEvents) {
-    Arrays.stream(internalEvents).forEach(internalEventHandlers()::reactTo);
-    clearInternalEvents();
+    Arrays.stream(internalEvents).forEach(reactingEventHandlers()::reactTo);
+    clearEvents();
     return this;
   }
   
@@ -35,8 +35,8 @@ class BehaviorTestHelper<T> {
     commandHandlers()
       .reactTo(message)
       .ifPresent(publishedEvent -> {
-        internalEvents().addAll(toEventList(publishedEvent));
-        internalEventHandlers().reactTo(publishedEvent);
+        events().addAll(toEventList(publishedEvent));
+        reactingEventHandlers().reactTo(publishedEvent);
       });
 
     return this;
@@ -66,14 +66,14 @@ class BehaviorTestHelper<T> {
     return commandHandlers;
   }
 
-  private ReactingEventHandlers<T> internalEventHandlers() {
-    return internalEventHandlers;
+  private ReactingEventHandlers<T> reactingEventHandlers() {
+    return reactingEventHandlers;
   }
 
-  public List<Object> internalEvents() {
-    return internalEvents;
+  public List<Object> events() {
+    return events;
   }
-  private void clearInternalEvents() {
-    this.internalEvents = new ArrayList<>();
+  private void clearEvents() {
+    this.events = new ArrayList<>();
   }
 }
