@@ -18,7 +18,7 @@ class ReactingEventHandlers<STATE> extends ReactingHandlers<STATE>{
 
   @SuppressWarnings("unchecked")
   public Optional<Object> reactTo(Object event) {
-    Optional<Object> result = handlers().reactTo(event);
+    Optional<Object> result = super.reactTo(event);
     result.ifPresent(r -> {
       if (!isInstanceOfStateClass(r)) {
         throwEventHandlerResultIsNotState(r);

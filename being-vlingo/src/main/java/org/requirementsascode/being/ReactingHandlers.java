@@ -17,7 +17,9 @@ abstract class ReactingHandlers<T> {
     deactivatePublishingEvents(handlers);
   }
   
-  public abstract Optional<Object> reactTo(Object message);
+  public Optional<Object> reactTo(Object message){
+	  return handlers.reactTo(message);
+  }
 
   private Actor newHandlers(Model handlersModel) {
     return new Actor().withBehavior(handlersModel);
@@ -25,10 +27,6 @@ abstract class ReactingHandlers<T> {
   
   private void setHandlers(Actor handlers) {
     this.handlers = handlers;
-  }
-  
-  protected AbstractActor handlers() {
-    return handlers;
   }
   
   private final void deactivatePublishingEvents(AbstractActor messageHandlers) {
