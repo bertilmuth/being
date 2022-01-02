@@ -2,8 +2,8 @@ package org.requirementsascode.being;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.requirementsascode.being.CommandHandler.commandHandler;
-import static org.requirementsascode.being.EventHandler.eventHandler;
+import static org.requirementsascode.being.CommandHandler.commandsOf;
+import static org.requirementsascode.being.EventHandler.eventsOf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,8 +169,8 @@ class SimpleBehaviorTest {
     @Override
     public CommandHandlers commandHandlers() {
       return CommandHandlers.are(
-          commandHandler(TestCommand.class, cmd -> new TestEvent(cmd.name)),
-          commandHandler(TestUpdateStateCommand.class, cmd -> new TestUpdateStateEvent())
+          commandsOf(TestCommand.class).toEvent(cmd -> new TestEvent(cmd.name)),
+          commandsOf(TestUpdateStateCommand.class).toEvent(cmd -> new TestUpdateStateEvent())
           //commandHandler(TestCommandForEventList.class, cmd -> {return asList(new TestEvent(cmd.name), new TestEvent(cmd.name));}),
           //commandHandler(TestCommandForEventSet.class, cmd -> {return new LinkedHashSet<>(asList(new TestEvent(cmd.name1), new TestEvent(cmd.name2)));}),
       );
@@ -179,8 +179,8 @@ class SimpleBehaviorTest {
     @Override
     public EventHandlers<TestState> eventHandlers() {
       return EventHandlers.are(
-          eventHandler(TestEvent.class, ev -> state().addEvent(ev)),
-          eventHandler(TestUpdateStateEvent.class, ev -> new TestState().addEvent(NEW_AGGREGATE_ROOT_EVENT))
+          eventsOf(TestEvent.class, ev -> state().addEvent(ev)),
+          eventsOf(TestUpdateStateEvent.class, ev -> new TestState().addEvent(NEW_AGGREGATE_ROOT_EVENT))
       );
     }
 

@@ -9,8 +9,20 @@ public class CommandHandler<T> {
 	private final Class<T> commandClass;
 	private final Function<T, ? extends IdentifiedDomainEvent> handler;
 
-	public static <T> CommandHandler<T> commandHandler(Class<T> commandClass, Function<T, ? extends IdentifiedDomainEvent> handler) {
-		return new CommandHandler<T>(commandClass, handler);
+	public static <T> CommandsOf<T> commandsOf(Class<T> commandClass) {
+		return new CommandsOf<T>(commandClass);
+	}
+	
+	public static class CommandsOf<T>{
+		private final Class<T> commandClass;
+		
+		private CommandsOf(Class<T> commandClass){
+			this.commandClass = commandClass;
+		}
+		
+		CommandHandler<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> handler){
+			return new CommandHandler<>(commandClass, handler);
+		}
 	}
 	
 	private CommandHandler(Class<T> commandClass, Function<T, ? extends IdentifiedDomainEvent> handler) {

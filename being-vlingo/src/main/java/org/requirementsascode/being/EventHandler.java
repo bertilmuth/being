@@ -9,7 +9,7 @@ public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE> {
 	private final Class<EVENT> eventClass;
 	private final Function<EVENT, STATE> handler;
 
-	public static <EVENT extends IdentifiedDomainEvent, STATE> EventHandler<EVENT, STATE> eventHandler(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
+	public static <EVENT extends IdentifiedDomainEvent, STATE> EventHandler<EVENT, STATE> eventsOf(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
 		return new EventHandler<>(eventClass, handler);
 	}
 	

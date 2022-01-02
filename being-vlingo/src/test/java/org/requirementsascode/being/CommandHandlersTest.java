@@ -2,7 +2,7 @@ package org.requirementsascode.being;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.requirementsascode.being.CommandHandler.commandHandler;
+import static org.requirementsascode.being.CommandHandler.commandsOf;
 
 import java.util.List;
 import java.util.function.Function;
@@ -28,7 +28,7 @@ class CommandHandlersTest {
 	void createsOneCommandHandler() {
 		final Function<SampleCommand1, SampleEvent1> handler = command -> new SampleEvent1(command.id);
 		CommandHandlers commandHandlers = CommandHandlers.are(
-			commandHandler(SampleCommand1.class, handler)
+			commandsOf(SampleCommand1.class).toEvent(handler)
 		);
 		
 		List<Class<?>> commandClasses = commandHandlers.getCommandClasses();
@@ -43,9 +43,9 @@ class CommandHandlersTest {
 	@Test
 	void createsTwoCommandHandlers() {
 		final Function<SampleCommand1, SampleEvent1> handler1 = command -> new SampleEvent1(command.id);
-		CommandHandler<SampleCommand1> commandHandler1 = commandHandler(SampleCommand1.class, handler1);
+		CommandHandler<SampleCommand1> commandHandler1 = commandsOf(SampleCommand1.class).toEvent(handler1);
 		final Function<SampleCommand2, SampleEvent2> handler2 = command -> new SampleEvent2(command.id);
-		CommandHandler<SampleCommand2> commandHandler2 = commandHandler(SampleCommand2.class, handler2);
+		CommandHandler<SampleCommand2> commandHandler2 = commandsOf(SampleCommand2.class).toEvent(handler2);
 
 		CommandHandlers commandHandlers = CommandHandlers.are(commandHandler1, commandHandler2);
 		List<Class<?>> commandClasses = commandHandlers.getCommandClasses();
