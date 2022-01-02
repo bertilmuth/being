@@ -17,8 +17,8 @@ class EventHandlersTest {
 	void createsEmptyEventHandlers() {
 		EventHandlers<State> eventHandlers = EventHandlers.are();
 		
-		List<Class<? extends Source<?>>> events = eventHandlers.getEventClasses();
-		assertTrue(events.isEmpty());
+		List<Class<? extends Source<?>>> eventClasses = eventHandlers.getEventClasses();
+		assertTrue(eventClasses.isEmpty());
 		
 		List<Function<? extends Source<?>, ?>> handlers = eventHandlers.getHandlers();
 		assertTrue(handlers.isEmpty());
@@ -31,9 +31,9 @@ class EventHandlersTest {
 			on(SampleEvent1.class, handler)
 		);
 		
-		List<Class<? extends Source<?>>> events = eventHandlers.getEventClasses();
-		assertEquals(1, events.size());
-		assertEquals(SampleEvent1.class, events.get(0));
+		List<Class<? extends Source<?>>> eventClasses = eventHandlers.getEventClasses();
+		assertEquals(1, eventClasses.size());
+		assertEquals(SampleEvent1.class, eventClasses.get(0));
 		
 		List<Function<? extends Source<?>, ?>> handlers = eventHandlers.getHandlers();
 		assertEquals(1, handlers.size());
@@ -48,10 +48,10 @@ class EventHandlersTest {
 		EventHandler<SampleEvent2, State> eventHandler2 = on(SampleEvent2.class, handler2);
 
 		EventHandlers<State> eventHandlers = EventHandlers.are(eventHandler, eventHandler2);
-		List<Class<? extends Source<?>>> events = eventHandlers.getEventClasses();
-		assertEquals(2, events.size());
-		assertEquals(SampleEvent1.class, events.get(0));
-		assertEquals(SampleEvent2.class, events.get(1));
+		List<Class<? extends Source<?>>> eventClasses = eventHandlers.getEventClasses();
+		assertEquals(2, eventClasses.size());
+		assertEquals(SampleEvent1.class, eventClasses.get(0));
+		assertEquals(SampleEvent2.class, eventClasses.get(1));
 		
 		List<Function<? extends Source<?>, ?>> handlers = eventHandlers.getHandlers();
 		assertEquals(2, handlers.size());
