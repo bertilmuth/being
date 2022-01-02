@@ -9,7 +9,7 @@ public class EventHandler<EVENT extends Source<?>, STATE> {
 	private final Class<EVENT> eventClass;
 	private final Function<EVENT, ?> handler;
 
-	public static <EVENT extends Source<?>, STATE> EventHandler<EVENT, STATE> on(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
+	public static <EVENT extends Source<?>, STATE> EventHandler<EVENT, STATE> eventHandler(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
 		return new EventHandler<>(eventClass, handler);
 	}
 	
