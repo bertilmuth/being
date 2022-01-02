@@ -17,7 +17,7 @@ class SimpleBehaviorTest {
   private static final TestEvent NEW_AGGREGATE_ROOT_EVENT = new TestEvent("New aggregate root");
   
   private TestAggregateBehavior testAggregateBehavior;
-  private BehaviorTestHelper<TestAggregateRoot> behaviorTestHelper;
+  private BehaviorTestHelper<TestState> behaviorTestHelper;
 
   @BeforeEach
   public void setup() {
@@ -175,7 +175,7 @@ class SimpleBehaviorTest {
     behaviorTest.when(new TestFailingUpdateAggregateRootCommand());
   }*/
 
-  private static class TestAggregateBehavior extends AggregateBehavior<TestAggregateRoot> {
+  private static class TestAggregateBehavior extends AggregateBehavior<TestState> {
     @Override
     public Model commandHandlers() {
       return Model.builder()
@@ -194,27 +194,27 @@ class SimpleBehaviorTest {
     public Model eventHandlers() {
       return Model.builder()
           .on(TestEvent.class).system(ev -> state().addEvent(ev))
-          .on(TestUpdateAggregateRootEvent.class).systemPublish(ev -> new TestAggregateRoot().addEvent(NEW_AGGREGATE_ROOT_EVENT))
+          .on(TestUpdateAggregateRootEvent.class).systemPublish(ev -> new TestState().addEvent(NEW_AGGREGATE_ROOT_EVENT))
           .on(TestFailingUpdateAggregateRootEvent.class).systemPublish(ev -> "This should be an aggregate root, so it will fail!")
           // The following line should not be handled, because it should not be published to this model in the first place
-          .user(TestAggregateRoot.class).system(ev -> {throw new RuntimeException("Illegal aggregate root in internalEventHandlers");})
+          .user(TestState.class).system(ev -> {throw new RuntimeException("Illegal aggregate root in internalEventHandlers");})
           .build();
     }
 
     @Override
-    public TestAggregateRoot initialState(String aggregateId) {
-      return new TestAggregateRoot();
+    public TestState initialState(String aggregateId) {
+      return new TestState();
     }
   }
 
-  private static class TestAggregateRoot{
+  private static class TestState{
     private final ArrayList<TestEvent> events;
 
-    public TestAggregateRoot() {
+    public TestState() {
       this.events = new ArrayList<>();
     }
 
-    public TestAggregateRoot addEvent(TestEvent testEvent) {
+    public TestState addEvent(TestEvent testEvent) {
       this.events.add(testEvent);
       return this;
     }
