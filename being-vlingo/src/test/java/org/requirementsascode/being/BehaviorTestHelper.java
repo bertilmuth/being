@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.UUID;
 
 class BehaviorTestHelper<T> {
-  private final ReactingCommandHandlers<T> commandHandlers;
+  private final ReactingCommandHandlers<T> reactingCommandHandlers;
   private final ReactingEventHandlers<T> reactingEventHandlers;
   private List<Object> events;
 
   private BehaviorTestHelper(AggregateBehavior<T> aggregateBehavior) {
-    clearEvents();   
-    this.commandHandlers = ReactingCommandHandlers.from(aggregateBehavior);
+    this.reactingCommandHandlers = ReactingCommandHandlers.from(aggregateBehavior);
     this.reactingEventHandlers = ReactingEventHandlers.of(aggregateBehavior);
     
+    clearEvents();   
     createInitialStateOf(aggregateBehavior);
   }
 
@@ -32,7 +32,7 @@ class BehaviorTestHelper<T> {
   }
   
   public BehaviorTestHelper<T> when(Object message){
-    commandHandlers()
+    reactingCommandHandlers()
       .reactTo(message)
       .ifPresent(publishedEvent -> {
         events().addAll(toEventList(publishedEvent));
@@ -62,8 +62,8 @@ class BehaviorTestHelper<T> {
     return UUID.randomUUID().toString();
   }
   
-  private ReactingCommandHandlers<T> commandHandlers() {
-    return commandHandlers;
+  private ReactingCommandHandlers<T> reactingCommandHandlers() {
+    return reactingCommandHandlers;
   }
 
   private ReactingEventHandlers<T> reactingEventHandlers() {
