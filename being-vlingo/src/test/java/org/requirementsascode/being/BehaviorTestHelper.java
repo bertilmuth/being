@@ -6,16 +6,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-class BehaviorTestHelper<T> {
-  private final ReactingCommandHandlers<T> reactingCommandHandlers;
-  private final ReactingEventHandlers<T> reactingEventHandlers;
-  private List<Object> events;
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-  private BehaviorTestHelper(AggregateBehavior<T> aggregateBehavior) {
-    this.reactingCommandHandlers = ReactingCommandHandlers.from(aggregateBehavior);
-    this.reactingEventHandlers = ReactingEventHandlers.of(aggregateBehavior);
+class BehaviorTestHelper<STATE> {
+  private final CommandHandlers reactingCommandHandlers;
+  private final EventHandlers<STATE> reactingEventHandlers;
+  private List<Object> events;
+  private final AggregateBehavior<STATE> aggregateBehavior;
+
+  private BehaviorTestHelper(AggregateBehavior<STATE> aggregateBehavior) {
+    this.reactingCommandHandlers = aggregateBehavior.commandHandlers();
+    this.reactingEventHandlers = aggregateBehavior.eventHandlers();
+    this.aggregateBehavior = aggregateBehavior;
     
     clearEvents();   
     createInitialStateOf(aggregateBehavior);
@@ -25,18 +30,19 @@ class BehaviorTestHelper<T> {
     return new BehaviorTestHelper<>(aggregateBehavior);
   }
   
-  public BehaviorTestHelper<T> givenEvents(Object... internalEvents) {
+  public BehaviorTestHelper<STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
     Arrays.stream(internalEvents).forEach(reactingEventHandlers()::reactTo);
     clearEvents();
     return this;
   }
   
-  public BehaviorTestHelper<T> when(Object message){
+  public BehaviorTestHelper<STATE> when(Object message){
     reactingCommandHandlers()
       .reactTo(message)
       .ifPresent(publishedEvent -> {
         events().addAll(toEventList(publishedEvent));
-        reactingEventHandlers().reactTo(publishedEvent);
+        Optional<STATE> optionalState = reactingEventHandlers().reactTo(publishedEvent);
+        optionalState.ifPresent(aggregateBehavior::setState);
       });
 
     return this;
@@ -52,9 +58,9 @@ class BehaviorTestHelper<T> {
     return eventList;
   }
   
-  private void createInitialStateOf(AggregateBehavior<T> aggregateBehavior){
+  private void createInitialStateOf(AggregateBehavior<STATE> aggregateBehavior){
     requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");
-    T initialState = aggregateBehavior.initialState(randomId());
+    STATE initialState = aggregateBehavior.initialState(randomId());
     aggregateBehavior.setState(initialState);
   }
 
@@ -62,11 +68,11 @@ class BehaviorTestHelper<T> {
     return UUID.randomUUID().toString();
   }
   
-  private ReactingCommandHandlers<T> reactingCommandHandlers() {
+  private CommandHandlers reactingCommandHandlers() {
     return reactingCommandHandlers;
   }
 
-  private ReactingEventHandlers<T> reactingEventHandlers() {
+  private EventHandlers<STATE> reactingEventHandlers() {
     return reactingEventHandlers;
   }
 

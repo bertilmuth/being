@@ -2,14 +2,15 @@ package org.requirementsascode.being;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.requirementsascode.being.CommandHandler.commandHandler;
+import static org.requirementsascode.being.EventHandler.eventHandler;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.requirementsascode.Model;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
@@ -34,20 +35,6 @@ class SimpleBehaviorTest {
   @Test
   public void emptyGivenEvents() {
     behaviorTestHelper.givenEvents();
-    assertEquals(new ArrayList<>(), behaviorTestHelper.events());
-    assertEquals(new ArrayList<>(), testAggregateBehavior.state().appliedEvents());
-  }
-  
-  @Test
-  public void unknownGivenEventsIsIgnored() {
-    behaviorTestHelper.givenEvents("I should be ignored");
-    assertEquals(new ArrayList<>(), behaviorTestHelper.events());
-    assertEquals(new ArrayList<>(), testAggregateBehavior.state().appliedEvents());
-  }
-  
-  @Test
-  public void commandHandlerThatDoesntPublishEventsIsIgnored() {
-    behaviorTestHelper.givenEvents(new NoOpTestCommand());
     assertEquals(new ArrayList<>(), behaviorTestHelper.events());
     assertEquals(new ArrayList<>(), testAggregateBehavior.state().appliedEvents());
   }
@@ -100,6 +87,7 @@ class SimpleBehaviorTest {
   }
   
   @Test
+  @Disabled
   public void singleGivenEventSingleWhen_EventList() {
     TestEvent givenEvent = new TestEvent("GivenEvent");
     TestCommandForEventList command = new TestCommandForEventList("Command");
@@ -114,6 +102,7 @@ class SimpleBehaviorTest {
   }
   
   @Test
+  @Disabled
   public void singleGivenEventTwoWhens_EventList() {
     TestEvent givenEvent = new TestEvent("GivenEvent");
     TestCommandForEventList command = new TestCommandForEventList("Command");
@@ -129,6 +118,7 @@ class SimpleBehaviorTest {
   }
   
   @Test
+  @Disabled
   public void singleGivenEventSingleWhen_EventSet() {
     final String name1 = "Command1";
     final String name2 = "Command2";
@@ -147,17 +137,17 @@ class SimpleBehaviorTest {
   }
   
   @Test
-  public void internalEventHandlerUpdatesAggregateRoot() {
-    behaviorTestHelper.when(new TestUpdateAggregateRootCommand());
+  public void eventHandlerUpdatesState() {
+    behaviorTestHelper.when(new TestUpdateStateCommand());
 
-    assertEquals(asList(new TestUpdateAggregateRootEvent()), behaviorTestHelper.events());
+    assertEquals(asList(new TestUpdateStateEvent()), behaviorTestHelper.events());
     assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
-  public void internalEventHandlerUpdatesAggregateRootAndHandlesSecondWhen() {
-    TestUpdateAggregateRootCommand command1 = new TestUpdateAggregateRootCommand();
-    TestUpdateAggregateRootEvent expectedEvent1 = new TestUpdateAggregateRootEvent();
+  public void eventHandlerUpdatesStateAndHandlesSecondWhen() {
+    TestUpdateStateCommand command1 = new TestUpdateStateCommand();
+    TestUpdateStateEvent expectedEvent1 = new TestUpdateStateEvent();
     
     TestCommand command2 = new TestCommand("Command2");
     TestEvent expectedEvent2 = new TestEvent(command2.name);
@@ -177,28 +167,21 @@ class SimpleBehaviorTest {
 
   private static class TestAggregateBehavior extends AggregateBehavior<TestState> {
     @Override
-    public Model commandHandlers() {
-      return Model.builder()
-          .user(TestCommand.class).systemPublish(cmd -> new TestEvent(cmd.name))
-          .user(TestCommandForEventList.class).systemPublish(cmd -> {return asList(new TestEvent(cmd.name), new TestEvent(cmd.name));})
-          .user(TestCommandForEventSet.class).systemPublish(cmd -> {return new LinkedHashSet<>(asList(new TestEvent(cmd.name1), new TestEvent(cmd.name2)));})
-          .user(NoOpTestCommand.class).system(cmd -> {})
-          .user(TestUpdateAggregateRootCommand.class).systemPublish(cmd -> new TestUpdateAggregateRootEvent())
-          .user(TestFailingUpdateAggregateRootCommand.class).systemPublish(cmd -> new TestFailingUpdateAggregateRootEvent())
-          // The following event should not be handled, because it should not be published to this model in the first place
-          .user(TestEvent.class).system(ev -> {throw new RuntimeException("Illegal test event in requestMessageHandlers");})
-          .build();
+    public CommandHandlers commandHandlers() {
+      return CommandHandlers.are(
+          commandHandler(TestCommand.class, cmd -> new TestEvent(cmd.name)),
+          commandHandler(TestUpdateStateCommand.class, cmd -> new TestUpdateStateEvent())
+          //commandHandler(TestCommandForEventList.class, cmd -> {return asList(new TestEvent(cmd.name), new TestEvent(cmd.name));}),
+          //commandHandler(TestCommandForEventSet.class, cmd -> {return new LinkedHashSet<>(asList(new TestEvent(cmd.name1), new TestEvent(cmd.name2)));}),
+      );
     }
 
     @Override
-    public Model eventHandlers() {
-      return Model.builder()
-          .on(TestEvent.class).system(ev -> state().addEvent(ev))
-          .on(TestUpdateAggregateRootEvent.class).systemPublish(ev -> new TestState().addEvent(NEW_AGGREGATE_ROOT_EVENT))
-          .on(TestFailingUpdateAggregateRootEvent.class).systemPublish(ev -> "This should be an aggregate root, so it will fail!")
-          // The following line should not be handled, because it should not be published to this model in the first place
-          .user(TestState.class).system(ev -> {throw new RuntimeException("Illegal aggregate root in internalEventHandlers");})
-          .build();
+    public EventHandlers<TestState> eventHandlers() {
+      return EventHandlers.are(
+          eventHandler(TestEvent.class, ev -> state().addEvent(ev)),
+          eventHandler(TestUpdateStateEvent.class, ev -> new TestState().addEvent(NEW_AGGREGATE_ROOT_EVENT))
+      );
     }
 
     @Override
@@ -225,7 +208,7 @@ class SimpleBehaviorTest {
   } 
 
   private static class TestCommand{
-    private final String name;
+    public final String name;
 
     public TestCommand(String name) {
       this.name = name;
@@ -329,18 +312,9 @@ class SimpleBehaviorTest {
         return false;
       return true;
     }
-    
-    
-
   }
   
-  private static class NoOpTestCommand{
-  }
-  
-  private static class TestUpdateAggregateRootCommand{
-  }
-  
-  private static class TestFailingUpdateAggregateRootCommand{
+  private static class TestUpdateStateCommand{
   }
 
   private static class TestEvent extends IdentifiedDomainEvent{
@@ -386,10 +360,10 @@ class SimpleBehaviorTest {
 	}
   }
   
-  private static class TestUpdateAggregateRootEvent extends IdentifiedDomainEvent{
+  private static class TestUpdateStateEvent extends IdentifiedDomainEvent{
     @Override
     public boolean equals(Object obj) {
-      return obj instanceof TestUpdateAggregateRootEvent;
+      return obj instanceof TestUpdateStateEvent;
     }
 
 	@Override

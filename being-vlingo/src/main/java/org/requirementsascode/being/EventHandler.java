@@ -3,13 +3,13 @@ package org.requirementsascode.being;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.vlingo.xoom.symbio.Source;
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class EventHandler<EVENT extends Source<?>, STATE> {
+public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE> {
 	private final Class<EVENT> eventClass;
-	private final Function<EVENT, ?> handler;
+	private final Function<EVENT, STATE> handler;
 
-	public static <EVENT extends Source<?>, STATE> EventHandler<EVENT, STATE> eventHandler(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
+	public static <EVENT extends IdentifiedDomainEvent, STATE> EventHandler<EVENT, STATE> eventHandler(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
 		return new EventHandler<>(eventClass, handler);
 	}
 	
@@ -22,7 +22,12 @@ public class EventHandler<EVENT extends Source<?>, STATE> {
 		return eventClass;
 	}
 
-	public Function<EVENT, ?> getHandler() {
+	public Function<EVENT, STATE> getHandler() {
 		return handler;
+	}
+	
+	@SuppressWarnings("unchecked")
+	STATE reactTo(IdentifiedDomainEvent event) {
+		return handler.apply((EVENT)event);
 	}
 }

@@ -3,26 +3,31 @@ package org.requirementsascode.being;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.vlingo.xoom.symbio.Source;
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class CommandHandler {
-	private final Class<?> commandClass;
-	private final Function<?, ? extends Source<?>> handler;
+public class CommandHandler<T> {
+	private final Class<T> commandClass;
+	private final Function<T, ? extends IdentifiedDomainEvent> handler;
 
-	public static <EVENT extends Source<?>, STATE> CommandHandler commandHandler(Class<?> commandClass, Function<?, ? extends Source<?>> handler) {
-		return new CommandHandler(commandClass, handler);
+	public static <T> CommandHandler<T> commandHandler(Class<T> commandClass, Function<T, ? extends IdentifiedDomainEvent> handler) {
+		return new CommandHandler<T>(commandClass, handler);
 	}
 	
-	private CommandHandler(Class<?> commandClass, Function<?, ? extends Source<?>> handler) {
+	private CommandHandler(Class<T> commandClass, Function<T, ? extends IdentifiedDomainEvent> handler) {
 		this.commandClass = Objects.requireNonNull(commandClass, "commandClass must be non-null!");
 		this.handler = Objects.requireNonNull(handler, "handler must be non-null!");
 	}
 
-	public Class<?> getCommandClass() {
+	public Class<T> getCommandClass() {
 		return commandClass;
 	}
 
-	public Function<?, ? extends Source<?>> getHandler() {
+	public Function<T, ? extends IdentifiedDomainEvent> getHandler() {
 		return handler;
+	}
+	
+	@SuppressWarnings("unchecked")
+	IdentifiedDomainEvent reactTo(Object command) {
+		return handler.apply((T)command);
 	}
 }

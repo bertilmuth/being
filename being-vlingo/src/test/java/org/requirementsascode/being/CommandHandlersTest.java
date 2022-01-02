@@ -43,9 +43,9 @@ class CommandHandlersTest {
 	@Test
 	void createsTwoCommandHandlers() {
 		final Function<SampleCommand1, SampleEvent1> handler1 = command -> new SampleEvent1(command.id);
-		CommandHandler commandHandler1 = commandHandler(SampleCommand1.class, handler1);
+		CommandHandler<SampleCommand1> commandHandler1 = commandHandler(SampleCommand1.class, handler1);
 		final Function<SampleCommand2, SampleEvent2> handler2 = command -> new SampleEvent2(command.id);
-		CommandHandler commandHandler2 = commandHandler(SampleCommand2.class, handler2);
+		CommandHandler<SampleCommand2> commandHandler2 = commandHandler(SampleCommand2.class, handler2);
 
 		CommandHandlers commandHandlers = CommandHandlers.are(commandHandler1, commandHandler2);
 		List<Class<?>> commandClasses = commandHandlers.getCommandClasses();
