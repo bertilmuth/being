@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.requirementsascode.Model;
 
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+
 class SimpleBehaviorTest {
   private static final TestEvent NEW_AGGREGATE_ROOT_EVENT = new TestEvent("New aggregate root");
   
@@ -341,7 +343,7 @@ class SimpleBehaviorTest {
   private static class TestFailingUpdateAggregateRootCommand{
   }
 
-  private static class TestEvent{
+  private static class TestEvent extends IdentifiedDomainEvent{
     private final String name;
 
     public TestEvent(String name) {
@@ -377,19 +379,34 @@ class SimpleBehaviorTest {
     public String toString() {
       return "TestEvent [name=" + name + "]";
     }
+
+	@Override
+	public String identity() {
+		return name;
+	}
   }
   
-  private static class TestUpdateAggregateRootEvent{
+  private static class TestUpdateAggregateRootEvent extends IdentifiedDomainEvent{
     @Override
     public boolean equals(Object obj) {
       return obj instanceof TestUpdateAggregateRootEvent;
     }
+
+	@Override
+	public String identity() {
+		return "TestUpdateAggregateRootEvent";
+	}
   }
   
-  private static class TestFailingUpdateAggregateRootEvent{
+  private static class TestFailingUpdateAggregateRootEvent extends IdentifiedDomainEvent{
     @Override
     public boolean equals(Object obj) {
       return obj instanceof TestFailingUpdateAggregateRootEvent;
     }
+
+	@Override
+	public String identity() {
+		return "TestUpdateAggregateRootEvent";
+	}
   }
 }
