@@ -2,7 +2,7 @@ package org.requirementsascode.being;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.requirementsascode.being.CommandHandler.commandsOf;
+import static org.requirementsascode.being.MapCommand.commandsOf;
 import static org.requirementsascode.being.EventHandler.eventsOf;
 
 import java.util.ArrayList;
@@ -167,8 +167,8 @@ class SimpleBehaviorTest {
 
   private static class TestAggregateBehavior extends AggregateBehavior<TestState> {
     @Override
-    public CommandHandlers commandHandlers() {
-      return CommandHandlers.are(
+    public MapCommands mapCommands() {
+      return MapCommands.with(
           commandsOf(TestCommand.class).toEvent(cmd -> new TestEvent(cmd.name)),
           commandsOf(TestUpdateStateCommand.class).toEvent(cmd -> new TestUpdateStateEvent()),
           commandsOf(TestCommandForEventList.class).toEvents(cmd -> {return asList(new TestEvent(cmd.name), new TestEvent2(cmd.name));}),

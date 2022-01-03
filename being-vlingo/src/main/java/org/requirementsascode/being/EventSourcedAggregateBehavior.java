@@ -14,13 +14,13 @@ import io.vlingo.xoom.symbio.Source;
 
 public class EventSourcedAggregateBehavior<STATE> extends EventSourced implements CompletableBehavior<STATE> {
 	private final AggregateBehavior<STATE> aggregateBehavior;
-	private final CommandHandlers commandHandlers;
+	private final MapCommands mapCommands;
 	private final EventHandlers<STATE> eventHandlers;
 
 	public EventSourcedAggregateBehavior(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
 		super(entityId);
 		this.aggregateBehavior = requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");	    
-		this.commandHandlers = aggregateBehavior.commandHandlers();
+		this.mapCommands = aggregateBehavior.mapCommands();
 		this.eventHandlers = aggregateBehavior.eventHandlers();
 
 	    createAggregate(entityId, aggregateBehavior);
@@ -46,7 +46,7 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 	}
 
 	public Completes<STATE> reactTo(Object command){
-		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers.reactTo(command);
+		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = mapCommands.apply(command);
 		if(identifiedDomainEvents.isEmpty()) {
 			throw new RuntimeException("Command handler didn't create event for command: " + command);
 		}

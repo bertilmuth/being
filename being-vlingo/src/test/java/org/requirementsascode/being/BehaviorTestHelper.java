@@ -12,13 +12,13 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 class BehaviorTestHelper<STATE> {
-  private final CommandHandlers commandHandlers;
+  private final MapCommands mapCommands;
   private final EventHandlers<STATE> eventHandlers;
   private List<Source<?>> events;
   private final AggregateBehavior<STATE> aggregateBehavior;
 
   private BehaviorTestHelper(AggregateBehavior<STATE> aggregateBehavior) {
-    this.commandHandlers = aggregateBehavior.commandHandlers();
+    this.mapCommands = aggregateBehavior.mapCommands();
     this.eventHandlers = aggregateBehavior.eventHandlers();
     this.aggregateBehavior = aggregateBehavior;
     
@@ -37,7 +37,7 @@ class BehaviorTestHelper<STATE> {
   }
   
   public BehaviorTestHelper<STATE> when(Object message){
-    List<? extends IdentifiedDomainEvent> newEvents = commandHandlers().reactTo(message);
+    List<? extends IdentifiedDomainEvent> newEvents = mapCommands().apply(message);
     events().addAll(newEvents);
     
     Optional<STATE> lastState = newEvents.stream()
@@ -60,8 +60,8 @@ class BehaviorTestHelper<STATE> {
     return UUID.randomUUID().toString();
   }
   
-  private CommandHandlers commandHandlers() {
-    return commandHandlers;
+  private MapCommands mapCommands() {
+    return mapCommands;
   }
 
   private EventHandlers<STATE> eventHandlers() {

@@ -41,17 +41,17 @@ public abstract class AggregateBehavior<STATE>{
   }
  
   /**
-   * Defines the command handlers. A handler consumes an incoming command and produces the event(s) to be persisted.
-   * In the handler methods you can call {@link #state}<code>()</code> to get access to the current state of the entity.
-   * @return the model
+   * Defines the command mappers. A mapper maps an incoming command to the event(s) to be persisted.
+   * In the mappers you can call {@link #state}<code>()</code> to get access to the current state of the entity.
+   * @return the mapping function
    */
-  public abstract CommandHandlers commandHandlers();
+  public abstract MapCommands mapCommands();
   
   /**
-   * Defines the event handlers. A handler consumes a persisted event and (optionally) publishes a new state of the
-   * entity. In handler methods, you can call
+   * Defines the event mappers. A mappers maps a persisted event to the new state of the
+   * entity. In mapper methods, you can call
    * {@link #state}<code>()</code> to get access to the current state of the entity.
-   * @return the model
+   * @return the mapping function
    */
   public abstract EventHandlers<STATE> eventHandlers();
   

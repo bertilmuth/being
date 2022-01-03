@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class CommandHandler<T> {
+public class MapCommand<T> {
 	private final Class<T> commandClass;
 	private final Function<T, List<? extends IdentifiedDomainEvent>> handler;
 
@@ -22,7 +22,7 @@ public class CommandHandler<T> {
 			this.commandClass = commandClass;
 		}
 
-		CommandHandler<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> handler) {
+		MapCommand<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> handler) {
 			Function<T, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = cmd -> {
 				IdentifiedDomainEvent result = handler.apply(cmd);
 				return Collections.singletonList(result);
@@ -31,12 +31,12 @@ public class CommandHandler<T> {
 			return toEvents(eventListProducingHandler);
 		}
 
-		public CommandHandler<T> toEvents(Function<T, List<? extends IdentifiedDomainEvent>> handler) {
-			return new CommandHandler<>(commandClass, handler);
+		public MapCommand<T> toEvents(Function<T, List<? extends IdentifiedDomainEvent>> handler) {
+			return new MapCommand<>(commandClass, handler);
 		}
 	}
 
-	private CommandHandler(Class<T> commandClass, Function<T, List<? extends IdentifiedDomainEvent>> handler) {
+	private MapCommand(Class<T> commandClass, Function<T, List<? extends IdentifiedDomainEvent>> handler) {
 		this.commandClass = Objects.requireNonNull(commandClass, "commandClass must be non-null!");
 		this.handler = Objects.requireNonNull(handler, "handler must be non-null!");
 	}
