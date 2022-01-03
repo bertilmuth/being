@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+import io.vlingo.xoom.symbio.Source;
 
 class SimpleBehaviorTest {
   private static final TestEvent NEW_AGGREGATE_ROOT_EVENT = new TestEvent("New aggregate root");
@@ -111,29 +112,33 @@ class SimpleBehaviorTest {
   public void singleGivenEventSingleWhen_EventList() {
     TestEvent givenEvent = new TestEvent("GivenEvent");
     TestCommandForEventList command = new TestCommandForEventList("Command");
-    TestEvent resultingEvent = new TestEvent(command.name);
     
     behaviorTestHelper
       .givenEvents(givenEvent)
       .when(command);
     
-    assertEquals(asList(resultingEvent, resultingEvent), behaviorTestHelper.events());
-    assertEquals(asList(givenEvent, resultingEvent, resultingEvent), testAggregateBehavior.state().appliedEvents());
+    TestEvent resultingEvent1 = new TestEvent(command.name);
+    TestEvent2 resultingEvent2 = new TestEvent2(command.name);
+    
+    assertEquals(asList(resultingEvent1, resultingEvent2), behaviorTestHelper.events());
+    assertEquals(asList(givenEvent, resultingEvent1, resultingEvent2), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
   public void singleGivenEventTwoWhens_EventList() {
     TestEvent givenEvent = new TestEvent("GivenEvent");
     TestCommandForEventList command = new TestCommandForEventList("Command");
-    TestEvent resultingEvent = new TestEvent(command.name);
     
     behaviorTestHelper
       .givenEvents(givenEvent)
       .when(command)
       .when(command);
     
-    assertEquals(asList(resultingEvent, resultingEvent, resultingEvent, resultingEvent), behaviorTestHelper.events());
-    assertEquals(asList(givenEvent, resultingEvent, resultingEvent, resultingEvent, resultingEvent), testAggregateBehavior.state().appliedEvents());
+    TestEvent resultingEvent1 = new TestEvent(command.name);
+    TestEvent2 resultingEvent2 = new TestEvent2(command.name);
+
+    assertEquals(asList(resultingEvent1, resultingEvent2, resultingEvent1, resultingEvent2), behaviorTestHelper.events());
+    assertEquals(asList(givenEvent, resultingEvent1, resultingEvent2, resultingEvent1, resultingEvent2), testAggregateBehavior.state().appliedEvents());
   }
   
   @Test
@@ -166,7 +171,7 @@ class SimpleBehaviorTest {
       return CommandHandlers.are(
           commandsOf(TestCommand.class).toEvent(cmd -> new TestEvent(cmd.name)),
           commandsOf(TestUpdateStateCommand.class).toEvent(cmd -> new TestUpdateStateEvent()),
-          commandsOf(TestCommandForEventList.class).toEvents(cmd -> {return asList(new TestEvent(cmd.name), new TestEvent(cmd.name));}),
+          commandsOf(TestCommandForEventList.class).toEvents(cmd -> {return asList(new TestEvent(cmd.name), new TestEvent2(cmd.name));}),
           commandsOf(ProduceUnhandledEventCommand.class).toEvent(cmd -> new UnhandledEvent())
       );
     }
@@ -175,6 +180,7 @@ class SimpleBehaviorTest {
     public EventHandlers<TestState> eventHandlers() {
       return EventHandlers.are(
           eventsOf(TestEvent.class).toState(ev -> state().addEvent(ev)),
+          eventsOf(TestEvent2.class).toState(ev -> state().addEvent(ev)),
           eventsOf(TestUpdateStateEvent.class).toState(ev -> new TestState().addEvent(NEW_AGGREGATE_ROOT_EVENT))
       );
     }
@@ -186,7 +192,7 @@ class SimpleBehaviorTest {
   }
 
   private static class TestState{
-    private final ArrayList<TestEvent> events;
+    private final ArrayList<Source<?>> events;
 
     public TestState() {
       this.events = new ArrayList<>();
@@ -197,7 +203,12 @@ class SimpleBehaviorTest {
       return this;
     }
     
-    public List<TestEvent> appliedEvents(){
+    public TestState addEvent(TestEvent2 testEvent) {
+        this.events.add(testEvent);
+        return this;
+      }
+    
+    public List<Source<?>> appliedEvents(){
       return java.util.Collections.unmodifiableList(events);
     }
   } 
@@ -313,6 +324,49 @@ class SimpleBehaviorTest {
 		return name;
 	}
   }
+  
+  private static class TestEvent2 extends IdentifiedDomainEvent{
+	    private final String name;
+
+	    public TestEvent2(String name) {
+	      this.name = name;
+	    }
+
+	    @Override
+	    public int hashCode() {
+	      final int prime = 31;
+	      int result = 1;
+	      result = prime * result + ((name == null) ? 0 : name.hashCode());
+	      return result;
+	    }
+
+	    @Override
+	    public boolean equals(Object obj) {
+	      if (this == obj)
+	        return true;
+	      if (obj == null)
+	        return false;
+	      if (getClass() != obj.getClass())
+	        return false;
+	      TestEvent2 other = (TestEvent2) obj;
+	      if (name == null) {
+	        if (other.name != null)
+	          return false;
+	      } else if (!name.equals(other.name))
+	        return false;
+	      return true;
+	    }
+
+	    @Override
+	    public String toString() {
+	      return "TestEvent2 [name=" + name + "]";
+	    }
+
+		@Override
+		public String identity() {
+			return name;
+		}
+	  }
   
   private static class TestUpdateStateEvent extends IdentifiedDomainEvent{
     @Override

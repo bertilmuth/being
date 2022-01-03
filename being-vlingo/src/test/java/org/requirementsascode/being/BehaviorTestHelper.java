@@ -15,7 +15,7 @@ import io.vlingo.xoom.symbio.Source;
 class BehaviorTestHelper<STATE> {
   private final CommandHandlers commandHandlers;
   private final EventHandlers<STATE> eventHandlers;
-  private List<Object> events;
+  private List<Source<?>> events;
   private final AggregateBehavior<STATE> aggregateBehavior;
 
   private BehaviorTestHelper(AggregateBehavior<STATE> aggregateBehavior) {
@@ -69,7 +69,7 @@ class BehaviorTestHelper<STATE> {
     return eventHandlers;
   }
 
-  public List<Object> events() {
+  public List<Source<?>> events() {
     return events;
   }
   private void clearEvents() {

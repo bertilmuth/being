@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import io.vlingo.xoom.lattice.model.DomainEvent;
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 public class CommandHandler<T> {
@@ -23,7 +24,7 @@ public class CommandHandler<T> {
 			this.commandClass = commandClass;
 		}
 
-		CommandHandler<T> toEvent(Function<T, ? extends Source<DomainEvent>> handler) {
+		CommandHandler<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> handler) {
 			Function<T, List<Source<DomainEvent>>> eventListProducingHandler = cmd -> {
 				Source<DomainEvent> result = handler.apply(cmd);
 				return Collections.singletonList(result);
