@@ -2,7 +2,6 @@ package org.requirementsascode.being;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.requirementsascode.being.CommandHandler.commandsOf;
 import static org.requirementsascode.being.EventHandler.eventsOf;
 
@@ -11,7 +10,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.requirementsascode.being.AggregateBehavior.IllegalEventHandlerResult;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
