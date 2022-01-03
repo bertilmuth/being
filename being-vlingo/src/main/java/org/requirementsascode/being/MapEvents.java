@@ -4,25 +4,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class MapEvents<STATE> {
-	private final List<EventMapper<? extends IdentifiedDomainEvent, STATE>> eventMappers;
+public class MapEvents<STATE> implements Function<IdentifiedDomainEvent, Optional<STATE>>{
+	private final List<MapEvent<? extends IdentifiedDomainEvent, STATE>> eventMappers;
 
 	@SafeVarargs
-	public static <STATE> MapEvents<STATE> with(EventMapper<? extends IdentifiedDomainEvent, STATE>... mapEvents) {
-		return new MapEvents<>(mapEvents);
+	public static <STATE> MapEvents<STATE> with(MapEvent<? extends IdentifiedDomainEvent, STATE>... eventMappers) {
+		return new MapEvents<>(eventMappers);
 	}
 	
 	@SafeVarargs
-	private MapEvents(EventMapper<? extends IdentifiedDomainEvent, STATE>... mapEvents) {
-		Objects.requireNonNull(mapEvents, "mapEvents must be non-null!");
-		this.eventMappers = Arrays.asList(mapEvents);
+	private MapEvents(MapEvent<? extends IdentifiedDomainEvent, STATE>... eventMappers) {
+		Objects.requireNonNull(eventMappers, "eventMappers must be non-null!");
+		this.eventMappers = Arrays.asList(eventMappers);
 	}
 	
-	public Optional<STATE> reactTo(IdentifiedDomainEvent event) {
+	@Override
+	public Optional<STATE> apply(IdentifiedDomainEvent event) {
 		Class<? extends IdentifiedDomainEvent> eventClass = Objects.requireNonNull(event, "event must be non-null!").getClass();
 		
 		Optional<STATE> optionalState = eventMappers.stream()
@@ -36,7 +38,7 @@ public class MapEvents<STATE> {
 	public List<Class<? extends IdentifiedDomainEvent>> getEventClasses() {
 		final List<Class<? extends IdentifiedDomainEvent>> eventClasses = 
 			eventMappers.stream()
-			.map(EventMapper::getEventClass)
+			.map(MapEvent::getEventClass)
 			.collect(Collectors.toList());
 		return eventClasses;
 	}

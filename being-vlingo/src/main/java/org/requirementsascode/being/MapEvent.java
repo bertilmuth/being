@@ -3,11 +3,9 @@ package org.requirementsascode.being;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
-import io.vlingo.xoom.symbio.Source;
 
-public class EventMapper<EVENT extends IdentifiedDomainEvent, STATE> implements Function<Source<DomainEvent>, STATE>{
+public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE> implements Function<IdentifiedDomainEvent, STATE>{
 	private final Class<EVENT> eventClass;
 	private final Function<EVENT, STATE> mapFunction;
 	
@@ -22,12 +20,12 @@ public class EventMapper<EVENT extends IdentifiedDomainEvent, STATE> implements 
 			this.eventClass = eventClass;
 		}
 		
-		<STATE> EventMapper<EVENT, STATE> toState(Function<EVENT, STATE> mapFunction){
-			return new EventMapper<>(eventClass, mapFunction);
+		<STATE> MapEvent<EVENT, STATE> toState(Function<EVENT, STATE> mapFunction){
+			return new MapEvent<>(eventClass, mapFunction);
 		}
 	}
 	
-	private EventMapper(Class<EVENT> eventClass, Function<EVENT, STATE> mapFunction) {
+	private MapEvent(Class<EVENT> eventClass, Function<EVENT, STATE> mapFunction) {
 		this.eventClass = Objects.requireNonNull(eventClass, "eventClass must be non-null!");
 		this.mapFunction = Objects.requireNonNull(mapFunction, "mapFunction must be non-null!");
 	}
@@ -38,7 +36,7 @@ public class EventMapper<EVENT extends IdentifiedDomainEvent, STATE> implements 
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public STATE apply(Source<DomainEvent> event) {
+	public STATE apply(IdentifiedDomainEvent event) {
 		return mapFunction.apply((EVENT)event);
 	}
 }

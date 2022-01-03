@@ -35,8 +35,8 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 
 	private void registerEventMapperFor(Class<? extends IdentifiedDomainEvent> eventClass) {
 		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (b, ev) -> {
-			Optional<STATE> updatedState = mapEvents.reactTo(ev);
-			aggregateBehavior.setState(updatedState.get());
+			Optional<STATE> updatedState = mapEvents.apply(ev);
+			updatedState.ifPresent(aggregateBehavior::setState);
 		});
 	}
 

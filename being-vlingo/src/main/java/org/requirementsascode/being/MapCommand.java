@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class CommandMapper<CMD> implements Function<Object, List<? extends IdentifiedDomainEvent>>{
+public class MapCommand<CMD> implements Function<Object, List<? extends IdentifiedDomainEvent>>{
 	private final Class<CMD> commandClass;
 	private final Function<CMD, List<? extends IdentifiedDomainEvent>> mapFunction;
 
@@ -22,7 +22,7 @@ public class CommandMapper<CMD> implements Function<Object, List<? extends Ident
 			this.commandClass = commandClass;
 		}
 
-		CommandMapper<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> mapFunction) {
+		MapCommand<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> mapFunction) {
 			Function<T, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = cmd -> {
 				IdentifiedDomainEvent result = mapFunction.apply(cmd);
 				return Collections.singletonList(result);
@@ -31,12 +31,12 @@ public class CommandMapper<CMD> implements Function<Object, List<? extends Ident
 			return toEvents(eventListProducingHandler);
 		}
 
-		public CommandMapper<T> toEvents(Function<T, List<? extends IdentifiedDomainEvent>> mapFunction) {
-			return new CommandMapper<>(commandClass, mapFunction);
+		public MapCommand<T> toEvents(Function<T, List<? extends IdentifiedDomainEvent>> mapFunction) {
+			return new MapCommand<>(commandClass, mapFunction);
 		}
 	}
 
-	private CommandMapper(Class<CMD> commandClass, Function<CMD, List<? extends IdentifiedDomainEvent>> mapFunction) {
+	private MapCommand(Class<CMD> commandClass, Function<CMD, List<? extends IdentifiedDomainEvent>> mapFunction) {
 		this.commandClass = Objects.requireNonNull(commandClass, "commandClass must be non-null!");
 		this.mapFunction = Objects.requireNonNull(mapFunction, "mapFunction must be non-null!");
 	}

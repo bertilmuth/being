@@ -10,17 +10,18 @@ import java.util.stream.Collectors;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
 public class MapCommands implements Function<Object, List<? extends IdentifiedDomainEvent>>{
-	private final List<CommandMapper<?>> commandMappers;
+	private final List<MapCommand<?>> commandMappers;
 
-	public static MapCommands with(CommandMapper<?>... commandMappers) {
+	public static MapCommands with(MapCommand<?>... commandMappers) {
 		return new MapCommands(commandMappers);
 	}
 	
-	private MapCommands(CommandMapper<?>... commandMappers) {
+	private MapCommands(MapCommand<?>... commandMappers) {
 		Objects.requireNonNull(commandMappers, "commandMappers must be non-null!");
 		this.commandMappers = Arrays.asList(commandMappers);
 	}
 	
+	@Override
 	public List<? extends IdentifiedDomainEvent> apply(Object command) {
 		Class<?> commandClass = Objects.requireNonNull(command, "command must be non-null!").getClass();
 		
@@ -36,7 +37,7 @@ public class MapCommands implements Function<Object, List<? extends IdentifiedDo
 	public List<Class<?>> getCommandClasses() {
 		final List<Class<?>> commandClasses = 
 			commandMappers.stream()
-			.map(CommandMapper::getCommandClass)
+			.map(MapCommand::getCommandClass)
 			.collect(Collectors.toList());
 		return commandClasses;
 	}

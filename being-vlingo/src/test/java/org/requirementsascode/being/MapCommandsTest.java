@@ -2,7 +2,7 @@ package org.requirementsascode.being;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.requirementsascode.being.CommandMapper.commandsOf;
+import static org.requirementsascode.being.MapCommand.commandsOf;
 
 import java.util.List;
 import java.util.function.Function;
@@ -35,9 +35,9 @@ class MapCommandsTest {
 	@Test
 	void createsTwoCommandMappers() {
 		final Function<SampleCommand1, SampleEvent1> handler1 = command -> new SampleEvent1(command.id);
-		CommandMapper<SampleCommand1> mapCommand1 = commandsOf(SampleCommand1.class).toEvent(handler1);
+		MapCommand<SampleCommand1> mapCommand1 = commandsOf(SampleCommand1.class).toEvent(handler1);
 		final Function<SampleCommand2, SampleEvent2> handler2 = command -> new SampleEvent2(command.id);
-		CommandMapper<SampleCommand2> mapCommand2 = commandsOf(SampleCommand2.class).toEvent(handler2);
+		MapCommand<SampleCommand2> mapCommand2 = commandsOf(SampleCommand2.class).toEvent(handler2);
 
 		MapCommands mapCommands = MapCommands.with(mapCommand1, mapCommand2);
 		List<Class<?>> commandClasses = mapCommands.getCommandClasses();

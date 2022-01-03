@@ -31,17 +31,17 @@ class BehaviorTestHelper<STATE> {
   }
   
   public BehaviorTestHelper<STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
-    Arrays.stream(internalEvents).forEach(mapEvents()::reactTo);
+    Arrays.stream(internalEvents).forEach(mapEvents()::apply);
     clearEvents();
     return this;
   }
   
-  public BehaviorTestHelper<STATE> when(Object message){
-    List<? extends IdentifiedDomainEvent> newEvents = mapCommands().apply(message);
-    events().addAll(newEvents);
+  public BehaviorTestHelper<STATE> when(Object command){
+    List<? extends IdentifiedDomainEvent> producedEvents = mapCommands().apply(command);
+    producedEvents().addAll(producedEvents);
     
-    Optional<STATE> lastState = newEvents.stream()
-    	.map(e -> mapEvents().reactTo(e))
+    Optional<STATE> lastState = producedEvents.stream()
+    	.map(e -> mapEvents().apply(e))
     	.filter(Optional::isPresent)
     	.map(state -> state.get())
     	.reduce((first, second) -> second);
@@ -68,7 +68,7 @@ class BehaviorTestHelper<STATE> {
     return mapEvents;
   }
 
-  public List<Source<?>> events() {
+  public List<Source<?>> producedEvents() {
     return events;
   }
   private void clearEvents() {
