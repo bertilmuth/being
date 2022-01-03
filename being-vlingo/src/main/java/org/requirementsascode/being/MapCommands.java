@@ -27,7 +27,7 @@ public class MapCommands implements Function<Object, List<? extends IdentifiedDo
 		List<? extends IdentifiedDomainEvent> eventList = mapCommands.stream()
 			.filter(h -> h.getCommandClass().equals(commandClass))
 			.findFirst()
-			.map(h -> h.reactTo(command))
+			.map(h -> h.apply(command))
 			.orElse(Collections.emptyList());
 		
 		return eventList;
