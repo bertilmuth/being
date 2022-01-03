@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-class CommandHandlersTest {
+class MapCommandsTest {
 	@Test
 	void createsEmptyCommandMappers() {
 		MapCommands mapCommands = MapCommands.with();
@@ -35,11 +35,11 @@ class CommandHandlersTest {
 	@Test
 	void createsTwoCommandMappers() {
 		final Function<SampleCommand1, SampleEvent1> handler1 = command -> new SampleEvent1(command.id);
-		MapCommand<SampleCommand1> commandHandler1 = commandsOf(SampleCommand1.class).toEvent(handler1);
+		MapCommand<SampleCommand1> mapCommand1 = commandsOf(SampleCommand1.class).toEvent(handler1);
 		final Function<SampleCommand2, SampleEvent2> handler2 = command -> new SampleEvent2(command.id);
-		MapCommand<SampleCommand2> commandHandler2 = commandsOf(SampleCommand2.class).toEvent(handler2);
+		MapCommand<SampleCommand2> mapCommand2 = commandsOf(SampleCommand2.class).toEvent(handler2);
 
-		MapCommands mapCommands = MapCommands.with(commandHandler1, commandHandler2);
+		MapCommands mapCommands = MapCommands.with(mapCommand1, mapCommand2);
 		List<Class<?>> commandClasses = mapCommands.getCommandClasses();
 		assertEquals(2, commandClasses.size());
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
