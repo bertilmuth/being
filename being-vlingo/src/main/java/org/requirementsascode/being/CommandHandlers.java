@@ -7,8 +7,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.vlingo.xoom.lattice.model.DomainEvent;
-import io.vlingo.xoom.symbio.Source;
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
 public class CommandHandlers {
 	private final List<CommandHandler<?>> commandHandlers;
@@ -22,10 +21,10 @@ public class CommandHandlers {
 		this.commandHandlers = Arrays.asList(commandHandlers);
 	}
 	
-	public List<Source<DomainEvent>> reactTo(Object command) {
+	public List<? extends IdentifiedDomainEvent> reactTo(Object command) {
 		Class<?> commandClass = Objects.requireNonNull(command, "command must be non-null!").getClass();
 		
-		List<Source<DomainEvent>> eventList = commandHandlers.stream()
+		List<? extends IdentifiedDomainEvent> eventList = commandHandlers.stream()
 			.filter(h -> h.getCommandClass().equals(commandClass))
 			.findFirst()
 			.map(h -> h.reactTo(command))
@@ -42,8 +41,8 @@ public class CommandHandlers {
 		return commandClasses;
 	}
 
-	public List<Function<?, List<Source<DomainEvent>>>> getHandlers() {
-		List<Function<?, List<Source<DomainEvent>>>> handlers = 
+	public List<Function<?, List<? extends IdentifiedDomainEvent>>> getHandlers() {
+		List<Function<?, List<? extends IdentifiedDomainEvent>>> handlers = 
 			commandHandlers.stream()
 			.map(CommandHandler::getHandler)
 			.collect(Collectors.toList());

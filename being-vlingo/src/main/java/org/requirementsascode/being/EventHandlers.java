@@ -7,27 +7,24 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
-import io.vlingo.xoom.symbio.Source;
 
 public class EventHandlers<STATE> {
-	private final List<EventHandler<? extends Source<?>, STATE>> eventHandlers;
+	private final List<EventHandler<? extends IdentifiedDomainEvent, STATE>> eventHandlers;
 
 	@SafeVarargs
-	public static <STATE> EventHandlers<STATE> are(EventHandler<? extends Source<?>, STATE>... eventHandlers) {
+	public static <STATE> EventHandlers<STATE> are(EventHandler<? extends IdentifiedDomainEvent, STATE>... eventHandlers) {
 		return new EventHandlers<>(eventHandlers);
 	}
 	
 	@SafeVarargs
-	private EventHandlers(EventHandler<? extends Source<?>, STATE>... eventHandlers) {
+	private EventHandlers(EventHandler<? extends IdentifiedDomainEvent, STATE>... eventHandlers) {
 		Objects.requireNonNull(eventHandlers, "eventHandlers must be non-null!");
 		this.eventHandlers = Arrays.asList(eventHandlers);
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public Optional<STATE> reactTo(Source<DomainEvent> event) {
-		Class<? extends Source> eventClass = Objects.requireNonNull(event, "event must be non-null!").getClass();
+	public Optional<STATE> reactTo(IdentifiedDomainEvent event) {
+		Class<? extends IdentifiedDomainEvent> eventClass = Objects.requireNonNull(event, "event must be non-null!").getClass();
 		
 		Optional<STATE> optionalState = eventHandlers.stream()
 			.filter(h -> h.getEventClass().equals(eventClass))
@@ -45,8 +42,8 @@ public class EventHandlers<STATE> {
 		return eventClasses;
 	}
 
-	public List<Function<? extends Source<?>, ?>> getHandlers() {
-		List<Function<? extends Source<?>, ?>> handlers = 
+	public List<Function<? extends IdentifiedDomainEvent, ?>> getHandlers() {
+		List<Function<? extends IdentifiedDomainEvent, ?>> handlers = 
 			eventHandlers.stream()
 			.map(EventHandler::getHandler)
 			.collect(Collectors.toList());

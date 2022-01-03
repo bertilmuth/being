@@ -9,9 +9,7 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
-import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
-import io.vlingo.xoom.symbio.Source;
 
 class CommandHandlersTest {
 	@Test
@@ -21,7 +19,7 @@ class CommandHandlersTest {
 		List<Class<?>> commands = commandHandlers.getCommandClasses();
 		assertTrue(commands.isEmpty());
 		
-		List<Function<?, List<Source<DomainEvent>>>> handlers = commandHandlers.getHandlers();
+		List<Function<?, List<? extends IdentifiedDomainEvent>>> handlers = commandHandlers.getHandlers();
 		assertTrue(handlers.isEmpty());
 	}
 
@@ -36,7 +34,7 @@ class CommandHandlersTest {
 		assertEquals(1, commandClasses.size());
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
 		
-		List<Function<?, List<Source<DomainEvent>>>> handlers = commandHandlers.getHandlers();
+		List<Function<?, List<? extends IdentifiedDomainEvent>>> handlers = commandHandlers.getHandlers();
 		assertEquals(1, handlers.size());
 	}
 	
@@ -53,7 +51,7 @@ class CommandHandlersTest {
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
 		assertEquals(SampleCommand2.class, commandClasses.get(1));
 		
-		List<Function<?, List<Source<DomainEvent>>>> handlers = commandHandlers.getHandlers();
+		List<Function<?, List<? extends IdentifiedDomainEvent>>> handlers = commandHandlers.getHandlers();
 		assertEquals(2, handlers.size());
 	}
 	

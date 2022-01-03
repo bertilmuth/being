@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
@@ -32,17 +31,17 @@ class BehaviorTestHelper<STATE> {
   }
   
   public BehaviorTestHelper<STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
-    Arrays.stream(internalEvents).forEach(reactingEventHandlers()::reactTo);
+    Arrays.stream(internalEvents).forEach(eventHandlers()::reactTo);
     clearEvents();
     return this;
   }
   
   public BehaviorTestHelper<STATE> when(Object message){
-    List<Source<DomainEvent>> newEvents = reactingCommandHandlers().reactTo(message);
+    List<? extends IdentifiedDomainEvent> newEvents = commandHandlers().reactTo(message);
     events().addAll(newEvents);
     
     Optional<STATE> lastState = newEvents.stream()
-    	.map(e -> reactingEventHandlers().reactTo(e))
+    	.map(e -> eventHandlers().reactTo(e))
     	.filter(Optional::isPresent)
     	.map(state -> state.get())
     	.reduce((first, second) -> second);
@@ -61,11 +60,11 @@ class BehaviorTestHelper<STATE> {
     return UUID.randomUUID().toString();
   }
   
-  private CommandHandlers reactingCommandHandlers() {
+  private CommandHandlers commandHandlers() {
     return commandHandlers;
   }
 
-  private EventHandlers<STATE> reactingEventHandlers() {
+  private EventHandlers<STATE> eventHandlers() {
     return eventHandlers;
   }
 

@@ -2,9 +2,9 @@ package org.requirementsascode.being;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import io.vlingo.xoom.common.Completes;
 import io.vlingo.xoom.lattice.model.DomainEvent;
@@ -14,13 +14,13 @@ import io.vlingo.xoom.symbio.Source;
 
 public class EventSourcedAggregateBehavior<STATE> extends EventSourced implements CompletableBehavior<STATE> {
 	private final AggregateBehavior<STATE> aggregateBehavior;
-	private final CommandHandlers reactingCommandHandlers;
+	private final CommandHandlers commandHandlers;
 	private final EventHandlers<STATE> reactingEventHandlers;
 
 	public EventSourcedAggregateBehavior(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
 		super(entityId);
 		this.aggregateBehavior = requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");	    
-		this.reactingCommandHandlers = aggregateBehavior.commandHandlers();
+		this.commandHandlers = aggregateBehavior.commandHandlers();
 		this.reactingEventHandlers = aggregateBehavior.eventHandlers();
 
 	    createAggregate(entityId, aggregateBehavior);
@@ -46,18 +46,14 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 	}
 
 	public Completes<STATE> reactTo(Object command){
-		List<Source<DomainEvent>> events = reactingCommandHandlers.reactTo(command);
-		if(events.isEmpty()) {
+		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers.reactTo(command);
+		if(identifiedDomainEvents.isEmpty()) {
 			throw new RuntimeException("Command handler didn't create event for command: " + command);
 		}
 
-		return apply(events, new StateSupplier());
-	}
-	
-	private class StateSupplier implements Supplier<STATE>{
-		@Override
-		public STATE get() {
-			return aggregateBehavior.state();
-		}
+		List<Source<DomainEvent>> sourceList = new ArrayList<>(identifiedDomainEvents.size());
+		sourceList.addAll(identifiedDomainEvents);
+		
+		return apply(sourceList, () -> aggregateBehavior.state());
 	}
 }

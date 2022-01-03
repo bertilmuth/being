@@ -5,13 +5,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
-import io.vlingo.xoom.symbio.Source;
 
 public class CommandHandler<T> {
 	private final Class<T> commandClass;
-	private final Function<T, List<Source<DomainEvent>>> handler;
+	private final Function<T, List<? extends IdentifiedDomainEvent>> handler;
 
 	public static <T> CommandsOf<T> commandsOf(Class<T> commandClass) {
 		return new CommandsOf<T>(commandClass);
@@ -25,20 +23,20 @@ public class CommandHandler<T> {
 		}
 
 		CommandHandler<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> handler) {
-			Function<T, List<Source<DomainEvent>>> eventListProducingHandler = cmd -> {
-				Source<DomainEvent> result = handler.apply(cmd);
+			Function<T, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = cmd -> {
+				IdentifiedDomainEvent result = handler.apply(cmd);
 				return Collections.singletonList(result);
 			};
 			
 			return toEvents(eventListProducingHandler);
 		}
 
-		public CommandHandler<T> toEvents(Function<T, List<Source<DomainEvent>>> handler) {
+		public CommandHandler<T> toEvents(Function<T, List<? extends IdentifiedDomainEvent>> handler) {
 			return new CommandHandler<>(commandClass, handler);
 		}
 	}
 
-	private CommandHandler(Class<T> commandClass, Function<T, List<Source<DomainEvent>>> handler) {
+	private CommandHandler(Class<T> commandClass, Function<T, List<? extends IdentifiedDomainEvent>> handler) {
 		this.commandClass = Objects.requireNonNull(commandClass, "commandClass must be non-null!");
 		this.handler = Objects.requireNonNull(handler, "handler must be non-null!");
 	}
@@ -47,12 +45,12 @@ public class CommandHandler<T> {
 		return commandClass;
 	}
 
-	public Function<T, List<Source<DomainEvent>>> getHandler() {
+	public Function<T, List<? extends IdentifiedDomainEvent>> getHandler() {
 		return handler;
 	}
 
 	@SuppressWarnings("unchecked")
-	List<Source<DomainEvent>> reactTo(Object command) {
+	List<? extends IdentifiedDomainEvent> reactTo(Object command) {
 		return handler.apply((T) command);
 	}
 }
