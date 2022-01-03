@@ -1,13 +1,13 @@
 package org.requirementsascode.being;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 public class CommandHandlers {
@@ -22,15 +22,16 @@ public class CommandHandlers {
 		this.commandHandlers = Arrays.asList(commandHandlers);
 	}
 	
-	public Optional<IdentifiedDomainEvent> reactTo(Object command) {
+	public List<Source<DomainEvent>> reactTo(Object command) {
 		Class<?> commandClass = Objects.requireNonNull(command, "command must be non-null!").getClass();
 		
-		Optional<IdentifiedDomainEvent> optionalEvent = commandHandlers.stream()
+		List<Source<DomainEvent>> eventList = commandHandlers.stream()
 			.filter(h -> h.getCommandClass().equals(commandClass))
+			.findFirst()
 			.map(h -> h.reactTo(command))
-			.findFirst();
+			.orElse(Collections.emptyList());
 		
-		return optionalEvent;
+		return eventList;
 	}
 
 	public List<Class<?>> getCommandClasses() {
@@ -41,8 +42,8 @@ public class CommandHandlers {
 		return commandClasses;
 	}
 
-	public List<Function<?, ? extends Source<?>>> getHandlers() {
-		List<Function<?, ? extends Source<?>>> handlers = 
+	public List<Function<?, List<Source<DomainEvent>>>> getHandlers() {
+		List<Function<?, List<Source<DomainEvent>>>> handlers = 
 			commandHandlers.stream()
 			.map(CommandHandler::getHandler)
 			.collect(Collectors.toList());

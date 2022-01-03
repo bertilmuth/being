@@ -3,7 +3,9 @@ package org.requirementsascode.being;
 import java.util.Objects;
 import java.util.function.Function;
 
+import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+import io.vlingo.xoom.symbio.Source;
 
 public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE> {
 	private final Class<EVENT> eventClass;
@@ -39,7 +41,7 @@ public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	STATE reactTo(IdentifiedDomainEvent event) {
+	STATE reactTo(Source<DomainEvent> event) {
 		return handler.apply((EVENT)event);
 	}
 }

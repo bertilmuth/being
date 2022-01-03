@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
+import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
@@ -20,7 +21,7 @@ class CommandHandlersTest {
 		List<Class<?>> commands = commandHandlers.getCommandClasses();
 		assertTrue(commands.isEmpty());
 		
-		List<Function<?, ? extends Source<?>>> handlers = commandHandlers.getHandlers();
+		List<Function<?, List<Source<DomainEvent>>>> handlers = commandHandlers.getHandlers();
 		assertTrue(handlers.isEmpty());
 	}
 
@@ -35,9 +36,8 @@ class CommandHandlersTest {
 		assertEquals(1, commandClasses.size());
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
 		
-		List<Function<?, ? extends Source<?>>> handlers = commandHandlers.getHandlers();
+		List<Function<?, List<Source<DomainEvent>>>> handlers = commandHandlers.getHandlers();
 		assertEquals(1, handlers.size());
-		assertEquals(handler, handlers.get(0));
 	}
 	
 	@Test
@@ -53,10 +53,8 @@ class CommandHandlersTest {
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
 		assertEquals(SampleCommand2.class, commandClasses.get(1));
 		
-		List<Function<?, ? extends Source<?>>> handlers = commandHandlers.getHandlers();
+		List<Function<?, List<Source<DomainEvent>>>> handlers = commandHandlers.getHandlers();
 		assertEquals(2, handlers.size());
-		assertEquals(handler1, handlers.get(0));
-		assertEquals(handler2, handlers.get(1));
 	}
 	
 	private class SampleCommand1{

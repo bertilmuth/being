@@ -2,11 +2,15 @@ package org.requirementsascode.being;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import io.vlingo.xoom.common.Completes;
+import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.lattice.model.sourcing.EventSourced;
+import io.vlingo.xoom.symbio.Source;
 
 public class EventSourcedAggregateBehavior<STATE> extends EventSourced implements CompletableBehavior<STATE> {
 	private final AggregateBehavior<STATE> aggregateBehavior;
@@ -41,10 +45,19 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 	    aggregateBehavior.setState(state);
 	}
 
-	public Completes<STATE> reactTo(Object command) {
-		Optional<IdentifiedDomainEvent> optionalEvent = reactingCommandHandlers.reactTo(command);
-		IdentifiedDomainEvent event = optionalEvent.orElseThrow(() -> new RuntimeException("Command handler didn't create event!"));
+	public Completes<STATE> reactTo(Object command){
+		List<Source<DomainEvent>> events = reactingCommandHandlers.reactTo(command);
+		if(events.isEmpty()) {
+			throw new RuntimeException("Command handler didn't create event for command: " + command);
+		}
 
-		return apply(event, () -> aggregateBehavior.state());
+		return apply(events, new StateSupplier());
+	}
+	
+	private class StateSupplier implements Supplier<STATE>{
+		@Override
+		public STATE get() {
+			return aggregateBehavior.state();
+		}
 	}
 }

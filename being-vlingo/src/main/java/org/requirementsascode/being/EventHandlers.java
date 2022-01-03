@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
@@ -24,8 +25,9 @@ public class EventHandlers<STATE> {
 		this.eventHandlers = Arrays.asList(eventHandlers);
 	}
 	
-	public Optional<STATE> reactTo(IdentifiedDomainEvent event) {
-		Class<? extends IdentifiedDomainEvent> eventClass = Objects.requireNonNull(event, "event must be non-null!").getClass();
+	@SuppressWarnings("rawtypes")
+	public Optional<STATE> reactTo(Source<DomainEvent> event) {
+		Class<? extends Source> eventClass = Objects.requireNonNull(event, "event must be non-null!").getClass();
 		
 		Optional<STATE> optionalState = eventHandlers.stream()
 			.filter(h -> h.getEventClass().equals(eventClass))
