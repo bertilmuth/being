@@ -2,7 +2,7 @@ package org.requirementsascode.being;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.requirementsascode.being.MapEvent.eventsOf;
+import static org.requirementsascode.being.EventMapper.eventsOf;
 
 import java.util.List;
 

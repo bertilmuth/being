@@ -2,8 +2,8 @@ package org.requirementsascode.being;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.requirementsascode.being.MapCommand.commandsOf;
-import static org.requirementsascode.being.MapEvent.eventsOf;
+import static org.requirementsascode.being.CommandMapper.commandsOf;
+import static org.requirementsascode.being.EventMapper.eventsOf;
 
 import java.util.ArrayList;
 import java.util.List;

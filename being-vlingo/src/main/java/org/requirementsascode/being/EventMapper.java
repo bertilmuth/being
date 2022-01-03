@@ -7,9 +7,9 @@ import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
-public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE> {
+public class EventMapper<EVENT extends IdentifiedDomainEvent, STATE> implements Function<Source<DomainEvent>, STATE>{
 	private final Class<EVENT> eventClass;
-	private final Function<EVENT, STATE> handler;
+	private final Function<EVENT, STATE> mapFunction;
 	
 	public static <EVENT extends IdentifiedDomainEvent> EventsOf<EVENT> eventsOf(Class<EVENT> eventClass) {
 		return new EventsOf<EVENT>(eventClass);
@@ -22,14 +22,14 @@ public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE> {
 			this.eventClass = eventClass;
 		}
 		
-		<STATE> MapEvent<EVENT, STATE> toState(Function<EVENT, STATE> handler){
-			return new MapEvent<>(eventClass, handler);
+		<STATE> EventMapper<EVENT, STATE> toState(Function<EVENT, STATE> mapFunction){
+			return new EventMapper<>(eventClass, mapFunction);
 		}
 	}
 	
-	private MapEvent(Class<EVENT> eventClass, Function<EVENT, STATE> handler) {
+	private EventMapper(Class<EVENT> eventClass, Function<EVENT, STATE> mapFunction) {
 		this.eventClass = Objects.requireNonNull(eventClass, "eventClass must be non-null!");
-		this.handler = Objects.requireNonNull(handler, "handler must be non-null!");
+		this.mapFunction = Objects.requireNonNull(mapFunction, "mapFunction must be non-null!");
 	}
 
 	public Class<EVENT> getEventClass() {
@@ -37,7 +37,8 @@ public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	STATE reactTo(Source<DomainEvent> event) {
-		return handler.apply((EVENT)event);
+	@Override
+	public STATE apply(Source<DomainEvent> event) {
+		return mapFunction.apply((EVENT)event);
 	}
 }

@@ -7,9 +7,9 @@ import java.util.function.Function;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class MapCommand<T> implements Function<Object, List<? extends IdentifiedDomainEvent>>{
-	private final Class<T> commandClass;
-	private final Function<T, List<? extends IdentifiedDomainEvent>> mapFunction;
+public class CommandMapper<CMD> implements Function<Object, List<? extends IdentifiedDomainEvent>>{
+	private final Class<CMD> commandClass;
+	private final Function<CMD, List<? extends IdentifiedDomainEvent>> mapFunction;
 
 	public static <T> CommandsOf<T> commandsOf(Class<T> commandClass) {
 		return new CommandsOf<T>(commandClass);
@@ -22,7 +22,7 @@ public class MapCommand<T> implements Function<Object, List<? extends Identified
 			this.commandClass = commandClass;
 		}
 
-		MapCommand<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> mapFunction) {
+		CommandMapper<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> mapFunction) {
 			Function<T, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = cmd -> {
 				IdentifiedDomainEvent result = mapFunction.apply(cmd);
 				return Collections.singletonList(result);
@@ -31,22 +31,22 @@ public class MapCommand<T> implements Function<Object, List<? extends Identified
 			return toEvents(eventListProducingHandler);
 		}
 
-		public MapCommand<T> toEvents(Function<T, List<? extends IdentifiedDomainEvent>> mapFunction) {
-			return new MapCommand<>(commandClass, mapFunction);
+		public CommandMapper<T> toEvents(Function<T, List<? extends IdentifiedDomainEvent>> mapFunction) {
+			return new CommandMapper<>(commandClass, mapFunction);
 		}
 	}
 
-	private MapCommand(Class<T> commandClass, Function<T, List<? extends IdentifiedDomainEvent>> mapFunction) {
+	private CommandMapper(Class<CMD> commandClass, Function<CMD, List<? extends IdentifiedDomainEvent>> mapFunction) {
 		this.commandClass = Objects.requireNonNull(commandClass, "commandClass must be non-null!");
 		this.mapFunction = Objects.requireNonNull(mapFunction, "mapFunction must be non-null!");
 	}
 
-	public Class<T> getCommandClass() {
+	public Class<CMD> getCommandClass() {
 		return commandClass;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<? extends IdentifiedDomainEvent> apply(Object command) {
-		return mapFunction.apply((T) command);
+		return mapFunction.apply((CMD) command);
 	}
 }

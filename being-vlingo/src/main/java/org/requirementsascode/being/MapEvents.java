@@ -9,25 +9,25 @@ import java.util.stream.Collectors;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
 public class MapEvents<STATE> {
-	private final List<MapEvent<? extends IdentifiedDomainEvent, STATE>> mapEvents;
+	private final List<EventMapper<? extends IdentifiedDomainEvent, STATE>> eventMappers;
 
 	@SafeVarargs
-	public static <STATE> MapEvents<STATE> with(MapEvent<? extends IdentifiedDomainEvent, STATE>... mapEvents) {
+	public static <STATE> MapEvents<STATE> with(EventMapper<? extends IdentifiedDomainEvent, STATE>... mapEvents) {
 		return new MapEvents<>(mapEvents);
 	}
 	
 	@SafeVarargs
-	private MapEvents(MapEvent<? extends IdentifiedDomainEvent, STATE>... mapEvents) {
+	private MapEvents(EventMapper<? extends IdentifiedDomainEvent, STATE>... mapEvents) {
 		Objects.requireNonNull(mapEvents, "mapEvents must be non-null!");
-		this.mapEvents = Arrays.asList(mapEvents);
+		this.eventMappers = Arrays.asList(mapEvents);
 	}
 	
 	public Optional<STATE> reactTo(IdentifiedDomainEvent event) {
 		Class<? extends IdentifiedDomainEvent> eventClass = Objects.requireNonNull(event, "event must be non-null!").getClass();
 		
-		Optional<STATE> optionalState = mapEvents.stream()
+		Optional<STATE> optionalState = eventMappers.stream()
 			.filter(h -> h.getEventClass().equals(eventClass))
-			.map(h -> h.reactTo(event))
+			.map(h -> h.apply(event))
 			.findFirst();
 		
 		return optionalState;
@@ -35,8 +35,8 @@ public class MapEvents<STATE> {
 
 	public List<Class<? extends IdentifiedDomainEvent>> getEventClasses() {
 		final List<Class<? extends IdentifiedDomainEvent>> eventClasses = 
-			mapEvents.stream()
-			.map(MapEvent::getEventClass)
+			eventMappers.stream()
+			.map(EventMapper::getEventClass)
 			.collect(Collectors.toList());
 		return eventClasses;
 	}
