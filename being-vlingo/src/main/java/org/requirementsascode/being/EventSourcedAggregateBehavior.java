@@ -15,13 +15,13 @@ import io.vlingo.xoom.symbio.Source;
 public class EventSourcedAggregateBehavior<STATE> extends EventSourced implements CompletableBehavior<STATE> {
 	private final AggregateBehavior<STATE> aggregateBehavior;
 	private final CommandHandlers commandHandlers;
-	private final EventHandlers<STATE> reactingEventHandlers;
+	private final EventHandlers<STATE> eventHandlers;
 
 	public EventSourcedAggregateBehavior(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
 		super(entityId);
 		this.aggregateBehavior = requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");	    
 		this.commandHandlers = aggregateBehavior.commandHandlers();
-		this.reactingEventHandlers = aggregateBehavior.eventHandlers();
+		this.eventHandlers = aggregateBehavior.eventHandlers();
 
 	    createAggregate(entityId, aggregateBehavior);
 		
@@ -35,7 +35,7 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 
 	private void registerEventHandlerFor(Class<? extends IdentifiedDomainEvent> eventClass) {
 		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (b, ev) -> {
-			Optional<STATE> updatedState = reactingEventHandlers.reactTo(ev);
+			Optional<STATE> updatedState = eventHandlers.reactTo(ev);
 			aggregateBehavior.setState(updatedState.get());
 		});
 	}
