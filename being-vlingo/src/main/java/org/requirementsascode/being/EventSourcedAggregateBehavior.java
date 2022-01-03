@@ -15,27 +15,27 @@ import io.vlingo.xoom.symbio.Source;
 public class EventSourcedAggregateBehavior<STATE> extends EventSourced implements CompletableBehavior<STATE> {
 	private final AggregateBehavior<STATE> aggregateBehavior;
 	private final MapCommands mapCommands;
-	private final EventHandlers<STATE> eventHandlers;
+	private final MapEvents<STATE> mapEvents;
 
 	public EventSourcedAggregateBehavior(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
 		super(entityId);
 		this.aggregateBehavior = requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");	    
 		this.mapCommands = aggregateBehavior.mapCommands();
-		this.eventHandlers = aggregateBehavior.eventHandlers();
+		this.mapEvents = aggregateBehavior.mapEvents();
 
 	    createAggregate(entityId, aggregateBehavior);
 		
-		registerEventHandlers();
+		registerEventMappers();
 	}
 
-	private void registerEventHandlers() {
-		aggregateBehavior.eventHandlers().getEventClasses().stream()
-			.forEach(clazz -> registerEventHandlerFor(clazz));		
+	private void registerEventMappers() {
+		aggregateBehavior.mapEvents().getEventClasses().stream()
+			.forEach(clazz -> registerEventMapperFor(clazz));		
 	}
 
-	private void registerEventHandlerFor(Class<? extends IdentifiedDomainEvent> eventClass) {
+	private void registerEventMapperFor(Class<? extends IdentifiedDomainEvent> eventClass) {
 		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (b, ev) -> {
-			Optional<STATE> updatedState = eventHandlers.reactTo(ev);
+			Optional<STATE> updatedState = mapEvents.reactTo(ev);
 			aggregateBehavior.setState(updatedState.get());
 		});
 	}

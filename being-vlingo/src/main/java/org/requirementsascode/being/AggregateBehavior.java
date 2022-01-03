@@ -53,19 +53,5 @@ public abstract class AggregateBehavior<STATE>{
    * {@link #state}<code>()</code> to get access to the current state of the entity.
    * @return the mapping function
    */
-  public abstract EventHandlers<STATE> eventHandlers();
-  
-  /** 
-   * Exception thrown by the library when a systemPublish() statement inside a AggregateBehavior's model
-   * returns an invalid object (e.g. of the wrong type) 
-   * 
-   * @author b_muth
-   *
-   */
-  @SuppressWarnings("serial")
-  public static class IllegalEventHandlerResult extends IllegalArgumentException{
-    public IllegalEventHandlerResult(String message) {
-      super(message);
-    }
-  }
+  public abstract MapEvents<STATE> mapEvents();
 }

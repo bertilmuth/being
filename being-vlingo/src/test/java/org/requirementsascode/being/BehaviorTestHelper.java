@@ -13,13 +13,13 @@ import io.vlingo.xoom.symbio.Source;
 
 class BehaviorTestHelper<STATE> {
   private final MapCommands mapCommands;
-  private final EventHandlers<STATE> eventHandlers;
+  private final MapEvents<STATE> mapEvents;
   private List<Source<?>> events;
   private final AggregateBehavior<STATE> aggregateBehavior;
 
   private BehaviorTestHelper(AggregateBehavior<STATE> aggregateBehavior) {
     this.mapCommands = aggregateBehavior.mapCommands();
-    this.eventHandlers = aggregateBehavior.eventHandlers();
+    this.mapEvents = aggregateBehavior.mapEvents();
     this.aggregateBehavior = aggregateBehavior;
     
     clearEvents();   
@@ -31,7 +31,7 @@ class BehaviorTestHelper<STATE> {
   }
   
   public BehaviorTestHelper<STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
-    Arrays.stream(internalEvents).forEach(eventHandlers()::reactTo);
+    Arrays.stream(internalEvents).forEach(mapEvents()::reactTo);
     clearEvents();
     return this;
   }
@@ -41,7 +41,7 @@ class BehaviorTestHelper<STATE> {
     events().addAll(newEvents);
     
     Optional<STATE> lastState = newEvents.stream()
-    	.map(e -> eventHandlers().reactTo(e))
+    	.map(e -> mapEvents().reactTo(e))
     	.filter(Optional::isPresent)
     	.map(state -> state.get())
     	.reduce((first, second) -> second);
@@ -64,8 +64,8 @@ class BehaviorTestHelper<STATE> {
     return mapCommands;
   }
 
-  private EventHandlers<STATE> eventHandlers() {
-    return eventHandlers;
+  private MapEvents<STATE> mapEvents() {
+    return mapEvents;
   }
 
   public List<Source<?>> events() {

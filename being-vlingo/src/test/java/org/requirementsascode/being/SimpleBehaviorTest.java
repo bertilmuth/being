@@ -3,7 +3,7 @@ package org.requirementsascode.being;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.requirementsascode.being.MapCommand.commandsOf;
-import static org.requirementsascode.being.EventHandler.eventsOf;
+import static org.requirementsascode.being.MapEvent.eventsOf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +142,7 @@ class SimpleBehaviorTest {
   }
   
   @Test
-  public void eventHandlerUpdatesState() {
+  public void appliedEventUpdatesState() {
     behaviorTestHelper.when(new TestUpdateStateCommand());
 
     assertEquals(asList(new TestUpdateStateEvent()), behaviorTestHelper.events());
@@ -150,7 +150,7 @@ class SimpleBehaviorTest {
   }
   
   @Test
-  public void eventHandlerUpdatesStateAndHandlesSecondWhen() {
+  public void appliedEventsUpdateState() {
     TestUpdateStateCommand command1 = new TestUpdateStateCommand();
     TestUpdateStateEvent expectedEvent1 = new TestUpdateStateEvent();
     
@@ -177,8 +177,8 @@ class SimpleBehaviorTest {
     }
 
     @Override
-    public EventHandlers<TestState> eventHandlers() {
-      return EventHandlers.are(
+    public MapEvents<TestState> mapEvents() {
+      return MapEvents.with(
           eventsOf(TestEvent.class).toState(ev -> state().addEvent(ev)),
           eventsOf(TestEvent2.class).toState(ev -> state().addEvent(ev)),
           eventsOf(TestUpdateStateEvent.class).toState(ev -> new TestState().addEvent(NEW_AGGREGATE_ROOT_EVENT))

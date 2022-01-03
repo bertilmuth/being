@@ -45,10 +45,6 @@ public class MapCommand<T> {
 		return commandClass;
 	}
 
-	public Function<T, List<? extends IdentifiedDomainEvent>> getHandler() {
-		return handler;
-	}
-
 	@SuppressWarnings("unchecked")
 	List<? extends IdentifiedDomainEvent> reactTo(Object command) {
 		return handler.apply((T) command);
