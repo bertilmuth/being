@@ -7,14 +7,19 @@ import java.util.function.Function;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class MapCommand<CMD> implements Function<Object, List<? extends IdentifiedDomainEvent>>{
+public class MapCommand<CMD>{
 	private final Class<CMD> commandClass;
 	private final Function<CMD, List<? extends IdentifiedDomainEvent>> mapFunction;
 
 	public static <T> CommandsOf<T> commandsOf(Class<T> commandClass) {
 		return new CommandsOf<T>(commandClass);
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public List<? extends IdentifiedDomainEvent> map(Object command) {
+		return mapFunction.apply((CMD) command);
+	}
+	
 	public static class CommandsOf<T> {
 		private final Class<T> commandClass;
 
@@ -43,10 +48,5 @@ public class MapCommand<CMD> implements Function<Object, List<? extends Identifi
 
 	public Class<CMD> getCommandClass() {
 		return commandClass;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<? extends IdentifiedDomainEvent> apply(Object command) {
-		return mapFunction.apply((CMD) command);
 	}
 }

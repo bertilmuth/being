@@ -5,12 +5,17 @@ import java.util.function.Function;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE> implements Function<IdentifiedDomainEvent, STATE>{
+public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE>{
 	private final Class<EVENT> eventClass;
 	private final Function<EVENT, STATE> mapFunction;
 	
 	public static <EVENT extends IdentifiedDomainEvent> EventsOf<EVENT> eventsOf(Class<EVENT> eventClass) {
 		return new EventsOf<EVENT>(eventClass);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public STATE map(IdentifiedDomainEvent event) {
+		return mapFunction.apply((EVENT)event);
 	}
 	
 	public static class EventsOf<EVENT extends IdentifiedDomainEvent>{
@@ -32,11 +37,5 @@ public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE> implements Fun
 
 	public Class<EVENT> getEventClass() {
 		return eventClass;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public STATE apply(IdentifiedDomainEvent event) {
-		return mapFunction.apply((EVENT)event);
 	}
 }
