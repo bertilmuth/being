@@ -15,11 +15,6 @@ public class MapCommand<CMD>{
 		return new CommandsOf<T>(commandClass);
 	}
 	
-	@SuppressWarnings("unchecked")
-	List<? extends IdentifiedDomainEvent> map(Object command) {
-		return mapFunction.apply((CMD) command);
-	}
-	
 	public static class CommandsOf<T> {
 		private final Class<T> commandClass;
 
@@ -40,12 +35,17 @@ public class MapCommand<CMD>{
 			return new MapCommand<>(commandClass, mapFunction);
 		}
 	}
-
+	
 	private MapCommand(Class<CMD> commandClass, Function<CMD, List<? extends IdentifiedDomainEvent>> mapFunction) {
 		this.commandClass = Objects.requireNonNull(commandClass, "commandClass must be non-null!");
 		this.mapFunction = Objects.requireNonNull(mapFunction, "mapFunction must be non-null!");
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	List<? extends IdentifiedDomainEvent> map(Object command) {
+		return mapFunction.apply((CMD) command);
+	}
+	
 	public Class<CMD> getCommandClass() {
 		return commandClass;
 	}

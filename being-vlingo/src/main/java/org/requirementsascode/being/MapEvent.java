@@ -13,11 +13,6 @@ public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE>{
 		return new EventsOf<EVENT>(eventClass);
 	}
 	
-	@SuppressWarnings("unchecked")
-	STATE map(IdentifiedDomainEvent event) {
-		return mapFunction.apply((EVENT)event);
-	}
-	
 	public static class EventsOf<EVENT extends IdentifiedDomainEvent>{
 		private final Class<EVENT> eventClass;
 		
@@ -33,6 +28,11 @@ public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE>{
 	private MapEvent(Class<EVENT> eventClass, Function<EVENT, STATE> mapFunction) {
 		this.eventClass = Objects.requireNonNull(eventClass, "eventClass must be non-null!");
 		this.mapFunction = Objects.requireNonNull(mapFunction, "mapFunction must be non-null!");
+	}
+	
+	@SuppressWarnings("unchecked")
+	STATE map(IdentifiedDomainEvent event) {
+		return mapFunction.apply((EVENT)event);
 	}
 
 	public Class<EVENT> getEventClass() {
