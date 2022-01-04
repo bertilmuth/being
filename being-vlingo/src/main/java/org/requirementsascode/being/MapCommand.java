@@ -27,7 +27,7 @@ public class MapCommand<CMD>{
 			this.commandClass = commandClass;
 		}
 
-		MapCommand<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> mapFunction) {
+		public MapCommand<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> mapFunction) {
 			Function<T, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = cmd -> {
 				IdentifiedDomainEvent result = mapFunction.apply(cmd);
 				return Collections.singletonList(result);

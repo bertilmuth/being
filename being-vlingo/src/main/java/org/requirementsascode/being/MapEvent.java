@@ -25,7 +25,7 @@ public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE>{
 			this.eventClass = eventClass;
 		}
 		
-		<STATE> MapEvent<EVENT, STATE> toState(Function<EVENT, STATE> mapFunction){
+		public <STATE> MapEvent<EVENT, STATE> toState(Function<EVENT, STATE> mapFunction){
 			return new MapEvent<>(eventClass, mapFunction);
 		}
 	}
