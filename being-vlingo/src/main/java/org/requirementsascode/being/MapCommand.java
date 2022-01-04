@@ -16,7 +16,7 @@ public class MapCommand<CMD>{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<? extends IdentifiedDomainEvent> map(Object command) {
+	List<? extends IdentifiedDomainEvent> map(Object command) {
 		return mapFunction.apply((CMD) command);
 	}
 	

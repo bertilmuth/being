@@ -14,7 +14,7 @@ public class MapEvent<EVENT extends IdentifiedDomainEvent, STATE>{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public STATE map(IdentifiedDomainEvent event) {
+	STATE map(IdentifiedDomainEvent event) {
 		return mapFunction.apply((EVENT)event);
 	}
 	
