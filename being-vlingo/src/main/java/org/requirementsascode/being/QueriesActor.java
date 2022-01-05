@@ -13,23 +13,23 @@ import io.vlingo.xoom.symbio.store.state.StateStore;
  * a StateStore</a>
  */
 @SuppressWarnings("all")
-public class QueriesActor<T> extends StateStoreQueryActor implements Queries {
-	private final Class<T> dataType;
-	private final T emptyData;
+public class QueriesActor<DATA> extends StateStoreQueryActor implements Queries {
+	private final Class<DATA> dataType;
+	private final DATA emptyData;
 
-	public QueriesActor(StateStore store, Class<T> dataType, T emptyData) {
+	public QueriesActor(StateStore store, Class<DATA> dataType, DATA emptyData) {
 		super(store);
 		this.dataType = dataType;
 		this.emptyData = emptyData;
 	}
 
 	@Override
-	public Completes<T> findById(String id) {
+	public Completes<DATA> findById(String id) {
 		return queryStateFor(id, dataType, emptyData);
 	}
 
 	@Override
-	public Completes<Collection<T>> findAll() {
+	public Completes<Collection<DATA>> findAll() {
 		return streamAllOf(dataType, new ArrayList<>());
 	}
 
