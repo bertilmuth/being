@@ -12,37 +12,36 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.lattice.model.sourcing.EventSourced;
 import io.vlingo.xoom.symbio.Source;
 
-public class EventSourcedAggregateBehavior<STATE> extends EventSourced implements CompletableBehavior<STATE> {
-	private final AggregateBehavior<STATE> aggregateBehavior;
+public class EventSourcedBehavior<STATE> extends EventSourced implements Behavior<STATE> {
+	private final Aggregate<STATE> aggregate;
 	private final MapCommands mapCommands;
 	private final MapEvents<STATE> mapEvents;
 
-	public EventSourcedAggregateBehavior(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
-		super(entityId);
-		this.aggregateBehavior = requireNonNull(aggregateBehavior, "aggregateBehavior must be non-null");	    
-		this.mapCommands = aggregateBehavior.mapCommands();
-		this.mapEvents = aggregateBehavior.mapEvents();
+	public EventSourcedBehavior(String aggregateId, Aggregate<STATE> aggregate) {
+		super(aggregateId);
+		this.aggregate = requireNonNull(aggregate, "aggregate must be non-null");	    
+		this.mapCommands = aggregate.mapCommands();
+		this.mapEvents = aggregate.mapEvents();
 
-	    createAggregate(entityId, aggregateBehavior);
-		
+	    initializeAggregate(aggregateId, aggregate);
 		registerEventMappers();
 	}
 
 	private void registerEventMappers() {
-		aggregateBehavior.mapEvents().getEventClasses().stream()
+		aggregate.mapEvents().getEventClasses().stream()
 			.forEach(clazz -> registerEventMapperFor(clazz));		
 	}
 
 	private void registerEventMapperFor(Class<? extends IdentifiedDomainEvent> eventClass) {
-		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (b, ev) -> {
+		EventSourced.registerConsumer(EventSourcedBehavior.class, eventClass, (b, ev) -> {
 			Optional<STATE> updatedState = mapEvents.apply(ev);
-			updatedState.ifPresent(aggregateBehavior::setState);
+			updatedState.ifPresent(aggregate::setState);
 		});
 	}
 
-	private void createAggregate(String entityId, AggregateBehavior<STATE> aggregateBehavior) {
-		STATE state = aggregateBehavior.initialState(entityId);
-	    aggregateBehavior.setState(state);
+	private void initializeAggregate(String aggregateId, Aggregate<STATE> aggregate) {
+		STATE state = aggregate.initialState(aggregateId);
+	    aggregate.setState(state);
 	}
 
 	public Completes<STATE> reactTo(Object command){
@@ -54,6 +53,6 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 		List<Source<DomainEvent>> sourceList = new ArrayList<>(identifiedDomainEvents.size());
 		sourceList.addAll(identifiedDomainEvents);
 		
-		return apply(sourceList, () -> aggregateBehavior.state());
+		return apply(sourceList, () -> aggregate.state());
 	}
 }

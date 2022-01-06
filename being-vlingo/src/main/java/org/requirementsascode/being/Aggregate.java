@@ -2,14 +2,14 @@ package org.requirementsascode.being;
 
 /**
  * <p>
- * Core class for defining how an entity reacts to commands by producing events (that are persisted),
- * and how events are applied to an entity to change state.
+ * Core class for defining how an aggregate reacts to commands by producing events (that are persisted),
+ * and how events are applied to an aggregate to change state.
  * </p>
  * @author b_muth
  *
- * @param <STATE> the state of the entity
+ * @param <STATE> the state of the aggregate
  */
-public abstract class AggregateBehavior<STATE>{
+public abstract class Aggregate<STATE>{
   private STATE state;
   
   /**
@@ -42,15 +42,15 @@ public abstract class AggregateBehavior<STATE>{
  
   /**
    * Defines the command mappers. A mapper maps an incoming command to the event(s) to be persisted.
-   * In the mappers you can call {@link #state}<code>()</code> to get access to the current state of the entity.
+   * In the mappers you can call {@link #state}<code>()</code> to get access to the current state of the aggregate.
    * @return the mapping function
    */
   public abstract MapCommands mapCommands();
   
   /**
    * Defines the event mappers. A mappers maps a persisted event to the new state of the
-   * entity. In mapper methods, you can call
-   * {@link #state}<code>()</code> to get access to the current state of the entity.
+   * aggregate. In mapper methods, you can call
+   * {@link #state}<code>()</code> to get access to the current state of the aggregate.
    * @return the mapping function
    */
   public abstract MapEvents<STATE> mapEvents();
