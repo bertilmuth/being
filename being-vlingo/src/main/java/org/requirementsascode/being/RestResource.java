@@ -30,12 +30,12 @@ import io.vlingo.xoom.turbo.ComponentRegistry;
 public class RestResource<STATE, DATA> extends DynamicResourceHandler {
 	private final Grid grid;
 	private final Queries<DATA> $queries;
-	private final Aggregate<STATE> aggregate;
+	private final EventSourcedAggregate<STATE> aggregate;
 	private final List<RequestHandler> requestHandlers;
 	private final ViewModel<STATE, DATA> viewModel;
 
 	@SuppressWarnings("unchecked")
-	public RestResource(final Grid grid, final Aggregate<STATE> aggregate, ViewModel<STATE, DATA> viewModel) {
+	public RestResource(final Grid grid, final EventSourcedAggregate<STATE> aggregate, ViewModel<STATE, DATA> viewModel) {
 		super(grid.world().stage());
 		this.grid = Objects.requireNonNull(grid, "grid must be non-null!");
 		this.aggregate = Objects.requireNonNull(aggregate, "aggregate must be non-null!");

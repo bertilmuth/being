@@ -14,9 +14,9 @@ class AggregateTestHelper<STATE> {
 	private final MapCommands mapCommands;
 	private final MapEvents<STATE> mapEvents;
 	private List<Source<?>> events;
-	private final Aggregate<STATE> aggregate;
+	private final EventSourcedAggregate<STATE> aggregate;
 
-	private AggregateTestHelper(Aggregate<STATE> aggregate) {
+	private AggregateTestHelper(EventSourcedAggregate<STATE> aggregate) {
 		this.aggregate = Objects.requireNonNull(aggregate, "aggregate must be non-null!");
 
 		this.mapCommands = aggregate.mapCommands();
@@ -26,8 +26,8 @@ class AggregateTestHelper<STATE> {
 		createInitialStateOf(aggregate);
 	}
 
-	public static <T> AggregateTestHelper<T> of(Aggregate<T> entity) {
-		return new AggregateTestHelper<>(entity);
+	public static <T> AggregateTestHelper<T> of(EventSourcedAggregate<T> aggregate) {
+		return new AggregateTestHelper<>(aggregate);
 	}
 
 	public AggregateTestHelper<STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
@@ -47,9 +47,9 @@ class AggregateTestHelper<STATE> {
 		return this;
 	}
 
-	private void createInitialStateOf(Aggregate<STATE> entity) {
-		STATE initialState = entity.initialState(randomId());
-		entity.setState(initialState);
+	private void createInitialStateOf(EventSourcedAggregate<STATE> aggregate) {
+		STATE initialState = aggregate.initialState(randomId());
+		aggregate.setState(initialState);
 	}
 
 	private String randomId() {

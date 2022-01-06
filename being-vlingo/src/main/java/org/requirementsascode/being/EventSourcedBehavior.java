@@ -13,11 +13,11 @@ import io.vlingo.xoom.lattice.model.sourcing.EventSourced;
 import io.vlingo.xoom.symbio.Source;
 
 public class EventSourcedBehavior<STATE> extends EventSourced implements Behavior<STATE> {
-	private final Aggregate<STATE> aggregate;
+	private final EventSourcedAggregate<STATE> aggregate;
 	private final MapCommands mapCommands;
 	private final MapEvents<STATE> mapEvents;
 
-	public EventSourcedBehavior(String aggregateId, Aggregate<STATE> aggregate) {
+	public EventSourcedBehavior(String aggregateId, EventSourcedAggregate<STATE> aggregate) {
 		super(aggregateId);
 		this.aggregate = requireNonNull(aggregate, "aggregate must be non-null");	    
 		this.mapCommands = aggregate.mapCommands();
@@ -39,7 +39,7 @@ public class EventSourcedBehavior<STATE> extends EventSourced implements Behavio
 		});
 	}
 
-	private void initializeAggregate(String aggregateId, Aggregate<STATE> aggregate) {
+	private void initializeAggregate(String aggregateId, EventSourcedAggregate<STATE> aggregate) {
 		STATE state = aggregate.initialState(aggregateId);
 	    aggregate.setState(state);
 	}
