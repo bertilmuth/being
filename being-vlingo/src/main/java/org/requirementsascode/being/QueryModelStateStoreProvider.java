@@ -20,7 +20,7 @@ public class QueryModelStateStoreProvider<DATA> {
   public final StateStore store;
   public final Queries queries;
 
-  public static <T> QueryModelStateStoreProvider using(final Stage stage, T emptyData) {
+  public static <DATA> QueryModelStateStoreProvider using(final Stage stage, DATA emptyData) {
     return using(stage, emptyData, new NoOpDispatcher());
   }
 
