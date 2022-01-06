@@ -13,13 +13,13 @@ import io.vlingo.xoom.turbo.ComponentRegistry;
  * @param <DATA> the data type of the projected view model
  */
 public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
-	private final ViewModel<DATA> viewModel;
+	private final ViewModel<?, DATA> viewModel;
 
-	public <U> ProjectionActor(ViewModel<DATA> viewModel) {
+	public <U> ProjectionActor(ViewModel<?, DATA> viewModel) {
 		this(ComponentRegistry.withType(QueryModelStateStoreProvider.class).store, viewModel);
 	}
 
-	public ProjectionActor(StateStore store, ViewModel<DATA> viewModel) {
+	public ProjectionActor(StateStore store, ViewModel<?, DATA> viewModel) {
 		super(store);
 		this.viewModel = viewModel;
 	}

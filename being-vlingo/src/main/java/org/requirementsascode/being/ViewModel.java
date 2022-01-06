@@ -4,19 +4,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 import io.vlingo.xoom.symbio.Source;
 
-public class ViewModel<DATA> {
+public class ViewModel<STATE, DATA> {
 	private final Map<Class<? extends Source<?>>,  Merge<DATA, ? extends Source<?>>> eventClassToMergeFunction;
 	private final DATA emptyData;
+	private final Function<STATE, DATA> stateToData;
 	
-	public static <DATA> ViewModel<DATA> inEmptyState(DATA emptyData) {
-		return new ViewModel<>(emptyData);
+	public static <STATE, DATA> ViewModel<STATE, DATA> of(DATA emptyData, Function<STATE, DATA> stateToData) {
+		return new ViewModel<>(emptyData, stateToData);
 	}
 	
-	private ViewModel(DATA emptyData) {
+	private ViewModel(DATA emptyData, Function<STATE, DATA> stateToData) {
 		this.emptyData = Objects.requireNonNull(emptyData, "emptyData must be non-null!");
+		this.stateToData = Objects.requireNonNull(stateToData, "stateToData must be non-null!");
 		this.eventClassToMergeFunction = new HashMap<>();
 	}
 	
@@ -45,6 +48,10 @@ public class ViewModel<DATA> {
 	
 	public DATA emptyData() {
 		return emptyData;
+	}
+	
+	public Function<STATE, DATA> stateToData() {
+		return stateToData;
 	}
 	
 	public Set<Class<? extends Source<?>>> eventClasses(){
