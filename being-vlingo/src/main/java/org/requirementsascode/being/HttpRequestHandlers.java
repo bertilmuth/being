@@ -14,24 +14,20 @@ import io.vlingo.xoom.http.resource.Resource;
 import io.vlingo.xoom.lattice.grid.Grid;
 import io.vlingo.xoom.turbo.ComponentRegistry;
 
-public class RestResource<DATA> extends DynamicResourceHandler {
+public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
 	private final String resourceName;
 	private final Queries<DATA> $queries;
 	private List<RequestHandler> requestHandlers;
 
 	@SuppressWarnings("unchecked")
-	public RestResource(final Grid grid, String resourceName) {
+	public HttpRequestHandlers(final Grid grid, String resourceName) {
 		super(grid.world().stage());
 		this.resourceName = Objects.requireNonNull(resourceName, "aggregate must be non-null!");
 		this.$queries = ComponentRegistry.withType(QueryModelStateStoreProvider.class).queries;
 	}
 	
-	public static RestResourceBuilder builder() {
-		return new RestResourceBuilder();
-	}
-	
-	void setRequestHandlers(List<RequestHandler> requestHandlers) {
-		this.requestHandlers = requestHandlers;
+	public static HttpRequestHandlersBuilder builder() {
+		return new HttpRequestHandlersBuilder();
 	}
 
 	@Override
@@ -45,6 +41,10 @@ public class RestResource<DATA> extends DynamicResourceHandler {
 	
 	Queries<DATA> $queries(){
 		return $queries;
+	}
+	
+	void addRequestHandler(RequestHandler requestHandler) {
+		requestHandlers.add(requestHandler);
 	}
 	
 	Response responseOf(final Status status, final String entity) {
