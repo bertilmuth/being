@@ -20,21 +20,20 @@ import io.vlingo.xoom.http.Response;
 import io.vlingo.xoom.http.resource.RequestHandler0;
 import io.vlingo.xoom.http.resource.RequestHandler1;
 import io.vlingo.xoom.http.resource.RequestHandler2;
-import io.vlingo.xoom.lattice.grid.Grid;
 
 public class HttpRequestHandlersBuilder {
 	HttpRequestHandlersBuilder() {
 	}
 
-	public GridBuilder grid(Grid grid) {
-		return new GridBuilder(grid);
+	public StageBuilder stage(Stage stage) {
+		return new StageBuilder(stage);
 	}
 
-	public class GridBuilder {
-		private final Grid grid;
+	public class StageBuilder {
+		private final Stage stage;
 
-		GridBuilder(Grid grid) {
-			this.grid = grid;
+		StageBuilder(Stage stage) {
+			this.stage = stage;
 		}
 
 		public <STATE> AggregateBuilder<STATE> aggregate(EventSourcedAggregate<STATE> aggregate) {
@@ -58,7 +57,7 @@ public class HttpRequestHandlersBuilder {
 
 				public DataFromStateBuilder(Function<STATE, DATA> dataFromState) {
 					this.dataFromState = dataFromState;
-					this.httpRequestHandlers = new HttpRequestHandlers<>(grid, resourceName());
+					this.httpRequestHandlers = new HttpRequestHandlers<>(stage, resourceName());
 				}
 
 				private String resourceName() {
@@ -98,7 +97,7 @@ public class HttpRequestHandlersBuilder {
 				}
 
 				private Completes<Response> createAggregate(Object request) {
-					return createAggregateOnStage(grid, request).andThenTo(state -> {
+					return createAggregateOnStage(stage, request).andThenTo(state -> {
 						return Completes
 								.withSuccess(httpRequestHandlers.responseOf(Created,
 										serialized(dataFromState.apply(state))))
@@ -141,8 +140,8 @@ public class HttpRequestHandlersBuilder {
 
 				@SuppressWarnings("rawtypes")
 				private Completes<Behavior> resolve(final String id) {
-					final Address address = grid.addressFactory().from(id);
-					return grid.actorOf(Behavior.class, address,
+					final Address address = stage.addressFactory().from(id);
+					return stage.actorOf(Behavior.class, address,
 							Definition.has(EventSourcedBehavior.class, Definition.parameters(id)));
 				}
 

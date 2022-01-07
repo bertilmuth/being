@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import io.vlingo.xoom.actors.Stage;
 import io.vlingo.xoom.http.ContentType;
 import io.vlingo.xoom.http.Response;
 import io.vlingo.xoom.http.Response.Status;
 import io.vlingo.xoom.http.resource.DynamicResourceHandler;
 import io.vlingo.xoom.http.resource.RequestHandler;
 import io.vlingo.xoom.http.resource.Resource;
-import io.vlingo.xoom.lattice.grid.Grid;
 import io.vlingo.xoom.turbo.ComponentRegistry;
 
 public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
@@ -21,8 +21,8 @@ public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
 	private List<RequestHandler> requestHandlers;
 
 	@SuppressWarnings("unchecked")
-	HttpRequestHandlers(final Grid grid, String resourceName) {
-		super(grid.world().stage());
+	HttpRequestHandlers(final Stage stage, String resourceName) {
+		super(stage.world().stage());
 		this.resourceName = Objects.requireNonNull(resourceName, "aggregate must be non-null!");
 		this.queries = ComponentRegistry.withType(QueryModelStateStoreProvider.class).queries;
 		this.requestHandlers = new ArrayList<>();
