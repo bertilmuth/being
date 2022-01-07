@@ -45,7 +45,7 @@ public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
 		return resourceName;
 	}
 	
-	Queries<DATA> $queries(){
+	Queries<DATA> queries(){
 		return queries;
 	}
 	

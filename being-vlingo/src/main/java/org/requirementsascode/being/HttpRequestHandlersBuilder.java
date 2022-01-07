@@ -117,7 +117,7 @@ public class HttpRequestHandlersBuilder {
 				}
 
 				private Completes<Response> findAllAggregates() {
-					Completes<Collection<DATA>> findAll = httpRequestHandlers.$queries().findAll();
+					Completes<Collection<DATA>> findAll = httpRequestHandlers.queries().findAll();
 					return findAll
 							.andThenTo(
 									data -> Completes.withSuccess(httpRequestHandlers.responseOf(Ok, serialized(data))))
@@ -126,7 +126,7 @@ public class HttpRequestHandlersBuilder {
 				}
 
 				private Completes<Response> findAggregateById(final String id) {
-					Completes<DATA> findById = httpRequestHandlers.$queries().findById(id);
+					Completes<DATA> findById = httpRequestHandlers.queries().findById(id);
 					return findById
 							.andThenTo(
 									data -> Completes.withSuccess(httpRequestHandlers.responseOf(Ok, serialized(data))))
