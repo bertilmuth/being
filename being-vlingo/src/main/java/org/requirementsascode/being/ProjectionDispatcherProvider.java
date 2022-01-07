@@ -23,7 +23,7 @@ public class ProjectionDispatcherProvider {
   public final ProjectionDispatcher projectionDispatcher;
   public final Dispatcher storeDispatcher;
 
-  public static <DATA> ProjectionDispatcherProvider using(final Stage stage, ViewModel<?,DATA> viewModel) {
+  public static <DATA> ProjectionDispatcherProvider using(final Stage stage, ViewModel<DATA> viewModel) {
     if (ComponentRegistry.has(ProjectionDispatcherProvider.class)) {
       return ComponentRegistry.withType(ProjectionDispatcherProvider.class);
     }
@@ -49,7 +49,7 @@ public class ProjectionDispatcherProvider {
     ComponentRegistry.register(getClass(), this);
   }
   
-  private static <DATA> Class<? extends Source<?>>[] eventClassesOf(ViewModel<?, DATA> viewModel) {
+  private static <DATA> Class<? extends Source<?>>[] eventClassesOf(ViewModel<DATA> viewModel) {
 	Set<Class<? extends Source<?>>> eventClasses = viewModel.eventClasses();
 	Class<? extends Source<?>>[] eventClassesArray = eventClasses.toArray(new Class[eventClasses.size()]);
 	return eventClassesArray;
