@@ -9,9 +9,7 @@ import static io.vlingo.xoom.http.resource.ResourceBuilder.get;
 import static io.vlingo.xoom.http.resource.ResourceBuilder.patch;
 import static io.vlingo.xoom.http.resource.ResourceBuilder.post;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
 import io.vlingo.xoom.actors.Address;
@@ -19,7 +17,6 @@ import io.vlingo.xoom.actors.Definition;
 import io.vlingo.xoom.actors.Stage;
 import io.vlingo.xoom.common.Completes;
 import io.vlingo.xoom.http.Response;
-import io.vlingo.xoom.http.resource.RequestHandler;
 import io.vlingo.xoom.http.resource.RequestHandler0;
 import io.vlingo.xoom.http.resource.RequestHandler1;
 import io.vlingo.xoom.http.resource.RequestHandler2;
@@ -57,23 +54,21 @@ public class HttpRequestHandlersBuilder {
 
 			public class DataFromStateBuilder<DATA> {
 				private final Function<STATE, DATA> dataFromState;
-				private final List<RequestHandler> requestHandlers;
 				private final HttpRequestHandlers<DATA> httpRequestHandlers;
 
 				public DataFromStateBuilder(Function<STATE, DATA> dataFromState) {
 					this.dataFromState = dataFromState;
-					this.requestHandlers = new ArrayList<>();
 					this.httpRequestHandlers = new HttpRequestHandlers<>(grid, resourceName());
 				}
 
 				private String resourceName() {
-					return aggregate.getClass().getSimpleName() + "Resource";
+					return aggregate.getClass().getSimpleName() + "RequestHandlers";
 				}
 
 				public AggregateBuilder<STATE>.DataFromStateBuilder<DATA> createRequest(String url,
 						Class<?> createRequestClass) {
 					final RequestHandler1<?> handler = post(url).body(createRequestClass).handle(this::createAggregate);
-					httpRequestHandlers.addRequestHandler(handler);
+					httpRequestHandlers.add(handler);
 					return this;
 				}
 
@@ -81,20 +76,20 @@ public class HttpRequestHandlersBuilder {
 						Class<?> updateRequestClass) {
 					final RequestHandler2<String, ?> handler = patch(url).param(String.class).body(updateRequestClass)
 							.handle(this::updateAggregate);
-					requestHandlers.add(handler);
+					httpRequestHandlers.add(handler);
 					return this;
 				}
 
 				public AggregateBuilder<STATE>.DataFromStateBuilder<DATA> findByIdRequest(String url) {
 					final RequestHandler1<String> handler = get(url).param(String.class)
 							.handle(this::findAggregateById);
-					requestHandlers.add(handler);
+					httpRequestHandlers.add(handler);
 					return this;
 				}
 
 				public AggregateBuilder<STATE>.DataFromStateBuilder<DATA> findAllRequest(String url) {
 					final RequestHandler0 handler = get(url).handle(this::findAllAggregates);
-					requestHandlers.add(handler);
+					httpRequestHandlers.add(handler);
 					return this;
 				}
 

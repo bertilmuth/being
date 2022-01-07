@@ -2,6 +2,7 @@ package org.requirementsascode.being;
 
 import static io.vlingo.xoom.http.resource.ResourceBuilder.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,14 +17,15 @@ import io.vlingo.xoom.turbo.ComponentRegistry;
 
 public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
 	private final String resourceName;
-	private final Queries<DATA> $queries;
+	private final Queries<DATA> queries;
 	private List<RequestHandler> requestHandlers;
 
 	@SuppressWarnings("unchecked")
-	public HttpRequestHandlers(final Grid grid, String resourceName) {
+	HttpRequestHandlers(final Grid grid, String resourceName) {
 		super(grid.world().stage());
 		this.resourceName = Objects.requireNonNull(resourceName, "aggregate must be non-null!");
-		this.$queries = ComponentRegistry.withType(QueryModelStateStoreProvider.class).queries;
+		this.queries = ComponentRegistry.withType(QueryModelStateStoreProvider.class).queries;
+		this.requestHandlers = new ArrayList<>();
 	}
 	
 	public static HttpRequestHandlersBuilder builder() {
@@ -35,15 +37,19 @@ public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
 		return resource(resourceName(), requestHandlerArray());
 	}
 	
+	private RequestHandler[] requestHandlerArray() {
+		return requestHandlers.toArray(new RequestHandler[requestHandlers.size()]);
+	}
+	
 	private String resourceName() {
-		return resourceName; // aggregate.getClass().getSimpleName() + "Resource";
+		return resourceName;
 	}
 	
 	Queries<DATA> $queries(){
-		return $queries;
+		return queries;
 	}
 	
-	void addRequestHandler(RequestHandler requestHandler) {
+	void add(RequestHandler requestHandler) {
 		requestHandlers.add(requestHandler);
 	}
 	
@@ -54,9 +60,5 @@ public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
 	@Override
 	protected ContentType contentType() {
 		return ContentType.of("application/json", "charset=UTF-8");
-	}
-
-	private RequestHandler[] requestHandlerArray() {
-		return requestHandlers.toArray(new RequestHandler[requestHandlers.size()]);
 	}
 }
