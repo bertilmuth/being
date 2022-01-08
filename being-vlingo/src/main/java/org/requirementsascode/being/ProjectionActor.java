@@ -1,5 +1,7 @@
 package org.requirementsascode.being;
 
+import java.util.Objects;
+
 import io.vlingo.xoom.actors.Logger;
 import io.vlingo.xoom.lattice.model.projection.Projectable;
 import io.vlingo.xoom.lattice.model.projection.StateStoreProjectionActor;
@@ -14,22 +16,22 @@ import io.vlingo.xoom.turbo.ComponentRegistry;
  * @param <DATA> the data type of the projected view model
  */
 public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
-	private final QueryModel<DATA> viewModel;
+	private final QueryModel<DATA> queryModel;
 	private final Logger logger;
 
-	public <U> ProjectionActor(QueryModel<DATA> viewModel) {
-		this(ComponentRegistry.withType(QueryModelStateStoreProvider.class).store, viewModel);
+	public <U> ProjectionActor(QueryModel<DATA> queryModel) {
+		this(ComponentRegistry.withType(QueryModelStateStoreProvider.class).store, queryModel);
 	}
 
-	public ProjectionActor(StateStore store, QueryModel<DATA> viewModel) {
+	public ProjectionActor(StateStore store, QueryModel<DATA> queryModel) {
 		super(store);
-		this.viewModel = viewModel;
+		this.queryModel = Objects.requireNonNull(queryModel, "queryModel must be non-null!");
 		this.logger = super.stage().world().defaultLogger();
 	}
 
 	@Override
 	protected DATA currentDataFor(final Projectable projectable) {
-		return viewModel.emptyData();
+		return queryModel.emptyData();
 	}
 
 	@Override
@@ -43,7 +45,7 @@ public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 		logger.info("Merging data:" + dataToMerge);
 
 		for (final Source<?> event : sources()) {
-			DATA mergedData = viewModel.merge(dataToMerge, event);
+			DATA mergedData = queryModel.merge(dataToMerge, event);
 			logger.info("Merged data:" + mergedData);
 			
 			if(dataToMerge == mergedData) {

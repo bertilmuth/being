@@ -23,7 +23,7 @@ public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
 	@SuppressWarnings("unchecked")
 	HttpRequestHandlers(final Stage stage, String resourceName) {
 		super(stage.world().stage());
-		this.resourceName = Objects.requireNonNull(resourceName, "aggregate must be non-null!");
+		this.resourceName = Objects.requireNonNull(resourceName, "resourceName must be non-null!");
 		this.queries = ComponentRegistry.withType(QueryModelStateStoreProvider.class).queries;
 		this.requestHandlers = new ArrayList<>();
 	}

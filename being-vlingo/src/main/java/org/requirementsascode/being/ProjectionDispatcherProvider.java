@@ -23,14 +23,14 @@ public class ProjectionDispatcherProvider {
   public final ProjectionDispatcher projectionDispatcher;
   public final Dispatcher storeDispatcher;
 
-  public static <DATA> ProjectionDispatcherProvider using(final Stage stage, QueryModel<DATA> viewModel) {
+  public static <DATA> ProjectionDispatcherProvider using(final Stage stage, QueryModel<DATA> queryModel) {
     if (ComponentRegistry.has(ProjectionDispatcherProvider.class)) {
       return ComponentRegistry.withType(ProjectionDispatcherProvider.class);
     }
     
     final List<ProjectToDescription> descriptions =
             Arrays.asList(
-                    ProjectToDescription.with(ProjectionActor.class, Optional.of(viewModel), eventClassesOf(viewModel))
+                    ProjectToDescription.with(ProjectionActor.class, Optional.of(queryModel), eventClassesOf(queryModel))
                     );
 
     final Protocols dispatcherProtocols =
@@ -49,8 +49,8 @@ public class ProjectionDispatcherProvider {
     ComponentRegistry.register(getClass(), this);
   }
   
-  private static <DATA> Class<? extends Source<?>>[] eventClassesOf(QueryModel<DATA> viewModel) {
-	Set<Class<? extends Source<?>>> eventClasses = viewModel.eventClasses();
+  private static <DATA> Class<? extends Source<?>>[] eventClassesOf(QueryModel<DATA> queryModel) {
+	Set<Class<? extends Source<?>>> eventClasses = queryModel.eventClasses();
 	Class<? extends Source<?>>[] eventClassesArray = eventClasses.toArray(new Class[eventClasses.size()]);
 	return eventClassesArray;
   }

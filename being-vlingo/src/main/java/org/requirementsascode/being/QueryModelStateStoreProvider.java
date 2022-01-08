@@ -19,14 +19,14 @@ public class QueryModelStateStoreProvider<DATA> {
 	public final StateStore store;
 	public final Queries<DATA> queries;
 
-	public static <DATA> QueryModelStateStoreProvider using(final Stage stage, QueryModel<DATA> viewModel) {
+	public static <DATA> QueryModelStateStoreProvider using(final Stage stage, QueryModel<DATA> queryModel) {
 		if (ComponentRegistry.has(QueryModelStateStoreProvider.class)) {
 			return ComponentRegistry.withType(QueryModelStateStoreProvider.class);
 		}
 
 		new EntryAdapterProvider(stage.world()); // future use
 
-		DATA emptyData = viewModel.emptyData();
+		DATA emptyData = queryModel.emptyData();
 		final Class<? extends DATA> dataType = (Class<? extends DATA>) emptyData.getClass();
 		StateTypeStateStoreMap.stateTypeToStoreName(dataType, dataType.getSimpleName());
 
