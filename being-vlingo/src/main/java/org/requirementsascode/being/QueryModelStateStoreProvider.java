@@ -19,7 +19,7 @@ public class QueryModelStateStoreProvider<DATA> {
 	public final StateStore store;
 	public final Queries<DATA> queries;
 
-	public static <DATA> QueryModelStateStoreProvider using(final Stage stage, ViewModel<DATA> viewModel) {
+	public static <DATA> QueryModelStateStoreProvider using(final Stage stage, QueryModel<DATA> viewModel) {
 		if (ComponentRegistry.has(QueryModelStateStoreProvider.class)) {
 			return ComponentRegistry.withType(QueryModelStateStoreProvider.class);
 		}

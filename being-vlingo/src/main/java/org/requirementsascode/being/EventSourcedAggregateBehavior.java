@@ -44,7 +44,7 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 			logInfo("Applied event: " + ev);
 
 			updatedState.ifPresent(state -> {
-				setState(state);
+				aggregateBehavior.setState(state);
 				logInfo("Updated state to: " + state);
 			});
 		});

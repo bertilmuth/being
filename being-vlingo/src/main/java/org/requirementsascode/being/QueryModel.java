@@ -7,15 +7,15 @@ import java.util.Set;
 
 import io.vlingo.xoom.symbio.Source;
 
-public class ViewModel<DATA> {
+public class QueryModel<DATA> {
 	private final Map<Class<? extends Source<?>>,  Merge<DATA, ? extends Source<?>>> eventClassToMergeFunction;
 	private final DATA emptyData;
 	
-	public static <DATA> ViewModel<DATA> of(DATA emptyData) {
-		return new ViewModel<>(emptyData);
+	public static <DATA> QueryModel<DATA> of(DATA emptyData) {
+		return new QueryModel<>(emptyData);
 	}
 	
-	private ViewModel(DATA emptyData) {
+	private QueryModel(DATA emptyData) {
 		this.emptyData = Objects.requireNonNull(emptyData, "emptyData must be non-null!");
 		this.eventClassToMergeFunction = new HashMap<>();
 	}
