@@ -142,14 +142,14 @@ public class HttpRequestHandlersBuilder {
 				private Completes<Behavior> resolve(final String id) {
 					final Address address = stage.addressFactory().from(id);
 					return stage.actorOf(Behavior.class, address,
-							Definition.has(EventSourcedBehavior.class, Definition.parameters(id)));
+							Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id)));
 				}
 
 				@SuppressWarnings("unchecked")
 				private Completes<STATE> createAggregateOnStage(final Stage stage, final Object command) {
 					final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("g-");
 					final Behavior<STATE> behavior = stage.actorFor(Behavior.class, Definition
-							.has(EventSourcedBehavior.class, Definition.parameters(_address.idString(), aggregate)),
+							.has(EventSourcedAggregateBehavior.class, Definition.parameters(_address.idString(), aggregate)),
 							_address);
 					return reactTo(behavior, command);
 				}

@@ -2,7 +2,7 @@ package org.requirementsascode.being;
 
 import java.util.Arrays;
 
-import org.requirementsascode.being.EventSourcedBehavior;
+import org.requirementsascode.being.EventSourcedAggregateBehavior;
 
 import io.vlingo.xoom.actors.Stage;
 import io.vlingo.xoom.lattice.model.sourcing.SourcedTypeRegistry;
@@ -33,7 +33,7 @@ public class CommandModelJournalProvider  {
     final Journal<String> journal =
               StoreActorBuilder.from(stage, Model.COMMAND, Arrays.asList(dispatchers), StorageType.JOURNAL, Settings.properties(), true);
 
-    registry.register(new Info(journal, EventSourcedBehavior.class, EventSourcedBehavior.class.getSimpleName()));
+    registry.register(new Info(journal, EventSourcedAggregateBehavior.class, EventSourcedAggregateBehavior.class.getSimpleName()));
 
     return new CommandModelJournalProvider(journal);
   }
