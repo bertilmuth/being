@@ -5,13 +5,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 public class QueryModel<DATA> {
 	private final Map<Class<? extends Source<?>>,  Merge<DATA, ? extends Source<?>>> eventClassToMergeFunction;
 	private final DATA emptyData;
 	
-	public static <DATA> QueryModel<DATA> of(DATA emptyData) {
+	public static <DATA> QueryModel<DATA> withEmptyData(DATA emptyData) {
 		return new QueryModel<>(emptyData);
 	}
 	
@@ -20,15 +21,16 @@ public class QueryModel<DATA> {
 		this.eventClassToMergeFunction = new HashMap<>();
 	}
 	
-	public <T extends Source<?>> void registerMerge(Class<T> eventClass, Merge<DATA, T> mergeFunction) {
+	public <EVENT extends IdentifiedDomainEvent> QueryModel<DATA> mergeEvent(Class<EVENT> eventClass, Merge<DATA, EVENT> mergeFunction) {
 		Objects.requireNonNull(eventClass, "eventClass must be non-null!");
 		Objects.requireNonNull(mergeFunction, "mergeFunction must be non-null!");
 		
 		eventClassToMergeFunction.put(eventClass, mergeFunction);
+		return this;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public <EVENT extends Source<?>> DATA merge(DATA dataToMerge, EVENT event) {		
+	<EVENT extends Source<?>> DATA mergeDataWithEvent(DATA dataToMerge, EVENT event) {		
 		Class<? extends Source> eventClass = event.getClass();
 		DATA mergedData;
 		

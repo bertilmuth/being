@@ -41,11 +41,11 @@ public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 		if (previousVersion == currentVersion)
 			return currentData;
 
-		DATA dataToMerge = previousData == null? currentData : previousData;
+		DATA dataToMerge = previousData;
 		logger.info("Merging data:" + dataToMerge);
 
 		for (final Source<?> event : sources()) {
-			DATA mergedData = queryModel.merge(dataToMerge, event);
+			DATA mergedData = queryModel.mergeDataWithEvent(dataToMerge, event);
 			logger.info("Merged data:" + mergedData);
 			
 			if(dataToMerge == mergedData) {
