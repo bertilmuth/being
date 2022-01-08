@@ -11,6 +11,7 @@ import static io.vlingo.xoom.http.resource.ResourceBuilder.post;
 
 import java.util.Collection;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import io.vlingo.xoom.actors.Address;
 import io.vlingo.xoom.actors.Definition;
@@ -36,15 +37,15 @@ public class HttpRequestHandlersBuilder {
 			this.stage = stage;
 		}
 
-		public <STATE> AggregateBuilder<STATE> aggregate(EventSourcedAggregate<STATE> aggregate) {
-			return new AggregateBuilder<>(aggregate);
+		public <STATE> AggregateBuilder<STATE> aggregateSupplier(Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
+			return new AggregateBuilder<>(aggregateSupplier);
 		}
 
 		public class AggregateBuilder<STATE> {
-			private final EventSourcedAggregate<STATE> aggregate;
+			private final Supplier<EventSourcedAggregate<STATE>> aggregateSupplier;
 
-			AggregateBuilder(EventSourcedAggregate<STATE> aggregate) {
-				this.aggregate = aggregate;
+			AggregateBuilder(Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
+				this.aggregateSupplier = aggregateSupplier;
 			}
 
 			public <DATA> DataFromStateBuilder<DATA> dataFromState(Function<STATE, DATA> dataFromState) {
@@ -61,7 +62,7 @@ public class HttpRequestHandlersBuilder {
 				}
 
 				private String resourceName() {
-					return aggregate.getClass().getSimpleName() + "RequestHandlers";
+					return aggregateSupplier.getClass().getSimpleName() + "RequestHandlers";
 				}
 
 				public AggregateBuilder<STATE>.DataFromStateBuilder<DATA> createRequest(String url,
@@ -141,15 +142,17 @@ public class HttpRequestHandlersBuilder {
 				@SuppressWarnings("rawtypes")
 				private Completes<Behavior> resolve(final String id) {
 					final Address address = stage.addressFactory().from(id);
-					return stage.actorOf(Behavior.class, address,
+					final Completes<Behavior> actor = stage.actorOf(Behavior.class, address,
 							Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id)));
+					stage.world().defaultLogger().info("Resolved actor: " + actor.id());
+					return actor;
 				}
 
 				@SuppressWarnings("unchecked")
 				private Completes<STATE> createAggregateOnStage(final Stage stage, final Object command) {
 					final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("g-");
 					final Behavior<STATE> behavior = stage.actorFor(Behavior.class, Definition
-							.has(EventSourcedAggregateBehavior.class, Definition.parameters(_address.idString(), aggregate)),
+							.has(EventSourcedAggregateBehavior.class, Definition.parameters(_address.idString(), aggregateSupplier)),
 							_address);
 					return reactTo(behavior, command);
 				}

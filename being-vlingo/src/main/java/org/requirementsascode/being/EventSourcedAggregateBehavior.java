@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import io.vlingo.xoom.actors.Logger;
 import io.vlingo.xoom.common.Completes;
@@ -19,11 +20,12 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 	private final MapEvents<STATE> mapEvents;
 	private final Logger logger;
 
-	public EventSourcedAggregateBehavior(String aggregateId, EventSourcedAggregate<STATE> aggregate) {
+	public EventSourcedAggregateBehavior(String aggregateId, Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
 		super(aggregateId);
-		this.aggregate = requireNonNull(aggregate, "aggregate must be non-null");	    
-		this.mapCommands = aggregate.mapCommands();
-		this.mapEvents = aggregate.mapEvents();
+		requireNonNull(aggregateSupplier, "aggregateSupplier must be non-null");
+		this.aggregate = requireNonNull(aggregateSupplier.get(), "supplied aggregate must be non-null!");
+		this.mapCommands = requireNonNull(aggregate.mapCommands(), "command handlers must be non-null!");
+		this.mapEvents = requireNonNull(aggregate.mapEvents(), "event handlers must be non-null!");
 		this.logger = super.stage().world().defaultLogger();
 
 	    initializeAggregate(aggregateId, aggregate);
@@ -35,22 +37,35 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 			.forEach(clazz -> registerEventMapperFor(clazz));		
 	}
 
+	@SuppressWarnings("unchecked")
 	private void registerEventMapperFor(Class<? extends IdentifiedDomainEvent> eventClass) {
-		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (b, ev) -> {
-			Optional<STATE> updatedState = mapEvents.apply(ev);
-			logger.info("Applied event: " + ev);
+		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (aggregateBehavior, ev) -> {
+			Optional<STATE> updatedState = aggregateBehavior.applyEvent(ev);
+			logInfo("Applied event: " + ev);
 
 			updatedState.ifPresent(state -> {
-				aggregate.setState(state);
-				logger.info("Updated state to: " + state);
+				setState(state);
+				logInfo("Updated state to: " + state);
 			});
 		});
+	}
+	
+	private Optional<STATE> applyEvent(IdentifiedDomainEvent event){
+		return mapEvents.apply(event);
+	}
+	
+	private void setState(STATE state) {
+		aggregate.setState(state);
+	}
+	
+	private void logInfo(String text) {
+		logger.info(text);
 	}
 
 	private void initializeAggregate(String aggregateId, EventSourcedAggregate<STATE> aggregate) {
 		STATE state = aggregate.initialState(aggregateId);
 	    aggregate.setState(state);
-	    logger.info("Initialized aggregate: " + aggregateId);
+	    logger.info("Initialized aggregate: " + aggregateId + " -> " + aggregate);
 	}
 
 	public Completes<STATE> reactTo(Object command){
