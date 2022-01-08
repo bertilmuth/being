@@ -79,6 +79,10 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 		List<Source<DomainEvent>> sourceList = new ArrayList<>(identifiedDomainEvents.size());
 		sourceList.addAll(identifiedDomainEvents);
 		
-		return apply(sourceList, () -> aggregate.state());
+		return apply(sourceList, () -> {
+			STATE aggregateState = aggregate.state();
+			logInfo("State returned to user: " + aggregateState);
+			return aggregateState;
+		});
 	}
 }
