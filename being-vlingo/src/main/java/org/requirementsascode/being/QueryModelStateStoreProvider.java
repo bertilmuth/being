@@ -1,6 +1,8 @@
 package org.requirementsascode.being;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.vlingo.xoom.actors.Stage;
 import io.vlingo.xoom.symbio.EntryAdapterProvider;
@@ -17,7 +19,7 @@ import io.vlingo.xoom.turbo.storage.StoreActorBuilder;
 public class QueryModelStateStoreProvider<DATA> {
 
 	public final StateStore store;
-	public final Queries<DATA> queries;
+	public final Map<Class<? extends DATA>, Queries<DATA>> queriesByDataType;
 
 	public static <DATA> QueryModelStateStoreProvider using(final Stage stage, QueryModel<DATA>... queryModels) {
 		if (ComponentRegistry.has(QueryModelStateStoreProvider.class)) {
@@ -27,7 +29,7 @@ public class QueryModelStateStoreProvider<DATA> {
 		new EntryAdapterProvider(stage.world()); // future use
 
 		for (QueryModel<DATA> queryModel : queryModels) {
-			mapDataTypeToStoreName(queryModel);
+			registerStoreNameFor(queryModel);
 		}
 
 		final StateStore store = StoreActorBuilder.from(stage, Model.QUERY, Arrays.asList(new NoOpDispatcher()),
@@ -38,12 +40,22 @@ public class QueryModelStateStoreProvider<DATA> {
 
 	private QueryModelStateStoreProvider(final Stage stage, final StateStore store, QueryModel<DATA>[] queryModels) {
 		this.store = store;		
-		this.queries = stage.actorFor(Queries.class, QueriesActor.class, store, datatypeOf(queryModels[0]), queryModels[0].emptyData());
+		this.queriesByDataType = new HashMap<>();
+		
+		for (QueryModel<DATA> queryModel : queryModels) {
+			mapDataTypeToQueries(stage, store, queryModel);
+		}
 		
 		ComponentRegistry.register(getClass(), this);
 	}
+
+	private void mapDataTypeToQueries(final Stage stage, final StateStore store, QueryModel<DATA> queryModel) {
+		final Class<? extends DATA> datatype = datatypeOf(queryModel);
+		Queries<DATA> queriesActor = stage.actorFor(Queries.class, QueriesActor.class, store, datatype, queryModel.emptyData());
+		queriesByDataType.put(datatype, queriesActor);
+	}
 	
-	private static <DATA> Class<? extends DATA> mapDataTypeToStoreName(QueryModel<DATA> queryModel) {
+	private static <DATA> Class<? extends DATA> registerStoreNameFor(QueryModel<DATA> queryModel) {
 		final Class<? extends DATA> dataType = datatypeOf(queryModel);
 		StateTypeStateStoreMap.stateTypeToStoreName(dataType, dataType.getSimpleName());
 		return dataType;

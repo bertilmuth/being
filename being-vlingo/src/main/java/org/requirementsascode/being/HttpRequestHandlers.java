@@ -20,12 +20,16 @@ public class HttpRequestHandlers<DATA> extends DynamicResourceHandler {
 	private final Queries<DATA> queries;
 	private List<RequestHandler> requestHandlers;
 
-	@SuppressWarnings("unchecked")
-	HttpRequestHandlers(final Stage stage, String resourceName) {
+	HttpRequestHandlers(final Stage stage, String resourceName, Class<? extends Object> dataTypeOfAggregate) {
 		super(stage.world().stage());
 		this.resourceName = Objects.requireNonNull(resourceName, "resourceName must be non-null!");
-		this.queries = ComponentRegistry.withType(QueryModelStateStoreProvider.class).queries;
+		this.queries = queriesByDataType(dataTypeOfAggregate);
 		this.requestHandlers = new ArrayList<>();
+	}
+
+	@SuppressWarnings("unchecked")
+	private Queries<DATA> queriesByDataType(Class<? extends Object> dataType) {
+		return (Queries<DATA>) ComponentRegistry.withType(QueryModelStateStoreProvider.class).queriesByDataType.get(dataType);
 	}
 	
 	public static HttpRequestHandlersBuilder builder() {
