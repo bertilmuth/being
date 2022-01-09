@@ -12,7 +12,7 @@ public class QueryModel<DATA> {
 	private final Map<Class<? extends Source<?>>,  Merge<DATA, ? extends Source<?>>> eventClassToMergeFunction;
 	private final DATA emptyData;
 	
-	public static <DATA> QueryModel<DATA> startEmptyWith(DATA emptyData) {
+	public static <DATA> QueryModel<DATA> startEmpty(DATA emptyData) {
 		return new QueryModel<>(emptyData);
 	}
 	
