@@ -12,7 +12,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
 class EventHandlersTest {
 	@Test
-	void createsEmptyEventMappers() {
+	void createsEmptyEventHandlers() {
 		EventHandlers<State> eventHandlers = EventHandlers.with();
 		
 		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
@@ -20,7 +20,7 @@ class EventHandlersTest {
 	}
 
 	@Test
-	void createsOneEventMappers() {
+	void createsOneEventHandlers() {
 		EventHandlers<State> eventHandlers = EventHandlers.with(
 			eventsOf(SampleEvent1.class).toState(event -> new State(event.id))
 		);
@@ -31,7 +31,7 @@ class EventHandlersTest {
 	}
 	
 	@Test
-	void createsTwoEventMappers() {
+	void createsTwoEventHandlers() {
 		EventHandlers<State> eventHandlers = EventHandlers.with(
 			eventsOf(SampleEvent1.class).toState(event -> new State(event.id)), 
 			eventsOf(SampleEvent2.class).toState(event -> new State(event.id + "0"))
