@@ -20,15 +20,15 @@ public class HttpRequestHandlersBuilder {
 			this.stage = stage;
 		}
 
-		public <STATE> AggregateBuilder<STATE> aggregateSupplier(
-				Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
+		public <CMD,STATE> AggregateBuilder<CMD,STATE> aggregateSupplier(
+				Supplier<EventSourcedAggregate<CMD,STATE>> aggregateSupplier) {
 			return new AggregateBuilder<>(aggregateSupplier);
 		}
 
-		public class AggregateBuilder<STATE> {
-			private final Supplier<EventSourcedAggregate<STATE>> aggregateSupplier;
+		public class AggregateBuilder<CMD,STATE> {
+			private final Supplier<EventSourcedAggregate<CMD,STATE>> aggregateSupplier;
 
-			AggregateBuilder(Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
+			AggregateBuilder(Supplier<EventSourcedAggregate<CMD,STATE>> aggregateSupplier) {
 				this.aggregateSupplier = aggregateSupplier;
 			}
 
@@ -37,35 +37,35 @@ public class HttpRequestHandlersBuilder {
 			}
 
 			public class RequestHandlersBuilder<DATA> {
-				private final HttpRequestHandlers<STATE, DATA> httpRequestHandlers;
+				private final HttpRequestHandlers<CMD,STATE, DATA> httpRequestHandlers;
 
 				public RequestHandlersBuilder(Function<STATE, DATA> dataFromState) {
 					this.httpRequestHandlers = new HttpRequestHandlers<>(stage, aggregateSupplier, dataFromState);
 				}
 
-				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> createRequest(String url,
-						Class<?> createRequestClass) {
+				public AggregateBuilder<CMD,STATE>.RequestHandlersBuilder<DATA> createRequest(String url,
+						Class<? extends CMD> createRequestClass) {
 					httpRequestHandlers.createRequest(url, createRequestClass);
 					return this;
 				}
 
-				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> updateRequest(String url,
-						Class<?> updateRequestClass) {
+				public AggregateBuilder<CMD,STATE>.RequestHandlersBuilder<DATA> updateRequest(String url,
+						Class<? extends CMD> updateRequestClass) {
 					httpRequestHandlers.updateRequest(url, updateRequestClass);
 					return this;
 				}
 
-				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> findByIdRequest(String url) {
+				public AggregateBuilder<CMD,STATE>.RequestHandlersBuilder<DATA> findByIdRequest(String url) {
 					httpRequestHandlers.findByIdRequest(url);
 					return this;
 				}
 
-				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> findAllRequest(String url) {
+				public AggregateBuilder<CMD,STATE>.RequestHandlersBuilder<DATA> findAllRequest(String url) {
 					httpRequestHandlers.findAllRequest(url);
 					return this;
 				}
 
-				public HttpRequestHandlers<STATE, DATA> build() {
+				public HttpRequestHandlers<CMD,STATE, DATA> build() {
 					return httpRequestHandlers;
 				}
 			}

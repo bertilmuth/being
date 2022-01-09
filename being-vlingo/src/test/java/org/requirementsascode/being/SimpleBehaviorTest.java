@@ -15,10 +15,10 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 class SimpleBehaviorTest {
-  private static final TestEvent NEW_AGGREGATE_ROOT_EVENT = new TestEvent("New aggregate root");
+  private static final TestEvent1 NEW_AGGREGATE_ROOT_EVENT = new TestEvent1("New aggregate root");
   
   private TestAggregate testAggregate;
-  private AggregateTestHelper<TestState> behaviorTestHelper;
+  private AggregateTestHelper<TestCommand, TestState1> behaviorTestHelper;
 
   @BeforeEach
   public void setup() {
@@ -63,7 +63,7 @@ class SimpleBehaviorTest {
 
   @Test
   public void singleGivenEvent() {
-    TestEvent givenEvent = new TestEvent("GivenEvent");
+    TestEvent1 givenEvent = new TestEvent1("GivenEvent");
     behaviorTestHelper
       .givenEvents(givenEvent);
     
@@ -73,8 +73,8 @@ class SimpleBehaviorTest {
   
   @Test
   public void twoGivenEvents() {
-    TestEvent givenEvent1 = new TestEvent("GivenEvent1");
-    TestEvent givenEvent2 = new TestEvent("GivenEvent2");
+    TestEvent1 givenEvent1 = new TestEvent1("GivenEvent1");
+    TestEvent1 givenEvent2 = new TestEvent1("GivenEvent2");
 
     behaviorTestHelper
       .givenEvents(givenEvent1, givenEvent2);
@@ -85,8 +85,8 @@ class SimpleBehaviorTest {
   
   @Test
   public void noGivenEventsSingleWhen() {
-    TestCommand command = new TestCommand("Command");
-    TestEvent resultingEvent = new TestEvent(command.name);
+    TestCommand1 command = new TestCommand1("Command");
+    TestEvent1 resultingEvent = new TestEvent1(command.name);
     
     behaviorTestHelper.when(command);
     
@@ -96,9 +96,9 @@ class SimpleBehaviorTest {
   
   @Test
   public void singleGivenEventSingleWhen() {
-    TestEvent givenEvent = new TestEvent("GivenEvent");
-    TestCommand command = new TestCommand("Command");
-    TestEvent resultingEvent = new TestEvent(command.name);
+    TestEvent1 givenEvent = new TestEvent1("GivenEvent");
+    TestCommand1 command = new TestCommand1("Command");
+    TestEvent1 resultingEvent = new TestEvent1(command.name);
     
     behaviorTestHelper
       .givenEvents(givenEvent)
@@ -110,14 +110,14 @@ class SimpleBehaviorTest {
   
   @Test
   public void singleGivenEventSingleWhen_EventList() {
-    TestEvent givenEvent = new TestEvent("GivenEvent");
+    TestEvent1 givenEvent = new TestEvent1("GivenEvent");
     TestCommandForEventList command = new TestCommandForEventList("Command");
     
     behaviorTestHelper
       .givenEvents(givenEvent)
       .when(command);
     
-    TestEvent resultingEvent1 = new TestEvent(command.name);
+    TestEvent1 resultingEvent1 = new TestEvent1(command.name);
     TestEvent2 resultingEvent2 = new TestEvent2(command.name);
     
     assertEquals(asList(resultingEvent1, resultingEvent2), behaviorTestHelper.producedEvents());
@@ -126,7 +126,7 @@ class SimpleBehaviorTest {
   
   @Test
   public void singleGivenEventTwoWhens_EventList() {
-    TestEvent givenEvent = new TestEvent("GivenEvent");
+    TestEvent1 givenEvent = new TestEvent1("GivenEvent");
     TestCommandForEventList command = new TestCommandForEventList("Command");
     
     behaviorTestHelper
@@ -134,7 +134,7 @@ class SimpleBehaviorTest {
       .when(command)
       .when(command);
     
-    TestEvent resultingEvent1 = new TestEvent(command.name);
+    TestEvent1 resultingEvent1 = new TestEvent1(command.name);
     TestEvent2 resultingEvent2 = new TestEvent2(command.name);
 
     assertEquals(asList(resultingEvent1, resultingEvent2, resultingEvent1, resultingEvent2), behaviorTestHelper.producedEvents());
@@ -154,8 +154,8 @@ class SimpleBehaviorTest {
     TestUpdateStateCommand command1 = new TestUpdateStateCommand();
     TestUpdateStateEvent expectedEvent1 = new TestUpdateStateEvent();
     
-    TestCommand command2 = new TestCommand("Command2");
-    TestEvent expectedEvent2 = new TestEvent(command2.name);
+    TestCommand1 command2 = new TestCommand1("Command2");
+    TestEvent1 expectedEvent2 = new TestEvent1(command2.name);
 
     behaviorTestHelper
       .when(command1)
@@ -165,45 +165,45 @@ class SimpleBehaviorTest {
     assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT, expectedEvent2), testAggregate.state().appliedEvents());
   }
 
-  private static class TestAggregate extends EventSourcedAggregate<TestState> {
+  private static class TestAggregate extends EventSourcedAggregate<TestCommand, TestState1> {
     @Override
     public MapCommands mapCommands() {
       return MapCommands.with(
-          commandsOf(TestCommand.class).toEvent(cmd -> new TestEvent(cmd.name)),
+          commandsOf(TestCommand1.class).toEvent(cmd -> new TestEvent1(cmd.name)),
           commandsOf(TestUpdateStateCommand.class).toEvent(cmd -> new TestUpdateStateEvent()),
-          commandsOf(TestCommandForEventList.class).toEvents(cmd -> {return asList(new TestEvent(cmd.name), new TestEvent2(cmd.name));}),
+          commandsOf(TestCommandForEventList.class).toEvents(cmd -> {return asList(new TestEvent1(cmd.name), new TestEvent2(cmd.name));}),
           commandsOf(ProduceUnhandledEventCommand.class).toEvent(cmd -> new UnhandledEvent())
       );
     }
 
     @Override
-    public MapEvents<TestState> mapEvents() {
+    public MapEvents<TestState1> mapEvents() {
       return MapEvents.with(
-          eventsOf(TestEvent.class).toState(ev -> state().addEvent(ev)),
+          eventsOf(TestEvent1.class).toState(ev -> state().addEvent(ev)),
           eventsOf(TestEvent2.class).toState(ev -> state().addEvent(ev)),
-          eventsOf(TestUpdateStateEvent.class).toState(ev -> new TestState().addEvent(NEW_AGGREGATE_ROOT_EVENT))
+          eventsOf(TestUpdateStateEvent.class).toState(ev -> new TestState1().addEvent(NEW_AGGREGATE_ROOT_EVENT))
       );
     }
 
     @Override
-    public TestState initialState(String aggregateId) {
-      return new TestState();
+    public TestState1 initialState(String aggregateId) {
+      return new TestState1();
     }
   }
 
-  private static class TestState{
+  private static class TestState1{
     private final ArrayList<Source<?>> events;
 
-    public TestState() {
+    public TestState1() {
       this.events = new ArrayList<>();
     }
 
-    public TestState addEvent(TestEvent testEvent) {
+    public TestState1 addEvent(TestEvent1 testEvent) {
       this.events.add(testEvent);
       return this;
     }
     
-    public TestState addEvent(TestEvent2 testEvent) {
+    public TestState1 addEvent(TestEvent2 testEvent) {
         this.events.add(testEvent);
         return this;
       }
@@ -212,11 +212,14 @@ class SimpleBehaviorTest {
       return java.util.Collections.unmodifiableList(events);
     }
   } 
+  
+  private interface TestCommand{
+  }
 
-  private static class TestCommand{
+  private static class TestCommand1 implements TestCommand{
     public final String name;
 
-    public TestCommand(String name) {
+    public TestCommand1(String name) {
       this.name = name;
     }
 
@@ -236,7 +239,7 @@ class SimpleBehaviorTest {
         return false;
       if (getClass() != obj.getClass())
         return false;
-      TestCommand other = (TestCommand) obj;
+      TestCommand1 other = (TestCommand1) obj;
       if (name == null) {
         if (other.name != null)
           return false;
@@ -246,7 +249,7 @@ class SimpleBehaviorTest {
     }
   }
   
-  private static class TestCommandForEventList{
+  private static class TestCommandForEventList implements TestCommand{
     private final String name;
 
     public TestCommandForEventList(String name) {
@@ -279,13 +282,13 @@ class SimpleBehaviorTest {
     }
   }
   
-  private static class TestUpdateStateCommand{
+  private static class TestUpdateStateCommand implements TestCommand{
   }
 
-  private static class TestEvent extends IdentifiedDomainEvent{
+  private static class TestEvent1 extends IdentifiedDomainEvent{
     private final String name;
 
-    public TestEvent(String name) {
+    public TestEvent1(String name) {
       this.name = name;
     }
 
@@ -305,7 +308,7 @@ class SimpleBehaviorTest {
         return false;
       if (getClass() != obj.getClass())
         return false;
-      TestEvent other = (TestEvent) obj;
+      TestEvent1 other = (TestEvent1) obj;
       if (name == null) {
         if (other.name != null)
           return false;
@@ -380,10 +383,10 @@ class SimpleBehaviorTest {
 	}
   }
   
-  private static class IgnoredCommand{
+  private static class IgnoredCommand implements TestCommand{
   }
   
-  private static class ProduceUnhandledEventCommand{
+  private static class ProduceUnhandledEventCommand implements TestCommand{
   }
   
   private static class UnhandledEvent extends IdentifiedDomainEvent{

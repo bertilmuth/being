@@ -14,13 +14,13 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.lattice.model.sourcing.EventSourced;
 import io.vlingo.xoom.symbio.Source;
 
-public class EventSourcedAggregateBehavior<STATE> extends EventSourced implements Behavior<STATE> {
-	private final EventSourcedAggregate<STATE> aggregate;
+public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced implements Behavior<CMD, STATE> {
+	private final EventSourcedAggregate<CMD, STATE> aggregate;
 	private final MapCommands mapCommands;
 	private final MapEvents<STATE> mapEvents;
 	private final Logger logger;
 
-	public EventSourcedAggregateBehavior(String aggregateId, Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
+	public EventSourcedAggregateBehavior(String aggregateId, Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier) {
 		super(aggregateId);
 		requireNonNull(aggregateSupplier, "aggregateSupplier must be non-null");
 		this.aggregate = requireNonNull(aggregateSupplier.get(), "supplied aggregate must be non-null!");
@@ -62,7 +62,7 @@ public class EventSourcedAggregateBehavior<STATE> extends EventSourced implement
 		logger.info(text);
 	}
 
-	private void initializeAggregate(String aggregateId, EventSourcedAggregate<STATE> aggregate) {
+	private void initializeAggregate(String aggregateId, EventSourcedAggregate<CMD, STATE> aggregate) {
 		STATE state = aggregate.initialState(aggregateId);
 	    aggregate.setState(state);
 	    logger.info("Initialized aggregate: " + aggregateId + " -> " + aggregate);

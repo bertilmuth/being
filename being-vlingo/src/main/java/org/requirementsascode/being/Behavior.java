@@ -2,6 +2,6 @@ package org.requirementsascode.being;
 
 import io.vlingo.xoom.common.Completes;
 
-public interface Behavior<STATE> {
-	Completes<STATE> reactTo(Object message);
+public interface Behavior<I, O> {
+	Completes<O> reactTo(I message);
 }

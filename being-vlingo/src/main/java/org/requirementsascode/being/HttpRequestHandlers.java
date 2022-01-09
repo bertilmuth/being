@@ -30,17 +30,17 @@ import io.vlingo.xoom.http.resource.RequestHandler2;
 import io.vlingo.xoom.http.resource.Resource;
 import io.vlingo.xoom.turbo.ComponentRegistry;
 
-public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
+public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandler {
 	private final Stage stage;
 	private final Queries<DATA> queries;
 	private final List<RequestHandler> httpRequestHandlers;
-	private final Supplier<EventSourcedAggregate<STATE>> aggregateSupplier;
-	private final EventSourcedAggregate<STATE> aggregate;
+	private final Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier;
+	private final EventSourcedAggregate<CMD, STATE> aggregate;
 	private final Function<STATE, DATA> dataFromState;
 	private final String resourceName;
 
-	HttpRequestHandlers(final Stage stage, Supplier<EventSourcedAggregate<STATE>> aggregateSupplier,
-			Function<STATE, DATA> dataFromState) {
+	HttpRequestHandlers(final Stage stage, final Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier,
+			final Function<STATE, DATA> dataFromState) {
 		super(stage.world().stage());
 		this.stage = stage;
 		this.httpRequestHandlers = new ArrayList<>();
@@ -62,17 +62,17 @@ public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Completes<STATE> reactTo(Behavior behavior, Object command) {
+	private Completes<STATE> reactTo(final Behavior behavior, final CMD command) {
 		return behavior.reactTo(command);
 	}
 
-	void createRequest(String url, Class<?> createRequestClass) {
-		final RequestHandler1<?> handler = post(url).body(createRequestClass).handle(this::createAggregate);
+	void createRequest(String url, Class<? extends CMD> createRequestClass) {
+		final RequestHandler1<? extends CMD> handler = post(url).body(createRequestClass).handle(this::createAggregate);
 		httpRequestHandlers.add(handler);
 	}
 
-	void updateRequest(String url, Class<?> updateRequestClass) {
-		final RequestHandler2<String, ?> handler = patch(url).param(String.class).body(updateRequestClass)
+	void updateRequest(String url, Class<? extends CMD> updateRequestClass) {
+		final RequestHandler2<String, ? extends CMD> handler = patch(url).param(String.class).body(updateRequestClass)
 				.handle(this::updateAggregate);
 		httpRequestHandlers.add(handler);
 	}
@@ -87,7 +87,7 @@ public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 		httpRequestHandlers.add(handler);
 	}
 
-	private Completes<Response> createAggregate(Object request) {
+	private Completes<Response> createAggregate(CMD request) {
 		return createAggregateOnStage(stage, request).andThenTo(state -> {
 			return Completes.withSuccess(entityResponseOf(Created, serialized(dataFromState.apply(state))))
 					.otherwise(arg -> Response.of(NotFound))
@@ -96,7 +96,7 @@ public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 
 	}
 
-	private Completes<Response> updateAggregate(final String id, final Object request) {
+	private Completes<Response> updateAggregate(final String id, final CMD request) {
 		return resolve(id).andThenTo(behavior -> reactTo(behavior, request))
 				.andThenTo(state -> Completes.withSuccess(entityResponseOf(Ok, serialized(dataFromState.apply(state)))))
 				.otherwise(noData -> Response.of(NotFound))
@@ -127,9 +127,9 @@ public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Completes<STATE> createAggregateOnStage(final Stage stage, final Object command) {
+	private Completes<STATE> createAggregateOnStage(final Stage stage, final CMD command) {
 		final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("g-");
-		final Behavior<STATE> behavior = stage.actorFor(Behavior.class,
+		final Behavior<CMD, STATE> behavior = stage.actorFor(Behavior.class,
 				Definition.has(EventSourcedAggregateBehavior.class,
 						Definition.parameters(_address.idString(), aggregateSupplier)),
 				_address);
@@ -141,12 +141,12 @@ public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 		return ContentType.of("application/json", "charset=UTF-8");
 	}
 
-	private Queries<DATA> queriesFor(EventSourcedAggregate<STATE> aggregate, Function<STATE, DATA> dataFromState) {
+	private Queries<DATA> queriesFor(EventSourcedAggregate<CMD, STATE> aggregate, Function<STATE, DATA> dataFromState) {
 		Class<? extends Object> dataTypeOfAggregate = dataTypeOfAggregate(aggregate, dataFromState);
 		return queriesByDataType(dataTypeOfAggregate);
 	}
 
-	private Class<? extends Object> dataTypeOfAggregate(EventSourcedAggregate<STATE> aggregate,
+	private Class<? extends Object> dataTypeOfAggregate(EventSourcedAggregate<CMD, STATE> aggregate,
 			Function<STATE, DATA> dataFromState) {
 		Class<? extends Object> aggregateDataClass = dataFromState.apply(aggregate.initialState(null)).getClass();
 		return aggregateDataClass;
@@ -158,7 +158,7 @@ public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 				.get(dataType);
 	}
 	
-	private String resourceNameOf(EventSourcedAggregate<STATE> aggregate) {
+	private String resourceNameOf(EventSourcedAggregate<CMD, STATE> aggregate) {
 		String resourceName = aggregate.getClass().getSimpleName() + "RequestHandlers";
 		return resourceName;
 	}

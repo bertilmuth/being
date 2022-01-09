@@ -9,7 +9,7 @@ package org.requirementsascode.being;
  *
  * @param <STATE> the state of the aggregate
  */
-public abstract class EventSourcedAggregate<STATE>{
+public abstract class EventSourcedAggregate<CMD, STATE>{
   private STATE state;
   
   /**

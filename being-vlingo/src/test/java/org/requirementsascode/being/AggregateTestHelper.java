@@ -10,13 +10,13 @@ import java.util.UUID;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
-class AggregateTestHelper<STATE> {
+class AggregateTestHelper<CMD,STATE> {
 	private final MapCommands mapCommands;
 	private final MapEvents<STATE> mapEvents;
 	private List<Source<?>> events;
-	private final EventSourcedAggregate<STATE> aggregate;
+	private final EventSourcedAggregate<CMD,STATE> aggregate;
 
-	private AggregateTestHelper(EventSourcedAggregate<STATE> aggregate) {
+	private AggregateTestHelper(EventSourcedAggregate<CMD,STATE> aggregate) {
 		this.aggregate = Objects.requireNonNull(aggregate, "aggregate must be non-null!");
 
 		this.mapCommands = aggregate.mapCommands();
@@ -25,18 +25,23 @@ class AggregateTestHelper<STATE> {
 		clearEvents();
 		createInitialStateOf(aggregate);
 	}
+	
+	private void createInitialStateOf(EventSourcedAggregate<CMD,STATE> aggregate) {
+		STATE initialState = aggregate.initialState(randomId());
+		aggregate.setState(initialState);
+	}
 
-	public static <T> AggregateTestHelper<T> of(EventSourcedAggregate<T> aggregate) {
+	public static <CMD,STATE> AggregateTestHelper<CMD,STATE> of(EventSourcedAggregate<CMD,STATE> aggregate) {
 		return new AggregateTestHelper<>(aggregate);
 	}
 
-	public AggregateTestHelper<STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
+	public AggregateTestHelper<CMD,STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
 		Arrays.stream(internalEvents).forEach(mapEvents()::apply);
 		clearEvents();
 		return this;
 	}
 
-	public AggregateTestHelper<STATE> when(Object command) {
+	public AggregateTestHelper<CMD,STATE> when(CMD command) {
 		List<? extends IdentifiedDomainEvent> producedEvents = mapCommands().apply(command);
 		producedEvents().addAll(producedEvents);
 
@@ -45,11 +50,6 @@ class AggregateTestHelper<STATE> {
 
 		lastState.ifPresent(aggregate::setState);
 		return this;
-	}
-
-	private void createInitialStateOf(EventSourcedAggregate<STATE> aggregate) {
-		STATE initialState = aggregate.initialState(randomId());
-		aggregate.setState(initialState);
 	}
 
 	private String randomId() {
