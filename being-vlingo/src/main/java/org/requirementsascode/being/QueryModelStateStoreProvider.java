@@ -19,24 +19,26 @@ public class QueryModelStateStoreProvider<DATA> {
 	public final StateStore store;
 	public final Queries<DATA> queries;
 
-	public static <DATA> QueryModelStateStoreProvider using(final Stage stage, QueryModel<DATA> queryModel) {
+	public static <DATA> QueryModelStateStoreProvider using(final Stage stage, QueryModel<DATA>... queryModels) {
 		if (ComponentRegistry.has(QueryModelStateStoreProvider.class)) {
 			return ComponentRegistry.withType(QueryModelStateStoreProvider.class);
 		}
 
 		new EntryAdapterProvider(stage.world()); // future use
 
-		mapDataTypeToStoreName(queryModel);
+		for (QueryModel<DATA> queryModel : queryModels) {
+			mapDataTypeToStoreName(queryModel);
+		}
 
 		final StateStore store = StoreActorBuilder.from(stage, Model.QUERY, Arrays.asList(new NoOpDispatcher()),
 				StorageType.STATE_STORE, Settings.properties(), true);
 
-		return new QueryModelStateStoreProvider(stage, store, queryModel);
+		return new QueryModelStateStoreProvider(stage, store, queryModels);
 	}
 
-	private QueryModelStateStoreProvider(final Stage stage, final StateStore store, QueryModel<DATA> queryModel) {
+	private QueryModelStateStoreProvider(final Stage stage, final StateStore store, QueryModel<DATA>[] queryModels) {
 		this.store = store;		
-		this.queries = stage.actorFor(Queries.class, QueriesActor.class, store, datatypeOf(queryModel), queryModel.emptyData());
+		this.queries = stage.actorFor(Queries.class, QueriesActor.class, store, datatypeOf(queryModels[0]), queryModels[0].emptyData());
 		
 		ComponentRegistry.register(getClass(), this);
 	}

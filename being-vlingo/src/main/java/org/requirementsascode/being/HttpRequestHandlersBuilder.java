@@ -25,144 +25,141 @@ import io.vlingo.xoom.http.resource.RequestHandler2;
 public class HttpRequestHandlersBuilder {
 	HttpRequestHandlersBuilder() {
 	}
-	
-	public ResourceNameBuilder resourceName(String resourceName) {
-		return new ResourceNameBuilder(resourceName);
+
+	public StageBuilder stage(Stage stage) {
+		return new StageBuilder(stage);
 	}
-	
-	public class ResourceNameBuilder {
-		private final String resourceName;
 
-		ResourceNameBuilder(String resourceName) {
-			this.resourceName = resourceName;
+	public class StageBuilder {
+		private final Stage stage;
+
+		StageBuilder(Stage stage) {
+			this.stage = stage;
 		}
 
-		public StageBuilder stage(Stage stage) {
-			return new StageBuilder(stage);
+		public <STATE> AggregateBuilder<STATE> aggregateSupplier(
+				Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
+			return new AggregateBuilder<>(aggregateSupplier);
 		}
-	
-		public class StageBuilder {
-			private final Stage stage;
-	
-			StageBuilder(Stage stage) {
-				this.stage = stage;
+
+		public class AggregateBuilder<STATE> {
+			private final Supplier<EventSourcedAggregate<STATE>> aggregateSupplier;
+
+			AggregateBuilder(Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
+				this.aggregateSupplier = aggregateSupplier;
 			}
-	
-			public <STATE> AggregateBuilder<STATE> aggregateSupplier(Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
-				return new AggregateBuilder<>(aggregateSupplier);
+
+			public <DATA> RequestHandlersBuilder<DATA> dataFromState(Function<STATE, DATA> dataFromState) {
+				return new RequestHandlersBuilder<DATA>(dataFromState);
 			}
-	
-			public class AggregateBuilder<STATE> {
-				private final Supplier<EventSourcedAggregate<STATE>> aggregateSupplier;
-	
-				AggregateBuilder(Supplier<EventSourcedAggregate<STATE>> aggregateSupplier) {
-					this.aggregateSupplier = aggregateSupplier;
+
+			public class RequestHandlersBuilder<DATA> {
+				private final Function<STATE, DATA> dataFromState;
+				private final HttpRequestHandlers<DATA> httpRequestHandlers;
+
+				public RequestHandlersBuilder(Function<STATE, DATA> dataFromState) {
+					this.dataFromState = dataFromState;
+
+					EventSourcedAggregate<STATE> aggregate = aggregateSupplier.get();
+					this.httpRequestHandlers = new HttpRequestHandlers<>(stage, resourceNameOf(aggregate));
 				}
-	
-				public <DATA> DataFromStateBuilder<DATA> dataFromState(Function<STATE, DATA> dataFromState) {
-					return new DataFromStateBuilder<DATA>(dataFromState);
+
+				private String resourceNameOf(EventSourcedAggregate<STATE> aggregate) {
+					String resourceName = aggregate.getClass().getSimpleName() + "RequestHandlers";
+					return resourceName;
 				}
-	
-				public class DataFromStateBuilder<DATA> {
-					private final Function<STATE, DATA> dataFromState;
-					private final HttpRequestHandlers<DATA> httpRequestHandlers;
-	
-					public DataFromStateBuilder(Function<STATE, DATA> dataFromState) {
-						this.dataFromState = dataFromState;
-						this.httpRequestHandlers = new HttpRequestHandlers<>(stage, resourceName);
-					}
-	
-					public AggregateBuilder<STATE>.DataFromStateBuilder<DATA> createRequest(String url,
-							Class<?> createRequestClass) {
-						final RequestHandler1<?> handler = post(url).body(createRequestClass).handle(this::createAggregate);
-						httpRequestHandlers.add(handler);
-						return this;
-					}
-	
-					public AggregateBuilder<STATE>.DataFromStateBuilder<DATA> updateRequest(String url,
-							Class<?> updateRequestClass) {
-						final RequestHandler2<String, ?> handler = patch(url).param(String.class).body(updateRequestClass)
-								.handle(this::updateAggregate);
-						httpRequestHandlers.add(handler);
-						return this;
-					}
-	
-					public AggregateBuilder<STATE>.DataFromStateBuilder<DATA> findByIdRequest(String url) {
-						final RequestHandler1<String> handler = get(url).param(String.class)
-								.handle(this::findAggregateById);
-						httpRequestHandlers.add(handler);
-						return this;
-					}
-	
-					public AggregateBuilder<STATE>.DataFromStateBuilder<DATA> findAllRequest(String url) {
-						final RequestHandler0 handler = get(url).handle(this::findAllAggregates);
-						httpRequestHandlers.add(handler);
-						return this;
-					}
-	
-					public HttpRequestHandlers<DATA> build() {
-						return httpRequestHandlers;
-					}
-	
-					private Completes<Response> createAggregate(Object request) {
-						return createAggregateOnStage(stage, request).andThenTo(state -> {
-							return Completes
-									.withSuccess(httpRequestHandlers.responseOf(Created,
-											serialized(dataFromState.apply(state))))
-									.otherwise(arg -> Response.of(NotFound))
-									.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
-						});
-	
-					}
-	
-					private Completes<Response> updateAggregate(final String id, final Object request) {
-						return resolve(id).andThenTo(behavior -> reactTo(behavior, request))
-								.andThenTo(state -> Completes.withSuccess(
-										httpRequestHandlers.responseOf(Ok, serialized(dataFromState.apply(state)))))
-								.otherwise(noData -> Response.of(NotFound))
-								.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
-					}
-	
-					private Completes<Response> findAllAggregates() {
-						Completes<Collection<DATA>> findAll = httpRequestHandlers.queries().findAll();
-						return findAll
-								.andThenTo(
-										data -> Completes.withSuccess(httpRequestHandlers.responseOf(Ok, serialized(data))))
+
+				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> createRequest(String url,
+						Class<?> createRequestClass) {
+					final RequestHandler1<?> handler = post(url).body(createRequestClass).handle(this::createAggregate);
+					httpRequestHandlers.add(handler);
+					return this;
+				}
+
+				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> updateRequest(String url,
+						Class<?> updateRequestClass) {
+					final RequestHandler2<String, ?> handler = patch(url).param(String.class).body(updateRequestClass)
+							.handle(this::updateAggregate);
+					httpRequestHandlers.add(handler);
+					return this;
+				}
+
+				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> findByIdRequest(String url) {
+					final RequestHandler1<String> handler = get(url).param(String.class)
+							.handle(this::findAggregateById);
+					httpRequestHandlers.add(handler);
+					return this;
+				}
+
+				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> findAllRequest(String url) {
+					final RequestHandler0 handler = get(url).handle(this::findAllAggregates);
+					httpRequestHandlers.add(handler);
+					return this;
+				}
+
+				public HttpRequestHandlers<DATA> build() {
+					return httpRequestHandlers;
+				}
+
+				private Completes<Response> createAggregate(Object request) {
+					return createAggregateOnStage(stage, request).andThenTo(state -> {
+						return Completes
+								.withSuccess(
+										httpRequestHandlers.responseOf(Created, serialized(dataFromState.apply(state))))
 								.otherwise(arg -> Response.of(NotFound))
 								.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
-					}
-	
-					private Completes<Response> findAggregateById(final String id) {
-						Completes<DATA> findById = httpRequestHandlers.queries().findById(id);
-						return findById
-								.andThenTo(
-										data -> Completes.withSuccess(httpRequestHandlers.responseOf(Ok, serialized(data))))
-								.otherwise(arg -> Response.of(NotFound))
-								.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
-					}
-	
-					@SuppressWarnings({ "unchecked", "rawtypes" })
-					private Completes<STATE> reactTo(Behavior behavior, Object command) {
-						return behavior.reactTo(command);
-					}
-	
-					@SuppressWarnings("rawtypes")
-					private Completes<Behavior> resolve(final String id) {
-						final Address address = stage.addressFactory().from(id);
-						final Completes<Behavior> actor = stage.actorOf(Behavior.class, address,
-								Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id)));
-						stage.world().defaultLogger().info("Resolved actor: " + actor.id());
-						return actor;
-					}
-	
-					@SuppressWarnings("unchecked")
-					private Completes<STATE> createAggregateOnStage(final Stage stage, final Object command) {
-						final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("g-");
-						final Behavior<STATE> behavior = stage.actorFor(Behavior.class, Definition
-								.has(EventSourcedAggregateBehavior.class, Definition.parameters(_address.idString(), aggregateSupplier)),
-								_address);
-						return reactTo(behavior, command);
-					}
+					});
+
+				}
+
+				private Completes<Response> updateAggregate(final String id, final Object request) {
+					return resolve(id).andThenTo(behavior -> reactTo(behavior, request))
+							.andThenTo(state -> Completes.withSuccess(
+									httpRequestHandlers.responseOf(Ok, serialized(dataFromState.apply(state)))))
+							.otherwise(noData -> Response.of(NotFound))
+							.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
+				}
+
+				private Completes<Response> findAllAggregates() {
+					Completes<Collection<DATA>> findAll = httpRequestHandlers.queries().findAll();
+					return findAll
+							.andThenTo(
+									data -> Completes.withSuccess(httpRequestHandlers.responseOf(Ok, serialized(data))))
+							.otherwise(arg -> Response.of(NotFound))
+							.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
+				}
+
+				private Completes<Response> findAggregateById(final String id) {
+					Completes<DATA> findById = httpRequestHandlers.queries().findById(id);
+					return findById
+							.andThenTo(
+									data -> Completes.withSuccess(httpRequestHandlers.responseOf(Ok, serialized(data))))
+							.otherwise(arg -> Response.of(NotFound))
+							.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
+				}
+
+				@SuppressWarnings({ "unchecked", "rawtypes" })
+				private Completes<STATE> reactTo(Behavior behavior, Object command) {
+					return behavior.reactTo(command);
+				}
+
+				@SuppressWarnings("rawtypes")
+				private Completes<Behavior> resolve(final String id) {
+					final Address address = stage.addressFactory().from(id);
+					final Completes<Behavior> actor = stage.actorOf(Behavior.class, address,
+							Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id)));
+					stage.world().defaultLogger().info("Resolved actor: " + actor.id());
+					return actor;
+				}
+
+				@SuppressWarnings("unchecked")
+				private Completes<STATE> createAggregateOnStage(final Stage stage, final Object command) {
+					final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("g-");
+					final Behavior<STATE> behavior = stage.actorFor(Behavior.class,
+							Definition.has(EventSourcedAggregateBehavior.class,
+									Definition.parameters(_address.idString(), aggregateSupplier)),
+							_address);
+					return reactTo(behavior, command);
 				}
 			}
 		}
