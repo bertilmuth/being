@@ -13,7 +13,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 class CommandHandlersTest {
 	@Test
 	void createsEmptyCommandHandlers() {
-		CommandHandlers<TestCommand> commandHandlers = CommandHandlers.with();
+		CommandHandlers<TestCommand> commandHandlers = CommandHandlers.handle();
 
 		List<Class<? extends TestCommand>> commands = commandHandlers.getCommandClasses();
 		assertTrue(commands.isEmpty());
@@ -21,7 +21,7 @@ class CommandHandlersTest {
 
 	@Test
 	void createsOneCommandMapper() {
-		CommandHandlers<TestCommand> commandHandlers = CommandHandlers.with(
+		CommandHandlers<TestCommand> commandHandlers = CommandHandlers.handle(
 			commandsOf(SampleCommand1.class).toEvent(command -> new SampleEvent1(command.id))
 		);
 
@@ -32,7 +32,7 @@ class CommandHandlersTest {
 
 	@Test
 	void createsTwoCommandHandlers() {
-		CommandHandlers<TestCommand> commandHandlers = CommandHandlers.with(
+		CommandHandlers<TestCommand> commandHandlers = CommandHandlers.handle(
 			commandsOf(SampleCommand1.class).toEvent(command -> new SampleEvent1(command.id)),
 			commandsOf(SampleCommand2.class).toEvent(command -> new SampleEvent2(command.id))
 		);

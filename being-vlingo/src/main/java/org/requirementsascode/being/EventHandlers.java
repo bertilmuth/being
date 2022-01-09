@@ -13,7 +13,7 @@ public class EventHandlers<STATE> implements Function<IdentifiedDomainEvent, Opt
 	private final List<EventHandler<? extends IdentifiedDomainEvent, STATE>> eventHandlers;
 
 	@SafeVarargs
-	public static <STATE> EventHandlers<STATE> with(EventHandler<? extends IdentifiedDomainEvent, STATE>... eventHandlers) {
+	public static <STATE> EventHandlers<STATE> handle(EventHandler<? extends IdentifiedDomainEvent, STATE>... eventHandlers) {
 		return new EventHandlers<>(eventHandlers);
 	}
 	

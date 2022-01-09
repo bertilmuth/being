@@ -13,7 +13,7 @@ public class CommandHandlers<CMD> implements Function<CMD, List<? extends Identi
 	private final List<CommandHandler<? extends CMD>> comandHandlers;
 
 	@SafeVarargs
-	public static <CMD> CommandHandlers<CMD> with(CommandHandler<? extends CMD>... commandHandlers) {
+	public static <CMD> CommandHandlers<CMD> handle(CommandHandler<? extends CMD>... commandHandlers) {
 		return new CommandHandlers<>(commandHandlers);
 	}
 	
