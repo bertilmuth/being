@@ -16,19 +16,19 @@ import io.vlingo.xoom.turbo.storage.Model;
 import io.vlingo.xoom.turbo.storage.StoreActorBuilder;
 
 @SuppressWarnings("all")
-public class QueryModelStateStoreProvider<DATA> {
+public class QueryModelStateStoreProvider{
 
 	public final StateStore store;
-	public final Map<Class<? extends DATA>, Queries<DATA>> queriesByDataType;
+	public final Map<Class<?>, Queries<?>> queriesByDataType;
 
-	public static <DATA> QueryModelStateStoreProvider using(final Stage stage, QueryModel<DATA>... queryModels) {
+	public static QueryModelStateStoreProvider using(final Stage stage, QueryModel<?>... queryModels) {
 		if (ComponentRegistry.has(QueryModelStateStoreProvider.class)) {
 			return ComponentRegistry.withType(QueryModelStateStoreProvider.class);
 		}
 
 		new EntryAdapterProvider(stage.world()); // future use
 
-		for (QueryModel<DATA> queryModel : queryModels) {
+		for (QueryModel<?> queryModel : queryModels) {
 			registerStoreNameFor(queryModel);
 		}
 
@@ -38,32 +38,32 @@ public class QueryModelStateStoreProvider<DATA> {
 		return new QueryModelStateStoreProvider(stage, store, queryModels);
 	}
 
-	private QueryModelStateStoreProvider(final Stage stage, final StateStore store, QueryModel<DATA>[] queryModels) {
+	private QueryModelStateStoreProvider(final Stage stage, final StateStore store, QueryModel<?>[] queryModels) {
 		this.store = store;		
 		this.queriesByDataType = new HashMap<>();
 		
-		for (QueryModel<DATA> queryModel : queryModels) {
+		for (QueryModel<?> queryModel : queryModels) {
 			mapDataTypeToQueries(stage, store, queryModel);
 		}
 		
 		ComponentRegistry.register(getClass(), this);
 	}
 
-	private void mapDataTypeToQueries(final Stage stage, final StateStore store, QueryModel<DATA> queryModel) {
-		final Class<? extends DATA> datatype = datatypeOf(queryModel);
-		Queries<DATA> queriesActor = stage.actorFor(Queries.class, QueriesActor.class, store, datatype, queryModel.emptyData());
+	private void mapDataTypeToQueries(final Stage stage, final StateStore store, QueryModel<?> queryModel) {
+		final Class<?> datatype = datatypeOf(queryModel);
+		Queries<?> queriesActor = stage.actorFor(Queries.class, QueriesActor.class, store, datatype, queryModel.emptyData());
 		queriesByDataType.put(datatype, queriesActor);
 	}
 	
-	private static <DATA> Class<? extends DATA> registerStoreNameFor(QueryModel<DATA> queryModel) {
-		final Class<? extends DATA> dataType = datatypeOf(queryModel);
+	private static Class<?> registerStoreNameFor(QueryModel<?> queryModel) {
+		final Class<?> dataType = datatypeOf(queryModel);
 		StateTypeStateStoreMap.stateTypeToStoreName(dataType, dataType.getSimpleName());
 		return dataType;
 	}
 
-	private static <DATA> Class<? extends DATA> datatypeOf(QueryModel<DATA> queryModel) {
-		DATA emptyData = queryModel.emptyData();
-		final Class<? extends DATA> dataType = (Class<? extends DATA>) emptyData.getClass();
+	private static Class<?> datatypeOf(QueryModel<?> queryModel) {
+		Object emptyData = queryModel.emptyData();
+		final Class<?> dataType = emptyData.getClass();
 		return dataType;
 	}
 }
