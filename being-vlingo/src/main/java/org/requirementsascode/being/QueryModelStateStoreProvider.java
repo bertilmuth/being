@@ -26,20 +26,30 @@ public class QueryModelStateStoreProvider<DATA> {
 
 		new EntryAdapterProvider(stage.world()); // future use
 
-		DATA emptyData = queryModel.emptyData();
-		final Class<? extends DATA> dataType = (Class<? extends DATA>) emptyData.getClass();
-		StateTypeStateStoreMap.stateTypeToStoreName(dataType, dataType.getSimpleName());
+		mapDataTypeToStoreName(queryModel);
 
 		final StateStore store = StoreActorBuilder.from(stage, Model.QUERY, Arrays.asList(new NoOpDispatcher()),
 				StorageType.STATE_STORE, Settings.properties(), true);
 
-		return new QueryModelStateStoreProvider(stage, store, dataType, emptyData);
+		return new QueryModelStateStoreProvider(stage, store, queryModel);
 	}
 
-	private QueryModelStateStoreProvider(final Stage stage, final StateStore store, Class<DATA> dataType,
-			DATA emptyData) {
-		this.store = store;
-		this.queries = stage.actorFor(Queries.class, QueriesActor.class, store, dataType, emptyData);
+	private QueryModelStateStoreProvider(final Stage stage, final StateStore store, QueryModel<DATA> queryModel) {
+		this.store = store;		
+		this.queries = stage.actorFor(Queries.class, QueriesActor.class, store, datatypeOf(queryModel), queryModel.emptyData());
+		
 		ComponentRegistry.register(getClass(), this);
+	}
+	
+	private static <DATA> Class<? extends DATA> mapDataTypeToStoreName(QueryModel<DATA> queryModel) {
+		final Class<? extends DATA> dataType = datatypeOf(queryModel);
+		StateTypeStateStoreMap.stateTypeToStoreName(dataType, dataType.getSimpleName());
+		return dataType;
+	}
+
+	private static <DATA> Class<? extends DATA> datatypeOf(QueryModel<DATA> queryModel) {
+		DATA emptyData = queryModel.emptyData();
+		final Class<? extends DATA> dataType = (Class<? extends DATA>) emptyData.getClass();
+		return dataType;
 	}
 }
