@@ -2,7 +2,7 @@ package org.requirementsascode.being;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.requirementsascode.being.MapEvent.eventsOf;
+import static org.requirementsascode.being.EventHandler.eventsOf;
 
 import java.util.List;
 
@@ -10,33 +10,33 @@ import org.junit.jupiter.api.Test;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-class MapEventsTest {
+class EventHandlersTest {
 	@Test
 	void createsEmptyEventMappers() {
-		MapEvents<State> mapEvents = MapEvents.with();
+		EventHandlers<State> eventHandlers = EventHandlers.with();
 		
-		List<Class<? extends IdentifiedDomainEvent>> eventClasses = mapEvents.getEventClasses();
+		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
 		assertTrue(eventClasses.isEmpty());
 	}
 
 	@Test
 	void createsOneEventMappers() {
-		MapEvents<State> mapEvents = MapEvents.with(
+		EventHandlers<State> eventHandlers = EventHandlers.with(
 			eventsOf(SampleEvent1.class).toState(event -> new State(event.id))
 		);
 		
-		List<Class<? extends IdentifiedDomainEvent>> eventClasses = mapEvents.getEventClasses();
+		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
 		assertEquals(1, eventClasses.size());
 		assertEquals(SampleEvent1.class, eventClasses.get(0));
 	}
 	
 	@Test
 	void createsTwoEventMappers() {
-		MapEvents<State> mapEvents = MapEvents.with(
+		EventHandlers<State> eventHandlers = EventHandlers.with(
 			eventsOf(SampleEvent1.class).toState(event -> new State(event.id)), 
 			eventsOf(SampleEvent2.class).toState(event -> new State(event.id + "0"))
 		);
-		List<Class<? extends IdentifiedDomainEvent>> eventClasses = mapEvents.getEventClasses();
+		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
 		assertEquals(2, eventClasses.size());
 		assertEquals(SampleEvent1.class, eventClasses.get(0));
 		assertEquals(SampleEvent2.class, eventClasses.get(1));

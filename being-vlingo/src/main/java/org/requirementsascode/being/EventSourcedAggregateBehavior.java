@@ -16,29 +16,29 @@ import io.vlingo.xoom.symbio.Source;
 
 public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced implements Behavior<CMD, STATE> {
 	private final EventSourcedAggregate<CMD, STATE> aggregate;
-	private final MapCommands<CMD> mapCommands;
-	private final MapEvents<STATE> mapEvents;
+	private final CommandHandlers<CMD> commandHandlers;
+	private final EventHandlers<STATE> eventHandlers;
 	private final Logger logger;
 
 	public EventSourcedAggregateBehavior(String aggregateId, Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier) {
 		super(aggregateId);
 		requireNonNull(aggregateSupplier, "aggregateSupplier must be non-null");
 		this.aggregate = requireNonNull(aggregateSupplier.get(), "supplied aggregate must be non-null!");
-		this.mapCommands = requireNonNull(aggregate.mapCommands(), "command handlers must be non-null!");
-		this.mapEvents = requireNonNull(aggregate.mapEvents(), "event handlers must be non-null!");
+		this.commandHandlers = requireNonNull(aggregate.commandHandlers(), "command handlers must be non-null!");
+		this.eventHandlers = requireNonNull(aggregate.eventHandlers(), "event handlers must be non-null!");
 		this.logger = super.stage().world().defaultLogger();
 
 	    initializeAggregate(aggregateId, aggregate);
-		registerEventMappers();
+		registerEventHandlers();
 	}
 
-	private void registerEventMappers() {
-		aggregate.mapEvents().getEventClasses().stream()
-			.forEach(clazz -> registerEventMapperFor(clazz));		
+	private void registerEventHandlers() {
+		aggregate.eventHandlers().getEventClasses().stream()
+			.forEach(clazz -> registerEventHandlerFor(clazz));		
 	}
 
 	@SuppressWarnings("unchecked")
-	private void registerEventMapperFor(Class<? extends IdentifiedDomainEvent> eventClass) {
+	private void registerEventHandlerFor(Class<? extends IdentifiedDomainEvent> eventClass) {
 		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (aggregateBehavior, ev) -> {
 			Optional<STATE> updatedState = aggregateBehavior.applyEvent(ev);
 			logInfo("Applied event: " + ev);
@@ -51,7 +51,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 	
 	private Optional<STATE> applyEvent(IdentifiedDomainEvent event){
-		return mapEvents.apply(event);
+		return eventHandlers.apply(event);
 	}
 	
 	private void setState(STATE state) {
@@ -68,8 +68,8 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	    logger.info("Initialized aggregate: " + aggregateId + " -> " + aggregate);
 	}
 
-	public Completes<STATE> reactTo(Object command){
-		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = mapCommands.apply(command);
+	public Completes<STATE> reactTo(CMD command){
+		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers.apply(command);
 	    logger.info("Handled command: " + command + " -> Events:" + identifiedDomainEvents);
 
 		if(identifiedDomainEvents.isEmpty()) {

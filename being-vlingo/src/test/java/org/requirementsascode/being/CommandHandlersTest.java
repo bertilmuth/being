@@ -2,7 +2,7 @@ package org.requirementsascode.being;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.requirementsascode.being.MapCommand.commandsOf;
+import static org.requirementsascode.being.CommandHandler.commandsOf;
 
 import java.util.List;
 import java.util.function.Function;
@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-class MapCommandsTest {
+class CommandHandlersTest {
 	@Test
 	void createsEmptyCommandMappers() {
-		MapCommands<TestCommand> mapCommands = MapCommands.with();
+		CommandHandlers<TestCommand> mapCommands = CommandHandlers.with();
 		
 		List<Class<? extends TestCommand>> commands = mapCommands.getCommandClasses();
 		assertTrue(commands.isEmpty());
@@ -23,7 +23,7 @@ class MapCommandsTest {
 	@Test
 	void createsOneCommandMapper() {
 		final Function<SampleCommand1, SampleEvent1> handler = command -> new SampleEvent1(command.id);
-		MapCommands<TestCommand> mapCommands = MapCommands.with(
+		CommandHandlers<TestCommand> mapCommands = CommandHandlers.with(
 			commandsOf(SampleCommand1.class).toEvent(handler)
 		);
 		
@@ -35,11 +35,11 @@ class MapCommandsTest {
 	@Test
 	void createsTwoCommandMappers() {
 		final Function<SampleCommand1, SampleEvent1> handler1 = command -> new SampleEvent1(command.id);
-		MapCommand<SampleCommand1> mapCommand1 = commandsOf(SampleCommand1.class).toEvent(handler1);
+		CommandHandler<SampleCommand1> mapCommand1 = commandsOf(SampleCommand1.class).toEvent(handler1);
 		final Function<SampleCommand2, SampleEvent2> handler2 = command -> new SampleEvent2(command.id);
-		MapCommand<SampleCommand2> mapCommand2 = commandsOf(SampleCommand2.class).toEvent(handler2);
+		CommandHandler<SampleCommand2> mapCommand2 = commandsOf(SampleCommand2.class).toEvent(handler2);
 
-		MapCommands<TestCommand> mapCommands = MapCommands.with(mapCommand1, mapCommand2);
+		CommandHandlers<TestCommand> mapCommands = CommandHandlers.with(mapCommand1, mapCommand2);
 		List<Class<? extends TestCommand>> commandClasses = mapCommands.getCommandClasses();
 		assertEquals(2, commandClasses.size());
 		assertEquals(SampleCommand1.class, commandClasses.get(0));

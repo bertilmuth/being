@@ -11,16 +11,16 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 class AggregateTestHelper<CMD,STATE> {
-	private final MapCommands<CMD> mapCommands;
-	private final MapEvents<STATE> mapEvents;
+	private final CommandHandlers<CMD> commandHandlers;
+	private final EventHandlers<STATE> eventHandlers;
 	private List<Source<?>> events;
 	private final EventSourcedAggregate<CMD,STATE> aggregate;
 
 	private AggregateTestHelper(EventSourcedAggregate<CMD,STATE> aggregate) {
 		this.aggregate = Objects.requireNonNull(aggregate, "aggregate must be non-null!");
 
-		this.mapCommands = aggregate.mapCommands();
-		this.mapEvents = aggregate.mapEvents();
+		this.commandHandlers = aggregate.commandHandlers();
+		this.eventHandlers = aggregate.eventHandlers();
 
 		clearEvents();
 		createInitialStateOf(aggregate);
@@ -36,16 +36,16 @@ class AggregateTestHelper<CMD,STATE> {
 	}
 
 	public AggregateTestHelper<CMD,STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
-		Arrays.stream(internalEvents).forEach(mapEvents()::apply);
+		Arrays.stream(internalEvents).forEach(eventHandlers()::apply);
 		clearEvents();
 		return this;
 	}
 
 	public AggregateTestHelper<CMD,STATE> when(CMD command) {
-		List<? extends IdentifiedDomainEvent> producedEvents = mapCommands().apply(command);
+		List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().apply(command);
 		producedEvents().addAll(producedEvents);
 
-		Optional<STATE> lastState = producedEvents.stream().map(e -> mapEvents().apply(e)).filter(Optional::isPresent)
+		Optional<STATE> lastState = producedEvents.stream().map(e -> eventHandlers().apply(e)).filter(Optional::isPresent)
 				.map(state -> state.get()).reduce((first, second) -> second);
 
 		lastState.ifPresent(aggregate::setState);
@@ -56,12 +56,12 @@ class AggregateTestHelper<CMD,STATE> {
 		return UUID.randomUUID().toString();
 	}
 
-	private MapCommands<CMD> mapCommands() {
-		return mapCommands;
+	private CommandHandlers<CMD> commandHandlers() {
+		return commandHandlers;
 	}
 
-	private MapEvents<STATE> mapEvents() {
-		return mapEvents;
+	private EventHandlers<STATE> eventHandlers() {
+		return eventHandlers;
 	}
 
 	public List<Source<?>> producedEvents() {

@@ -41,17 +41,17 @@ public abstract class EventSourcedAggregate<CMD, STATE>{
   }
  
   /**
-   * Defines the command mappers. A mapper maps an incoming command to the event(s) to be persisted.
-   * In the mappers you can call {@link #state}<code>()</code> to get access to the current state of the aggregate.
-   * @return the mapping function
+   * Defines the command handlers. A handler maps an incoming command to the event(s) to be persisted.
+   * In the handlers you can call {@link #state}<code>()</code> to get access to the current state of the aggregate.
+   * @return the command handlers
    */
-  public abstract MapCommands<CMD> mapCommands();
+  public abstract CommandHandlers<CMD> commandHandlers();
   
   /**
-   * Defines the event mappers. A mappers maps a persisted event to the new state of the
-   * aggregate. In mapper methods, you can call
+   * Defines the event handlers. A handler maps a persisted event to the new state of the
+   * aggregate. In handler methods, you can call
    * {@link #state}<code>()</code> to get access to the current state of the aggregate.
-   * @return the mapping function
+   * @return the event handlers
    */
-  public abstract MapEvents<STATE> mapEvents();
+  public abstract EventHandlers<STATE> eventHandlers();
 }
