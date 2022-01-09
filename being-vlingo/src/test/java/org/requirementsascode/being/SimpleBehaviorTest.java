@@ -167,7 +167,7 @@ class SimpleBehaviorTest {
 
   private static class TestAggregate extends EventSourcedAggregate<TestCommand, TestState1> {
     @Override
-    public MapCommands mapCommands() {
+    public MapCommands<TestCommand> mapCommands() {
       return MapCommands.with(
           commandsOf(TestCommand1.class).toEvent(cmd -> new TestEvent1(cmd.name)),
           commandsOf(TestUpdateStateCommand.class).toEvent(cmd -> new TestUpdateStateEvent()),

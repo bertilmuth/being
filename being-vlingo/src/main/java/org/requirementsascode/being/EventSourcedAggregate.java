@@ -45,7 +45,7 @@ public abstract class EventSourcedAggregate<CMD, STATE>{
    * In the mappers you can call {@link #state}<code>()</code> to get access to the current state of the aggregate.
    * @return the mapping function
    */
-  public abstract MapCommands mapCommands();
+  public abstract MapCommands<CMD> mapCommands();
   
   /**
    * Defines the event mappers. A mappers maps a persisted event to the new state of the

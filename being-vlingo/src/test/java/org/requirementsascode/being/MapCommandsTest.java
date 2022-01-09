@@ -14,20 +14,20 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 class MapCommandsTest {
 	@Test
 	void createsEmptyCommandMappers() {
-		MapCommands mapCommands = MapCommands.with();
+		MapCommands<TestCommand> mapCommands = MapCommands.with();
 		
-		List<Class<?>> commands = mapCommands.getCommandClasses();
+		List<Class<? extends TestCommand>> commands = mapCommands.getCommandClasses();
 		assertTrue(commands.isEmpty());
 	}
 
 	@Test
 	void createsOneCommandMapper() {
 		final Function<SampleCommand1, SampleEvent1> handler = command -> new SampleEvent1(command.id);
-		MapCommands mapCommands = MapCommands.with(
+		MapCommands<TestCommand> mapCommands = MapCommands.with(
 			commandsOf(SampleCommand1.class).toEvent(handler)
 		);
 		
-		List<Class<?>> commandClasses = mapCommands.getCommandClasses();
+		List<Class<? extends TestCommand>> commandClasses = mapCommands.getCommandClasses();
 		assertEquals(1, commandClasses.size());
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
 	}
@@ -39,18 +39,20 @@ class MapCommandsTest {
 		final Function<SampleCommand2, SampleEvent2> handler2 = command -> new SampleEvent2(command.id);
 		MapCommand<SampleCommand2> mapCommand2 = commandsOf(SampleCommand2.class).toEvent(handler2);
 
-		MapCommands mapCommands = MapCommands.with(mapCommand1, mapCommand2);
-		List<Class<?>> commandClasses = mapCommands.getCommandClasses();
+		MapCommands<TestCommand> mapCommands = MapCommands.with(mapCommand1, mapCommand2);
+		List<Class<? extends TestCommand>> commandClasses = mapCommands.getCommandClasses();
 		assertEquals(2, commandClasses.size());
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
 		assertEquals(SampleCommand2.class, commandClasses.get(1));
 	}
 	
-	private class SampleCommand1{
+	private interface TestCommand{}
+	
+	private class SampleCommand1 implements TestCommand{
 		public String id;
 	};
 	
-	private class SampleCommand2{
+	private class SampleCommand2 implements TestCommand{
 		public String id;
 	};
 

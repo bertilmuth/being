@@ -11,7 +11,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 class AggregateTestHelper<CMD,STATE> {
-	private final MapCommands mapCommands;
+	private final MapCommands<CMD> mapCommands;
 	private final MapEvents<STATE> mapEvents;
 	private List<Source<?>> events;
 	private final EventSourcedAggregate<CMD,STATE> aggregate;
@@ -56,7 +56,7 @@ class AggregateTestHelper<CMD,STATE> {
 		return UUID.randomUUID().toString();
 	}
 
-	private MapCommands mapCommands() {
+	private MapCommands<CMD> mapCommands() {
 		return mapCommands;
 	}
 

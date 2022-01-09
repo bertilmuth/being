@@ -16,7 +16,7 @@ import io.vlingo.xoom.symbio.Source;
 
 public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced implements Behavior<CMD, STATE> {
 	private final EventSourcedAggregate<CMD, STATE> aggregate;
-	private final MapCommands mapCommands;
+	private final MapCommands<CMD> mapCommands;
 	private final MapEvents<STATE> mapEvents;
 	private final Logger logger;
 
