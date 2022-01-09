@@ -13,7 +13,6 @@ import static io.vlingo.xoom.http.resource.ResourceBuilder.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -33,27 +32,23 @@ import io.vlingo.xoom.turbo.ComponentRegistry;
 
 public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 	private final Stage stage;
-	private final String resourceName;
 	private final Queries<DATA> queries;
-	private List<RequestHandler> httpRequestHandlers;
+	private final List<RequestHandler> httpRequestHandlers;
 	private final Supplier<EventSourcedAggregate<STATE>> aggregateSupplier;
+	private final EventSourcedAggregate<STATE> aggregate;
 	private final Function<STATE, DATA> dataFromState;
+	private final String resourceName;
 
-	HttpRequestHandlers(final Stage stage, String resourceName, Class<? extends Object> dataTypeOfAggregate,
-			Supplier<EventSourcedAggregate<STATE>> aggregateSupplier, Function<STATE, DATA> dataFromState) {
+	HttpRequestHandlers(final Stage stage, Supplier<EventSourcedAggregate<STATE>> aggregateSupplier,
+			Function<STATE, DATA> dataFromState) {
 		super(stage.world().stage());
 		this.stage = stage;
-		this.resourceName = Objects.requireNonNull(resourceName, "resourceName must be non-null!");
-		this.queries = queriesByDataType(dataTypeOfAggregate);
 		this.httpRequestHandlers = new ArrayList<>();
 		this.aggregateSupplier = aggregateSupplier;
+		this.aggregate = aggregateSupplier.get();
+		this.queries = queriesFor(aggregate, dataFromState);
+		this.resourceName = resourceNameOf(aggregate);
 		this.dataFromState = dataFromState;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private Queries<DATA> queriesByDataType(Class<? extends Object> dataType) {
-		return (Queries<DATA>) ComponentRegistry.withType(QueryModelStateStoreProvider.class).queriesByDataType
-				.get(dataType);
 	}
 
 	public static HttpRequestHandlersBuilder builder() {
@@ -62,31 +57,13 @@ public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 
 	@Override
 	public Resource<?> routes() {
-		return resource(resourceName(), requestHandlerArray());
-	}
-
-	private RequestHandler[] requestHandlerArray() {
-		return httpRequestHandlers.toArray(new RequestHandler[httpRequestHandlers.size()]);
-	}
-
-	private String resourceName() {
-		return resourceName;
+		RequestHandler[] requestHandlerArray = httpRequestHandlers.toArray(new RequestHandler[httpRequestHandlers.size()]);
+		return resource(resourceName, requestHandlerArray);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Completes<STATE> reactTo(Behavior behavior, Object command) {
 		return behavior.reactTo(command);
-	}
-
-	private Class<? extends Object> dataTypeOfAggregate(EventSourcedAggregate<STATE> aggregate,
-			Function<STATE, DATA> dataFromState) {
-		Class<? extends Object> aggregateDataClass = dataFromState.apply(aggregate.initialState(null)).getClass();
-		return aggregateDataClass;
-	}
-
-	private String resourceNameOf(EventSourcedAggregate<STATE> aggregate) {
-		String resourceName = aggregate.getClass().getSimpleName() + "RequestHandlers";
-		return resourceName;
 	}
 
 	void createRequest(String url, Class<?> createRequestClass) {
@@ -162,5 +139,27 @@ public class HttpRequestHandlers<STATE, DATA> extends DynamicResourceHandler {
 	@Override
 	protected ContentType contentType() {
 		return ContentType.of("application/json", "charset=UTF-8");
+	}
+
+	private Queries<DATA> queriesFor(EventSourcedAggregate<STATE> aggregate, Function<STATE, DATA> dataFromState) {
+		Class<? extends Object> dataTypeOfAggregate = dataTypeOfAggregate(aggregate, dataFromState);
+		return queriesByDataType(dataTypeOfAggregate);
+	}
+
+	private Class<? extends Object> dataTypeOfAggregate(EventSourcedAggregate<STATE> aggregate,
+			Function<STATE, DATA> dataFromState) {
+		Class<? extends Object> aggregateDataClass = dataFromState.apply(aggregate.initialState(null)).getClass();
+		return aggregateDataClass;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Queries<DATA> queriesByDataType(Class<? extends Object> dataType) {
+		return (Queries<DATA>) ComponentRegistry.withType(QueryModelStateStoreProvider.class).queriesByDataType
+				.get(dataType);
+	}
+	
+	private String resourceNameOf(EventSourcedAggregate<STATE> aggregate) {
+		String resourceName = aggregate.getClass().getSimpleName() + "RequestHandlers";
+		return resourceName;
 	}
 }

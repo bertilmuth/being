@@ -38,25 +38,9 @@ public class HttpRequestHandlersBuilder {
 
 			public class RequestHandlersBuilder<DATA> {
 				private final HttpRequestHandlers<STATE, DATA> httpRequestHandlers;
-				private final Class<? extends Object> dataTypeOfAggregate;
 
 				public RequestHandlersBuilder(Function<STATE, DATA> dataFromState) {
-					final EventSourcedAggregate<STATE> aggregate = aggregateSupplier.get();					
-					this.dataTypeOfAggregate = dataTypeOfAggregate(aggregate, dataFromState);
-					
-					this.httpRequestHandlers = new HttpRequestHandlers<>(stage, resourceNameOf(aggregate), dataTypeOfAggregate, aggregateSupplier, dataFromState);
-				}
-
-				private Class<? extends Object> dataTypeOfAggregate(EventSourcedAggregate<STATE> aggregate,
-						Function<STATE, DATA> dataFromState) {
-					Class<? extends Object> aggregateDataClass = dataFromState.apply(aggregate.initialState(null))
-							.getClass();
-					return aggregateDataClass;
-				}
-
-				private String resourceNameOf(EventSourcedAggregate<STATE> aggregate) {
-					String resourceName = aggregate.getClass().getSimpleName() + "RequestHandlers";
-					return resourceName;
+					this.httpRequestHandlers = new HttpRequestHandlers<>(stage, aggregateSupplier, dataFromState);
 				}
 
 				public AggregateBuilder<STATE>.RequestHandlersBuilder<DATA> createRequest(String url,
