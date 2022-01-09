@@ -12,7 +12,7 @@ public class QueryModel<DATA> {
 	private final Map<Class<? extends Source<?>>,  Merge<DATA, ? extends Source<?>>> eventClassToMergeFunction;
 	private final DATA emptyData;
 	
-	public static <DATA> QueryModel<DATA> withEmptyData(DATA emptyData) {
+	public static <DATA> QueryModel<DATA> startEmptyWith(DATA emptyData) {
 		return new QueryModel<>(emptyData);
 	}
 	
@@ -21,7 +21,7 @@ public class QueryModel<DATA> {
 		this.eventClassToMergeFunction = new HashMap<>();
 	}
 	
-	public <EVENT extends IdentifiedDomainEvent> QueryModel<DATA> mergeEvent(Class<EVENT> eventClass, Merge<DATA, EVENT> mergeFunction) {
+	public <EVENT extends IdentifiedDomainEvent> QueryModel<DATA> andMerge(Class<EVENT> eventClass, Merge<DATA, EVENT> mergeFunction) {
 		Objects.requireNonNull(eventClass, "eventClass must be non-null!");
 		Objects.requireNonNull(mergeFunction, "mergeFunction must be non-null!");
 		
