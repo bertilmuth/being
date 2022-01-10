@@ -2,14 +2,14 @@ package org.requirementsascode.being;
 
 /**
  * <p>
- * Core class for defining how an aggregate reacts to commands by producing events (that are persisted),
+ * Core interface for defining how an aggregate reacts to commands by producing events (that are persisted),
  * and how events are applied to an aggregate to change state.
  * </p>
  * @author b_muth
  *
  * @param <STATE> the state of the aggregate
  */
-public abstract class EventSourcedAggregate<CMD, STATE>{  
+public interface EventSourcedAggregate<CMD, STATE>{  
   /**
    * Creates the very first state of the aggregate.
    * 

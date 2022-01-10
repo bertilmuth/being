@@ -165,7 +165,7 @@ class SimpleBehaviorTest {
     assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT, expectedEvent2), behaviorTestHelper.state().appliedEvents());
   }
 
-  private static class TestAggregate extends EventSourcedAggregate<TestCommand, TestState1> {
+  private static class TestAggregate implements EventSourcedAggregate<TestCommand, TestState1> {
     @Override
     public CommandHandlers<TestCommand, TestState1> commandHandlers() {
       return CommandHandlers.handle(
