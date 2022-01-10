@@ -179,9 +179,9 @@ class SimpleBehaviorTest {
     @Override
     public EventHandlers<TestState1> eventHandlers() {
       return EventHandlers.handle(
-          eventsOf(TestEvent1.class).with((state,event) -> state.addEvent(event)),
-          eventsOf(TestEvent2.class).with((state,event) -> state.addEvent(event)),
-          eventsOf(TestUpdateStateEvent.class).with((state,event) -> new TestState1().addEvent(NEW_AGGREGATE_ROOT_EVENT))
+          eventsOf(TestEvent1.class).with((event,state) -> state.addEvent(event)),
+          eventsOf(TestEvent2.class).with((event,state) -> state.addEvent(event)),
+          eventsOf(TestUpdateStateEvent.class).with((event,state) -> new TestState1().addEvent(NEW_AGGREGATE_ROOT_EVENT))
       );
     }
 

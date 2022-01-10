@@ -54,7 +54,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 	
 	private Optional<STATE> reactToEvent(IdentifiedDomainEvent event){
-		return eventHandlers.reactTo(state(), event);
+		return eventHandlers.reactTo(event, state());
 	}
 	
 	private STATE state() {

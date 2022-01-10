@@ -22,12 +22,12 @@ public class EventHandlers<STATE>{
 		this.eventHandlers = Arrays.asList(eventHandlers);
 	}
 	
-	public Optional<STATE> reactTo(STATE state, IdentifiedDomainEvent event) {
+	public Optional<STATE> reactTo(IdentifiedDomainEvent event, STATE state) {
 		Class<? extends IdentifiedDomainEvent> eventClass = Objects.requireNonNull(event, "event must be non-null!").getClass();
 		
 		Optional<STATE> optionalState = eventHandlers.stream()
 			.filter(eventHandler -> eventHandler.getEventClass().equals(eventClass))
-			.map(eventHandler -> eventHandler.reactTo(state, event))
+			.map(eventHandler -> eventHandler.reactTo(event, state))
 			.findFirst();
 		
 		return optionalState;
