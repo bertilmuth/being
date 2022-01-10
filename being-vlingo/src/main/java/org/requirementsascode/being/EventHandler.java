@@ -20,7 +20,7 @@ public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE>{
 			this.eventClass = eventClass;
 		}
 		
-		public <STATE> EventHandler<EVENT, STATE> toState(Function<EVENT, STATE> mapFunction){
+		public <STATE> EventHandler<EVENT, STATE> with(Function<EVENT, STATE> mapFunction){
 			return new EventHandler<>(eventClass, mapFunction);
 		}
 	}

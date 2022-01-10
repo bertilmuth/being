@@ -22,7 +22,7 @@ class EventHandlersTest {
 	@Test
 	void createsOneEventHandlers() {
 		EventHandlers<State> eventHandlers = EventHandlers.handle(
-			eventsOf(SampleEvent1.class).toState(event -> new State(event.id))
+			eventsOf(SampleEvent1.class).with(event -> new State(event.id))
 		);
 		
 		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
@@ -33,8 +33,8 @@ class EventHandlersTest {
 	@Test
 	void createsTwoEventHandlers() {
 		EventHandlers<State> eventHandlers = EventHandlers.handle(
-			eventsOf(SampleEvent1.class).toState(event -> new State(event.id)), 
-			eventsOf(SampleEvent2.class).toState(event -> new State(event.id + "0"))
+			eventsOf(SampleEvent1.class).with(event -> new State(event.id)), 
+			eventsOf(SampleEvent2.class).with(event -> new State(event.id + "0"))
 		);
 		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
 		assertEquals(2, eventClasses.size());

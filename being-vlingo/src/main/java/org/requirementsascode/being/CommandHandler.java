@@ -22,16 +22,16 @@ public class CommandHandler<CMD>{
 			this.commandClass = commandClass;
 		}
 
-		public CommandHandler<T> toEvent(Function<T, ? extends IdentifiedDomainEvent> mapFunction) {
+		public CommandHandler<T> with(Function<T, ? extends IdentifiedDomainEvent> mapFunction) {
 			Function<T, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = cmd -> {
 				IdentifiedDomainEvent result = mapFunction.apply(cmd);
 				return Collections.singletonList(result);
 			};
 			
-			return toEvents(eventListProducingHandler);
+			return withSome(eventListProducingHandler);
 		}
 
-		public CommandHandler<T> toEvents(Function<T, List<? extends IdentifiedDomainEvent>> mapFunction) {
+		public CommandHandler<T> withSome(Function<T, List<? extends IdentifiedDomainEvent>> mapFunction) {
 			return new CommandHandler<>(commandClass, mapFunction);
 		}
 	}

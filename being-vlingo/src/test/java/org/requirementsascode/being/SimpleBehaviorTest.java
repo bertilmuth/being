@@ -169,19 +169,19 @@ class SimpleBehaviorTest {
     @Override
     public CommandHandlers<TestCommand> commandHandlers() {
       return CommandHandlers.handle(
-          commandsOf(TestCommand1.class).toEvent(cmd -> new TestEvent1(cmd.name)),
-          commandsOf(TestUpdateStateCommand.class).toEvent(cmd -> new TestUpdateStateEvent()),
-          commandsOf(TestCommandForEventList.class).toEvents(cmd -> {return asList(new TestEvent1(cmd.name), new TestEvent2(cmd.name));}),
-          commandsOf(ProduceUnhandledEventCommand.class).toEvent(cmd -> new UnhandledEvent())
+          commandsOf(TestCommand1.class).with(cmd -> new TestEvent1(cmd.name)),
+          commandsOf(TestUpdateStateCommand.class).with(cmd -> new TestUpdateStateEvent()),
+          commandsOf(TestCommandForEventList.class).withSome(cmd -> {return asList(new TestEvent1(cmd.name), new TestEvent2(cmd.name));}),
+          commandsOf(ProduceUnhandledEventCommand.class).with(cmd -> new UnhandledEvent())
       );
     }
 
     @Override
     public EventHandlers<TestState1> eventHandlers() {
       return EventHandlers.handle(
-          eventsOf(TestEvent1.class).toState(ev -> state().addEvent(ev)),
-          eventsOf(TestEvent2.class).toState(ev -> state().addEvent(ev)),
-          eventsOf(TestUpdateStateEvent.class).toState(ev -> new TestState1().addEvent(NEW_AGGREGATE_ROOT_EVENT))
+          eventsOf(TestEvent1.class).with(ev -> state().addEvent(ev)),
+          eventsOf(TestEvent2.class).with(ev -> state().addEvent(ev)),
+          eventsOf(TestUpdateStateEvent.class).with(ev -> new TestState1().addEvent(NEW_AGGREGATE_ROOT_EVENT))
       );
     }
 
