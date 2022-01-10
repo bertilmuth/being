@@ -11,7 +11,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 class AggregateTestHelper<CMD,STATE> {
-	private final CommandHandlers<CMD> commandHandlers;
+	private final CommandHandlers<STATE, CMD> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private List<Source<?>> events;
 	private final EventSourcedAggregate<CMD,STATE> aggregate;
@@ -28,14 +28,14 @@ class AggregateTestHelper<CMD,STATE> {
 	
 	private void createInitialStateOf(EventSourcedAggregate<CMD,STATE> aggregate) {
 		STATE initialState = aggregate.initialState(randomId());
-		setState(aggregate, initialState);
+		setState(initialState);
 	}
 	
 	private STATE state() {
 		return aggregate.state();
 	}
 
-	private void setState(EventSourcedAggregate<CMD, STATE> aggregate, STATE initialState) {
+	private void setState(STATE initialState) {
 		aggregate.setState(initialState);
 	}
 
@@ -50,13 +50,13 @@ class AggregateTestHelper<CMD,STATE> {
 	}
 
 	public AggregateTestHelper<CMD,STATE> when(CMD command) {
-		List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().reactTo(command);
+		List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().reactTo(state(), command);
 		producedEvents().addAll(producedEvents);
 
 		Optional<STATE> lastState = producedEvents.stream().map(ev -> eventHandlers().reactTo(state(), ev)).filter(Optional::isPresent)
 				.map(state -> state.get()).reduce((first, second) -> second);
 
-		lastState.ifPresent(aggregate::setState);
+		lastState.ifPresent(this::setState);
 		return this;
 	}
 
@@ -64,7 +64,7 @@ class AggregateTestHelper<CMD,STATE> {
 		return UUID.randomUUID().toString();
 	}
 
-	private CommandHandlers<CMD> commandHandlers() {
+	private CommandHandlers<STATE, CMD> commandHandlers() {
 		return commandHandlers;
 	}
 
