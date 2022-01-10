@@ -7,7 +7,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
 public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE>{
 	private final Class<EVENT> eventClass;
-	private final Function<EVENT, STATE> mapFunction;
+	private final Function<EVENT, STATE> eventHandler;
 	
 	public static <EVENT extends IdentifiedDomainEvent> EventsOf<EVENT> eventsOf(Class<EVENT> eventClass) {
 		return new EventsOf<EVENT>(eventClass);
@@ -20,19 +20,19 @@ public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE>{
 			this.eventClass = eventClass;
 		}
 		
-		public <STATE> EventHandler<EVENT, STATE> with(Function<EVENT, STATE> mapFunction){
-			return new EventHandler<>(eventClass, mapFunction);
+		public <STATE> EventHandler<EVENT, STATE> with(Function<EVENT, STATE> eventHandler){
+			return new EventHandler<>(eventClass, eventHandler);
 		}
 	}
 	
 	private EventHandler(Class<EVENT> eventClass, Function<EVENT, STATE> mapFunction) {
 		this.eventClass = Objects.requireNonNull(eventClass, "eventClass must be non-null!");
-		this.mapFunction = Objects.requireNonNull(mapFunction, "mapFunction must be non-null!");
+		this.eventHandler = Objects.requireNonNull(mapFunction, "eventHandler must be non-null!");
 	}
 	
 	@SuppressWarnings("unchecked")
 	STATE reactTo(IdentifiedDomainEvent event) {
-		return mapFunction.apply((EVENT)event);
+		return eventHandler.apply((EVENT)event);
 	}
 
 	public Class<EVENT> getEventClass() {
