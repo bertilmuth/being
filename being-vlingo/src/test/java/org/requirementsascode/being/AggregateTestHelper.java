@@ -28,6 +28,14 @@ class AggregateTestHelper<CMD,STATE> {
 	
 	private void createInitialStateOf(EventSourcedAggregate<CMD,STATE> aggregate) {
 		STATE initialState = aggregate.initialState(randomId());
+		setState(aggregate, initialState);
+	}
+	
+	private STATE state() {
+		return aggregate.state();
+	}
+
+	private void setState(EventSourcedAggregate<CMD, STATE> aggregate, STATE initialState) {
 		aggregate.setState(initialState);
 	}
 
@@ -36,7 +44,7 @@ class AggregateTestHelper<CMD,STATE> {
 	}
 
 	public AggregateTestHelper<CMD,STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
-		Arrays.stream(internalEvents).forEach(eventHandlers()::reactTo);
+		Arrays.stream(internalEvents).forEach(ev -> eventHandlers().reactTo(state(), ev));
 		clearEvents();
 		return this;
 	}
@@ -45,7 +53,7 @@ class AggregateTestHelper<CMD,STATE> {
 		List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().reactTo(command);
 		producedEvents().addAll(producedEvents);
 
-		Optional<STATE> lastState = producedEvents.stream().map(e -> eventHandlers().reactTo(e)).filter(Optional::isPresent)
+		Optional<STATE> lastState = producedEvents.stream().map(ev -> eventHandlers().reactTo(state(), ev)).filter(Optional::isPresent)
 				.map(state -> state.get()).reduce((first, second) -> second);
 
 		lastState.ifPresent(aggregate::setState);

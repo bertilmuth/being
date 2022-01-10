@@ -29,29 +29,34 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 		this.logger = super.stage().world().defaultLogger();
 
 	    initializeAggregate(aggregateId, aggregate);
-		registerEventHandlers();
+		registerEventConsumers();
 	}
 
-	private void registerEventHandlers() {
+	private void registerEventConsumers() {
 		aggregate.eventHandlers().getEventClasses().stream()
-			.forEach(clazz -> registerEventHandlerFor(clazz));		
+			.forEach(clazz -> registerConsumerFor(clazz));		
 	}
 
-	@SuppressWarnings("unchecked")
-	private void registerEventHandlerFor(Class<? extends IdentifiedDomainEvent> eventClass) {
-		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, (aggregateBehavior, ev) -> {
-			Optional<STATE> updatedState = aggregateBehavior.applyEvent(ev);
-			logInfo("Applied event: " + ev);
+	private void registerConsumerFor(Class<? extends IdentifiedDomainEvent> eventClass) {
+		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, EventSourcedAggregateBehavior::consumeEvent);
+	}
+	
+	private static <CMD, STATE> void consumeEvent(EventSourcedAggregateBehavior<CMD, STATE> aggregateBehavior, IdentifiedDomainEvent event) {
+		Optional<STATE> updatedState = aggregateBehavior.reactToEvent(event);
+		aggregateBehavior.logInfo("Applied event: " + event);
 
-			updatedState.ifPresent(state -> {
-				aggregateBehavior.setState(state);
-				logInfo("Updated state to: " + state);
-			});
+		updatedState.ifPresent(state -> {
+			aggregateBehavior.setState(state);
+			aggregateBehavior.logInfo("Updated state to: " + state);
 		});
 	}
 	
-	private Optional<STATE> applyEvent(IdentifiedDomainEvent event){
-		return eventHandlers.reactTo(event);
+	private Optional<STATE> reactToEvent(IdentifiedDomainEvent event){
+		return eventHandlers.reactTo(state(), event);
+	}
+	
+	private STATE state() {
+		return aggregate.state();
 	}
 	
 	private void setState(STATE state) {
@@ -64,7 +69,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 
 	private void initializeAggregate(String aggregateId, EventSourcedAggregate<CMD, STATE> aggregate) {
 		STATE state = aggregate.initialState(aggregateId);
-	    aggregate.setState(state);
+	    setState(state);
 	    logger.info("Initialized aggregate: " + aggregateId + " -> " + aggregate);
 	}
 
@@ -85,4 +90,5 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 			return aggregateState;
 		});
 	}
+	
 }
