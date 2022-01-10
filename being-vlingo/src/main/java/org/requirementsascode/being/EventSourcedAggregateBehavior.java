@@ -51,7 +51,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 	
 	private Optional<STATE> applyEvent(IdentifiedDomainEvent event){
-		return eventHandlers.apply(event);
+		return eventHandlers.reactTo(event);
 	}
 	
 	private void setState(STATE state) {
@@ -69,7 +69,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 
 	public Completes<STATE> reactTo(CMD command){
-		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers.apply(command);
+		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers.reactTo(command);
 	    logger.info("Handled command: " + command + " -> Events:" + identifiedDomainEvents);
 
 		if(identifiedDomainEvents.isEmpty()) {

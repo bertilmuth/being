@@ -4,12 +4,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class CommandHandlers<CMD> implements Function<CMD, List<? extends IdentifiedDomainEvent>>{
+public class CommandHandlers<CMD>{
 	private final List<CommandHandler<? extends CMD>> comandHandlers;
 
 	@SafeVarargs
@@ -23,8 +22,7 @@ public class CommandHandlers<CMD> implements Function<CMD, List<? extends Identi
 		this.comandHandlers = Arrays.asList(commandHandlers);
 	}
 	
-	@Override
-	public List<? extends IdentifiedDomainEvent> apply(CMD command) {
+	public List<? extends IdentifiedDomainEvent> reactTo(CMD command) {
 		Class<?> commandClass = Objects.requireNonNull(command, "command must be non-null!").getClass();
 		
 		List<? extends IdentifiedDomainEvent> eventList = comandHandlers.stream()

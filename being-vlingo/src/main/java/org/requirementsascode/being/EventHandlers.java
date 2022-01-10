@@ -4,12 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class EventHandlers<STATE> implements Function<IdentifiedDomainEvent, Optional<STATE>>{
+public class EventHandlers<STATE>{
 	private final List<EventHandler<? extends IdentifiedDomainEvent, STATE>> eventHandlers;
 
 	@SafeVarargs
@@ -23,8 +22,7 @@ public class EventHandlers<STATE> implements Function<IdentifiedDomainEvent, Opt
 		this.eventHandlers = Arrays.asList(eventHandlers);
 	}
 	
-	@Override
-	public Optional<STATE> apply(IdentifiedDomainEvent event) {
+	public Optional<STATE> reactTo(IdentifiedDomainEvent event) {
 		Class<? extends IdentifiedDomainEvent> eventClass = Objects.requireNonNull(event, "event must be non-null!").getClass();
 		
 		Optional<STATE> optionalState = eventHandlers.stream()
