@@ -8,21 +8,21 @@ import java.util.stream.Collectors;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class CommandHandlers<STATE, CMD>{
-	private final List<CommandHandler<STATE, ? extends CMD>> comandHandlers;
+public class CommandHandlers<CMD,STATE>{
+	private final List<CommandHandler<? extends CMD, STATE>> comandHandlers;
 
 	@SafeVarargs
-	public static <STATE, CMD> CommandHandlers<STATE, CMD> handle(CommandHandler<STATE, ? extends CMD>... commandHandlers) {
+	public static <CMD,STATE> CommandHandlers<CMD,STATE> handle(CommandHandler<? extends CMD, STATE>... commandHandlers) {
 		return new CommandHandlers<>(commandHandlers);
 	}
 	
 	@SafeVarargs
-	private CommandHandlers(CommandHandler<STATE, ? extends CMD>... commandHandlers) {
+	private CommandHandlers(CommandHandler<? extends CMD, STATE>... commandHandlers) {
 		Objects.requireNonNull(commandHandlers, "commandHandlers must be non-null!");
 		this.comandHandlers = Arrays.asList(commandHandlers);
 	}
 	
-	public List<? extends IdentifiedDomainEvent> reactTo(STATE state, CMD command) {
+	public List<? extends IdentifiedDomainEvent> reactTo(CMD command,STATE state) {
 		Class<?> commandClass = Objects.requireNonNull(command, "command must be non-null!").getClass();
 		
 		List<? extends IdentifiedDomainEvent> eventList = comandHandlers.stream()

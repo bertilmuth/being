@@ -167,12 +167,12 @@ class SimpleBehaviorTest {
 
   private static class TestAggregate extends EventSourcedAggregate<TestCommand, TestState1> {
     @Override
-    public CommandHandlers<TestState1, TestCommand> commandHandlers() {
+    public CommandHandlers<TestCommand, TestState1> commandHandlers() {
       return CommandHandlers.handle(
-          commandsOf(TestCommand1.class).with((state,cmd) -> new TestEvent1(cmd.name)),
-          commandsOf(TestUpdateStateCommand.class).with((state,cmd) -> new TestUpdateStateEvent()),
-          commandsOf(TestCommandForEventList.class).withSome((state,cmd) -> {return asList(new TestEvent1(cmd.name), new TestEvent2(cmd.name));}),
-          commandsOf(ProduceUnhandledEventCommand.class).with((state,cmd) -> new UnhandledEvent())
+          commandsOf(TestCommand1.class).with((cmd,state) -> new TestEvent1(cmd.name)),
+          commandsOf(TestUpdateStateCommand.class).with((cmd,state) -> new TestUpdateStateEvent()),
+          commandsOf(TestCommandForEventList.class).withSome((cmd,state) -> {return asList(new TestEvent1(cmd.name), new TestEvent2(cmd.name));}),
+          commandsOf(ProduceUnhandledEventCommand.class).with((cmd,state) -> new UnhandledEvent())
       );
     }
 

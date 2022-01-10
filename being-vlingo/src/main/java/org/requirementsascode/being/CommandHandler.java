@@ -7,9 +7,9 @@ import java.util.function.BiFunction;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class CommandHandler<STATE, CMD>{
+public class CommandHandler<CMD,STATE>{
 	private final Class<CMD> commandClass;
-	private final BiFunction<STATE, CMD, List<? extends IdentifiedDomainEvent>> commandHandler;
+	private final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler;
 
 	public static <T> CommandsOf<T> commandsOf(Class<T> commandClass) {
 		return new CommandsOf<T>(commandClass);
@@ -22,28 +22,28 @@ public class CommandHandler<STATE, CMD>{
 			this.commandClass = commandClass;
 		}
 
-		public <STATE> CommandHandler<STATE, CMD> with(BiFunction<STATE, CMD, ? extends IdentifiedDomainEvent> commandHandler) {
-			BiFunction<STATE, CMD, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = (state,cmd) -> {
-				IdentifiedDomainEvent result = commandHandler.apply(state, cmd);
+		public <STATE> CommandHandler<CMD, STATE> with(BiFunction<CMD, STATE, ? extends IdentifiedDomainEvent> commandHandler) {
+			BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = (cmd, state) -> {
+				IdentifiedDomainEvent result = commandHandler.apply(cmd, state);
 				return Collections.singletonList(result);
 			};
 			
 			return withSome(eventListProducingHandler);
 		}
 
-		public <STATE> CommandHandler<STATE, CMD> withSome(BiFunction<STATE, CMD, List<? extends IdentifiedDomainEvent>> commandHandler) {
+		public <STATE> CommandHandler<CMD, STATE> withSome(BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler) {
 			return new CommandHandler<>(commandClass, commandHandler);
 		}
 	}
 	
-	private CommandHandler(Class<CMD> commandClass, BiFunction<STATE, CMD, List<? extends IdentifiedDomainEvent>> commandHandler) {
+	private CommandHandler(Class<CMD> commandClass, BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler) {
 		this.commandClass = Objects.requireNonNull(commandClass, "commandClass must be non-null!");
 		this.commandHandler = Objects.requireNonNull(commandHandler, "commandHandler must be non-null!");
 	}
 	
 	@SuppressWarnings("unchecked")
 	List<? extends IdentifiedDomainEvent> reactTo(STATE state, Object command) {
-		return commandHandler.apply(state, (CMD)command);
+		return commandHandler.apply((CMD)command,state);
 	}
 	
 	public Class<CMD> getCommandClass() {

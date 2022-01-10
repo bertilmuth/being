@@ -45,7 +45,7 @@ public abstract class EventSourcedAggregate<CMD, STATE>{
    * In the handlers you can call {@link #state}<code>()</code> to get access to the current state of the aggregate.
    * @return the command handlers
    */
-  public abstract CommandHandlers<STATE, CMD> commandHandlers();
+  public abstract CommandHandlers<CMD,STATE> commandHandlers();
   
   /**
    * Defines the event handlers. A handler maps a persisted event to the new state of the

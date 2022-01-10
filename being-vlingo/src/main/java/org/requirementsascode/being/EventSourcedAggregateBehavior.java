@@ -16,7 +16,7 @@ import io.vlingo.xoom.symbio.Source;
 
 public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced implements AggregateBehavior<CMD, STATE> {
 	private final EventSourcedAggregate<CMD, STATE> aggregate;
-	private final CommandHandlers<STATE, CMD> commandHandlers;
+	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private final Logger logger;
 
@@ -74,7 +74,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 
 	public Completes<STATE> reactTo(CMD command){
-		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers.reactTo(state(), command);
+		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers.reactTo(command,state());
 	    logger.info("Handled command: " + command + " -> Events:" + identifiedDomainEvents);
 
 		if(identifiedDomainEvents.isEmpty()) {

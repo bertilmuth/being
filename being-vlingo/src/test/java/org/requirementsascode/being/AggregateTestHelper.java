@@ -11,7 +11,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 class AggregateTestHelper<CMD,STATE> {
-	private final CommandHandlers<STATE, CMD> commandHandlers;
+	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private List<Source<?>> events;
 	private final EventSourcedAggregate<CMD,STATE> aggregate;
@@ -50,7 +50,7 @@ class AggregateTestHelper<CMD,STATE> {
 	}
 
 	public AggregateTestHelper<CMD,STATE> when(CMD command) {
-		List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().reactTo(state(), command);
+		List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().reactTo(command,state());
 		producedEvents().addAll(producedEvents);
 
 		Optional<STATE> lastState = producedEvents.stream().map(ev -> eventHandlers().reactTo(state(), ev)).filter(Optional::isPresent)
@@ -64,7 +64,7 @@ class AggregateTestHelper<CMD,STATE> {
 		return UUID.randomUUID().toString();
 	}
 
-	private CommandHandlers<STATE, CMD> commandHandlers() {
+	private CommandHandlers<CMD,STATE> commandHandlers() {
 		return commandHandlers;
 	}
 
