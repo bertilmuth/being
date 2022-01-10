@@ -14,10 +14,11 @@ class AggregateTestHelper<CMD,STATE> {
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private List<Source<?>> events;
-	private final EventSourcedAggregate<CMD,STATE> aggregate;
+	
+	private STATE state;
 
 	private AggregateTestHelper(EventSourcedAggregate<CMD,STATE> aggregate) {
-		this.aggregate = Objects.requireNonNull(aggregate, "aggregate must be non-null!");
+		Objects.requireNonNull(aggregate, "aggregate must be non-null!");
 
 		this.commandHandlers = aggregate.commandHandlers();
 		this.eventHandlers = aggregate.eventHandlers();
@@ -31,12 +32,12 @@ class AggregateTestHelper<CMD,STATE> {
 		setState(initialState);
 	}
 	
-	private STATE state() {
-		return aggregate.state();
+	public STATE state() {
+		return state;
 	}
 
-	private void setState(STATE initialState) {
-		aggregate.setState(initialState);
+	private void setState(STATE state) {
+		this.state = state;
 	}
 
 	public static <CMD,STATE> AggregateTestHelper<CMD,STATE> of(EventSourcedAggregate<CMD,STATE> aggregate) {

@@ -9,9 +9,7 @@ package org.requirementsascode.being;
  *
  * @param <STATE> the state of the aggregate
  */
-public abstract class EventSourcedAggregate<CMD, STATE>{
-  private STATE state;
-  
+public abstract class EventSourcedAggregate<CMD, STATE>{  
   /**
    * Creates the very first state of the aggregate.
    * 
@@ -19,38 +17,16 @@ public abstract class EventSourcedAggregate<CMD, STATE>{
    * @return the initial state of the aggregate
    */
   public abstract STATE initialState(String aggregateId);
-
-  /**
-   * Don't call this method yourself.
-   * Called by the library to inform about updated state of the aggregate.
-   * 
-   * @param state the root object of the aggregate
-   */
-  void setState(STATE state) {
-    this.state = state;
-  }
-  
-  /**
-   * Call this method to access the current state of the aggregate,
-   * typically within a model or its referenced methods.
-   * 
-   * @return the state of the aggregate
-   */
-  public STATE state() {
-    return state;
-  }
  
   /**
-   * Defines the command handlers. A handler maps an incoming command to the event(s) to be persisted.
-   * In the handlers you can call {@link #state}<code>()</code> to get access to the current state of the aggregate.
+   * Defines the command handlers. A command handler consumes an incoming command and produces the event(s) to be persisted.
    * @return the command handlers
    */
   public abstract CommandHandlers<CMD,STATE> commandHandlers();
   
   /**
-   * Defines the event handlers. A handler maps a persisted event to the new state of the
-   * aggregate. In handler methods, you can call
-   * {@link #state}<code>()</code> to get access to the current state of the aggregate.
+   * Defines the event handlers. An event handler consumes a persisted event and produces the new state of the
+   * aggregate. 
    * @return the event handlers
    */
   public abstract EventHandlers<STATE> eventHandlers();

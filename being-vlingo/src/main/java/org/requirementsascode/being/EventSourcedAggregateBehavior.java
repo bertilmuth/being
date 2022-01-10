@@ -19,6 +19,8 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private final Logger logger;
+	
+	private STATE state;
 
 	public EventSourcedAggregateBehavior(String aggregateId, Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier) {
 		super(aggregateId);
@@ -56,11 +58,11 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 	
 	private STATE state() {
-		return aggregate.state();
+		return state;
 	}
 	
 	private void setState(STATE state) {
-		aggregate.setState(state);
+		this.state = state;
 	}
 	
 	private void logInfo(String text) {
@@ -85,9 +87,8 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 		sourceList.addAll(identifiedDomainEvents);
 		
 		return apply(sourceList, () -> {
-			STATE aggregateState = aggregate.state();
-			logInfo("State returned to user: " + aggregateState);
-			return aggregateState;
+			logInfo("State returned to user: " + state());
+			return state();
 		});
 	}
 	
