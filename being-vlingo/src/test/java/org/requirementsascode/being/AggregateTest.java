@@ -10,7 +10,7 @@ import java.util.UUID;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
-class AggregateTest<CMD,STATE> {
+class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private List<Source<?>> events;
@@ -36,8 +36,12 @@ class AggregateTest<CMD,STATE> {
 		return state;
 	}
 
-	private void setState(STATE state) {
+	public void setState(STATE state) {
 		this.state = state;
+	}
+	
+	public EventHandlers<STATE> eventHandlers() {
+		return eventHandlers;
 	}
 
 	public static <CMD,STATE> AggregateTest<CMD,STATE> of(EventSourcedAggregate<CMD,STATE> aggregate) {
@@ -67,10 +71,6 @@ class AggregateTest<CMD,STATE> {
 
 	private CommandHandlers<CMD,STATE> commandHandlers() {
 		return commandHandlers;
-	}
-
-	private EventHandlers<STATE> eventHandlers() {
-		return eventHandlers;
 	}
 
 	public List<Source<?>> producedEvents() {

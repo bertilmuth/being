@@ -13,7 +13,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.lattice.model.sourcing.EventSourced;
 import io.vlingo.xoom.symbio.Source;
 
-public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced implements AggregateBehavior<CMD, STATE> {
+public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced implements AggregateBehavior<CMD, STATE>, EventApplier<STATE> {
 	private final EventSourcedAggregate<CMD, STATE> aggregate;
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
@@ -41,10 +41,10 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 	
 	private static <CMD, STATE> void consumeEvent(EventSourcedAggregateBehavior<CMD, STATE> aggregateBehavior, IdentifiedDomainEvent event) {
-		Optional<STATE> updatedState = aggregateBehavior.reactToEvent(event);
+		Optional<STATE> newState = aggregateBehavior.reactToEvent(event);
 		aggregateBehavior.logInfo("Applied event: " + event);
 
-		updatedState.ifPresent(state -> {
+		newState.ifPresent(state -> {
 			aggregateBehavior.setState(state);
 			aggregateBehavior.logInfo("Updated state to: " + state);
 		});
@@ -52,6 +52,18 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	
 	private Optional<STATE> reactToEvent(IdentifiedDomainEvent event){
 		return eventHandlers().reactTo(event, state());
+	}
+	
+	public EventHandlers<STATE> eventHandlers() {
+		return eventHandlers;
+	}
+	
+	public STATE state() {
+		return state;
+	}
+	
+	public void setState(STATE state) {
+		this.state = state;
 	}
 	
 	private void logInfo(String text) {
@@ -87,17 +99,5 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 
 	private CommandHandlers<CMD, STATE> commandHandlers() {
 		return commandHandlers;
-	}
-
-	private EventHandlers<STATE> eventHandlers() {
-		return eventHandlers;
-	}
-	
-	private STATE state() {
-		return state;
-	}
-	
-	private void setState(STATE state) {
-		this.state = state;
 	}
 }
