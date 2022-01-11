@@ -152,7 +152,7 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 
 	@SuppressWarnings("unchecked")
 	private Queries<DATA> queriesByDataType(Class<? extends Object> dataType) {
-		return (Queries<DATA>) ComponentRegistry.withType(QueryModelStateStoreProvider.class).queriesByDataType
+		return (Queries<DATA>) ComponentRegistry.withType(QueryModelStateStoreProvider.class).queriesByDataTypeMap
 				.get(dataType);
 	}
 	

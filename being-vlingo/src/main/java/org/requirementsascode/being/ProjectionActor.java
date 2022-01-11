@@ -2,7 +2,6 @@ package org.requirementsascode.being;
 
 import java.util.Objects;
 
-import io.vlingo.xoom.actors.Logger;
 import io.vlingo.xoom.lattice.model.projection.Projectable;
 import io.vlingo.xoom.lattice.model.projection.StateStoreProjectionActor;
 import io.vlingo.xoom.symbio.Source;
@@ -17,7 +16,6 @@ import io.vlingo.xoom.turbo.ComponentRegistry;
  */
 public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 	private final QueryModel<DATA> queryModel;
-	private final Logger logger;
 
 	public <U> ProjectionActor(QueryModel<DATA> queryModel) {
 		this(ComponentRegistry.withType(QueryModelStateStoreProvider.class).store, queryModel);
@@ -26,7 +24,6 @@ public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 	public ProjectionActor(StateStore store, QueryModel<DATA> queryModel) {
 		super(store);
 		this.queryModel = Objects.requireNonNull(queryModel, "queryModel must be non-null!");
-		this.logger = super.stage().world().defaultLogger();
 	}
 
 	@Override
@@ -42,11 +39,11 @@ public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 			return currentData;
 
 		DATA dataToMerge = previousData;
-		logger.info("Merging data:" + dataToMerge);
+		logger().info("Merging data:" + dataToMerge);
 
 		for (final Source<?> event : sources()) {
 			DATA mergedData = queryModel.mergeDataWithEvent(dataToMerge, event);
-			logger.info("Merged data:" + mergedData);
+			logger().info("Merged data:" + mergedData);
 			
 			if(dataToMerge == mergedData) {
 				logger().warn("Event of type " + event.typeName() + " was not matched.");

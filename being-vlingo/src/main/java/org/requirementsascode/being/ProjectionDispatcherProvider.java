@@ -19,7 +19,6 @@ import io.vlingo.xoom.turbo.ComponentRegistry;
 
 @SuppressWarnings("all")
 public class ProjectionDispatcherProvider {
-
   public final ProjectionDispatcher projectionDispatcher;
   public final Dispatcher storeDispatcher;
 

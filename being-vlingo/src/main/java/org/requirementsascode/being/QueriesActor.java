@@ -7,12 +7,7 @@ import io.vlingo.xoom.common.Completes;
 import io.vlingo.xoom.lattice.query.StateStoreQueryActor;
 import io.vlingo.xoom.symbio.store.state.StateStore;
 
-/**
- * See <a href=
- * "https://docs.vlingo.io/xoom-lattice/entity-cqrs#querying-a-statestore">Querying
- * a StateStore</a>
- */
-@SuppressWarnings("all")
+@SuppressWarnings("rawtypes")
 public class QueriesActor<DATA> extends StateStoreQueryActor implements Queries {
 	private final Class<DATA> dataType;
 	private final DATA emptyData;
@@ -25,12 +20,20 @@ public class QueriesActor<DATA> extends StateStoreQueryActor implements Queries 
 
 	@Override
 	public Completes<DATA> findById(String id) {
-		return queryStateFor(id, dataType, emptyData);
+		return queryStateFor(id, dataType(), emptyData());
 	}
 
 	@Override
 	public Completes<Collection<DATA>> findAll() {
-		return streamAllOf(dataType, new ArrayList<>());
+		return streamAllOf(dataType(), new ArrayList<>());
+	}
+
+	private Class<DATA> dataType() {
+		return dataType;
+	}
+
+	private DATA emptyData() {
+		return emptyData;
 	}
 
 }

@@ -9,7 +9,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 public class QueryModel<DATA> {
-	private final Map<Class<? extends Source<?>>,  Merge<DATA, ? extends Source<?>>> eventClassToMergeFunction;
+	private final Map<Class<? extends Source<?>>,  Merge<DATA, ? extends Source<?>>> eventClassToMergeFunctionMap;
 	private final DATA emptyData;
 	
 	public static <DATA> QueryModel<DATA> startEmpty(DATA emptyData) {
@@ -18,14 +18,14 @@ public class QueryModel<DATA> {
 	
 	private QueryModel(DATA emptyData) {
 		this.emptyData = Objects.requireNonNull(emptyData, "emptyData must be non-null!");
-		this.eventClassToMergeFunction = new HashMap<>();
+		this.eventClassToMergeFunctionMap = new HashMap<>();
 	}
 	
 	public <EVENT extends IdentifiedDomainEvent> QueryModel<DATA> mergeEventsOf(Class<EVENT> eventClass, Merge<DATA, EVENT> mergeFunction) {
 		Objects.requireNonNull(eventClass, "eventClass must be non-null!");
 		Objects.requireNonNull(mergeFunction, "mergeFunction must be non-null!");
 		
-		eventClassToMergeFunction.put(eventClass, mergeFunction);
+		eventClassToMergeFunctionMap().put(eventClass, mergeFunction);
 		return this;
 	}
 
@@ -34,8 +34,8 @@ public class QueryModel<DATA> {
 		Class<? extends Source> eventClass = event.getClass();
 		DATA mergedData;
 		
-		if(eventClassToMergeFunction.containsKey(eventClass)) {
-			Merge<DATA, EVENT> mergeFunction = (Merge<DATA, EVENT>) eventClassToMergeFunction.get(eventClass);
+		if(eventClassToMergeFunctionMap().containsKey(eventClass)) {
+			Merge<DATA, EVENT> mergeFunction = (Merge<DATA, EVENT>) eventClassToMergeFunctionMap().get(eventClass);
 			mergedData = mergeFunction.merge(dataToMerge, event);
 		} else {
 			// if event has not been found, return the input data
@@ -49,7 +49,11 @@ public class QueryModel<DATA> {
 		return emptyData;
 	}
 	
+	private Map<Class<? extends Source<?>>, Merge<DATA, ? extends Source<?>>> eventClassToMergeFunctionMap() {
+		return eventClassToMergeFunctionMap;
+	}
+	
 	public Set<Class<? extends Source<?>>> eventClasses(){
-		return eventClassToMergeFunction.keySet();
+		return eventClassToMergeFunctionMap.keySet();
 	}
 }
