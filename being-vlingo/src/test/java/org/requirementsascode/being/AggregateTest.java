@@ -11,6 +11,7 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private EventConsumer<STATE> eventConsumer;
+	private final STATE initialState;
 
 	private STATE state;
 
@@ -24,11 +25,13 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 		this.commandHandlers = aggregate.commandHandlers();
 		this.eventHandlers = aggregate.eventHandlers();
 		this.eventConsumer = new EventConsumer<>(this);
+		this.initialState = aggregate.initialState(randomId());
 
-		createInitialStateOf(aggregate, randomId());
+		setInitialState();
 	}
 	
 	public AggregateTest<CMD,STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
+		setInitialState();
 		Arrays.stream(internalEvents).forEach(eventConsumer()::consumeEvent);
 		return this;
 	}
@@ -55,11 +58,6 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 	public EventHandlers<STATE> eventHandlers() {
 		return eventHandlers;
 	}
-	
-	private void createInitialStateOf(EventSourcedAggregate<CMD,STATE> aggregate, String id) {
-		STATE initialState = aggregate.initialState(id);
-		setState(initialState);
-	}
 
 	private String randomId() {
 		return UUID.randomUUID().toString();
@@ -67,5 +65,9 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 
 	private EventConsumer<STATE> eventConsumer() {
 		return eventConsumer;
+	}
+	
+	private void setInitialState() {
+		setState(initialState);
 	}
 }
