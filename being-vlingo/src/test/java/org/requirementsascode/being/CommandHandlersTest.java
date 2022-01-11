@@ -15,7 +15,7 @@ class CommandHandlersTest {
 	void createsEmptyCommandHandlers() {
 		CommandHandlers<TestCommand,?> commandHandlers = CommandHandlers.handle();
 
-		List<Class<? extends TestCommand>> commands = commandHandlers.getCommandClasses();
+		List<Class<? extends TestCommand>> commands = commandHandlers.commandClasses();
 		assertTrue(commands.isEmpty());
 	}
 
@@ -25,7 +25,7 @@ class CommandHandlersTest {
 			commandsOf(SampleCommand1.class).with((command,state) -> new SampleEvent1(command.id))
 		);
 
-		List<Class<? extends TestCommand>> commandClasses = commandHandlers.getCommandClasses();
+		List<Class<? extends TestCommand>> commandClasses = commandHandlers.commandClasses();
 		assertEquals(1, commandClasses.size());
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
 	}
@@ -37,7 +37,7 @@ class CommandHandlersTest {
 			commandsOf(SampleCommand2.class).with((command,state) -> new SampleEvent2(command.id))
 		);
 		
-		List<Class<? extends TestCommand>> commandClasses = commandHandlers.getCommandClasses();
+		List<Class<? extends TestCommand>> commandClasses = commandHandlers.commandClasses();
 		assertEquals(2, commandClasses.size());
 		assertEquals(SampleCommand1.class, commandClasses.get(0));
 		assertEquals(SampleCommand2.class, commandClasses.get(1));

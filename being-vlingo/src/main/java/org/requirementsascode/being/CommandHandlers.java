@@ -16,6 +16,14 @@ public class CommandHandlers<CMD,STATE>{
 		return new CommandHandlers<>(commandHandlers);
 	}
 	
+	public List<Class<? extends CMD>> commandClasses() {
+		final List<Class<? extends CMD>> commandClasses = 
+			comandHandlers.stream()
+			.map(CommandHandler::commandClass)
+			.collect(Collectors.toList());
+		return commandClasses;
+	}
+	
 	@SafeVarargs
 	private CommandHandlers(CommandHandler<? extends CMD, STATE>... commandHandlers) {
 		Objects.requireNonNull(commandHandlers, "commandHandlers must be non-null!");
@@ -32,13 +40,5 @@ public class CommandHandlers<CMD,STATE>{
 			.orElse(Collections.emptyList());
 		
 		return eventList;
-	}
-
-	public List<Class<? extends CMD>> getCommandClasses() {
-		final List<Class<? extends CMD>> commandClasses = 
-			comandHandlers.stream()
-			.map(CommandHandler::commandClass)
-			.collect(Collectors.toList());
-		return commandClasses;
 	}
 }
