@@ -15,7 +15,7 @@ class EventHandlersTest {
 	void createsEmptyEventHandlers() {
 		EventHandlers<State> eventHandlers = EventHandlers.handle();
 		
-		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
+		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.eventClasses();
 		assertTrue(eventClasses.isEmpty());
 	}
 
@@ -25,7 +25,7 @@ class EventHandlersTest {
 			eventsOf(SampleEvent1.class).with((state,event) -> new State(event.id))
 		);
 		
-		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
+		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.eventClasses();
 		assertEquals(1, eventClasses.size());
 		assertEquals(SampleEvent1.class, eventClasses.get(0));
 	}
@@ -36,7 +36,7 @@ class EventHandlersTest {
 			eventsOf(SampleEvent1.class).with((state,event) -> new State(event.id)), 
 			eventsOf(SampleEvent2.class).with((state,event) -> new State(event.id + "0"))
 		);
-		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.getEventClasses();
+		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers.eventClasses();
 		assertEquals(2, eventClasses.size());
 		assertEquals(SampleEvent1.class, eventClasses.get(0));
 		assertEquals(SampleEvent2.class, eventClasses.get(1));

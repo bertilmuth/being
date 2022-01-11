@@ -13,6 +13,15 @@ public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE>{
 		return new EventsOf<EVENT>(eventClass);
 	}
 	
+	@SuppressWarnings("unchecked")
+	STATE reactTo(IdentifiedDomainEvent event, STATE state) {
+		return eventHandler.apply((EVENT)event, state);
+	}
+	
+	public Class<EVENT> eventClass() {
+		return eventClass;
+	}
+	
 	public static class EventsOf<EVENT extends IdentifiedDomainEvent>{
 		private final Class<EVENT> eventClass;
 		
@@ -28,14 +37,5 @@ public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE>{
 	private EventHandler(Class<EVENT> eventClass, BiFunction<EVENT, STATE, STATE> eventHandler) {
 		this.eventClass = Objects.requireNonNull(eventClass, "eventClass must be non-null!");
 		this.eventHandler = Objects.requireNonNull(eventHandler, "eventHandler must be non-null!");
-	}
-	
-	@SuppressWarnings("unchecked")
-	STATE reactTo(IdentifiedDomainEvent event, STATE state) {
-		return eventHandler.apply((EVENT)event, state);
-	}
-
-	public Class<EVENT> getEventClass() {
-		return eventClass;
 	}
 }

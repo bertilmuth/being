@@ -35,7 +35,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 
 	private void registerEventConsumers() {
-		aggregate.eventHandlers().getEventClasses().stream()
+		aggregate.eventHandlers().eventClasses().stream()
 			.forEach(clazz -> registerConsumerFor(clazz));		
 	}
 
