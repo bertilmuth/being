@@ -18,57 +18,52 @@ class SimpleBehaviorTest {
   private static final TestEvent1 NEW_AGGREGATE_ROOT_EVENT = new TestEvent1("New aggregate root");
   
   private TestAggregate testAggregate;
-  private AggregateTest<TestCommand, TestState1> behaviorTestHelper;
+  private AggregateTest<TestCommand, TestState1> aggregateTest;
 
   @BeforeEach
   public void setup() {
     testAggregate = new TestAggregate();
-    behaviorTestHelper = AggregateTest.of(testAggregate);
+    aggregateTest = AggregateTest.of(testAggregate);
   }
 
   @Test
   public void noGivenEvents() {
-    assertEquals(new ArrayList<>(), behaviorTestHelper.producedEvents());
-    assertEquals(new ArrayList<>(), behaviorTestHelper.state().appliedEvents());
+    assertEquals(new ArrayList<>(), aggregateTest.state().appliedEvents());
   }
 
   @Test
   public void emptyGivenEvents() {
-    behaviorTestHelper.givenEvents();
-    assertEquals(asList(), behaviorTestHelper.producedEvents());
-    assertEquals(asList(), behaviorTestHelper.state().appliedEvents());
+    aggregateTest.givenEvents();
+    assertEquals(asList(), aggregateTest.state().appliedEvents());
   }
   
   @Test
   public void emptyGivenEventsUnhandledWhen() {
     IgnoredCommand command = new IgnoredCommand();
-    behaviorTestHelper
+    aggregateTest
     	.givenEvents()
     	.when(command);
     
-    assertEquals(asList(), behaviorTestHelper.producedEvents());
-    assertEquals(asList(), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(), aggregateTest.state().appliedEvents());
   }
   
   @Test
   public void emptyGivenEventsUnhandledEvent() {
 	ProduceUnhandledEventCommand command = new ProduceUnhandledEventCommand();
-    behaviorTestHelper
+    aggregateTest
     	.givenEvents()
     	.when(command);
     
-    assertEquals(asList(new UnhandledEvent()), behaviorTestHelper.producedEvents());
-    assertEquals(asList(), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(), aggregateTest.state().appliedEvents());
   }
 
   @Test
   public void singleGivenEvent() {
     TestEvent1 givenEvent = new TestEvent1("GivenEvent");
-    behaviorTestHelper
+    aggregateTest
       .givenEvents(givenEvent);
     
-    assertEquals(asList(), behaviorTestHelper.producedEvents());
-    assertEquals(asList(givenEvent), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(givenEvent), aggregateTest.state().appliedEvents());
   }
   
   @Test
@@ -76,11 +71,10 @@ class SimpleBehaviorTest {
     TestEvent1 givenEvent1 = new TestEvent1("GivenEvent1");
     TestEvent1 givenEvent2 = new TestEvent1("GivenEvent2");
 
-    behaviorTestHelper
+    aggregateTest
       .givenEvents(givenEvent1, givenEvent2);
     
-    assertEquals(asList(), behaviorTestHelper.producedEvents());
-    assertEquals(asList(givenEvent1, givenEvent2), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(givenEvent1, givenEvent2), aggregateTest.state().appliedEvents());
   }
   
   @Test
@@ -88,10 +82,9 @@ class SimpleBehaviorTest {
     TestCommand1 command = new TestCommand1("Command");
     TestEvent1 resultingEvent = new TestEvent1(command.name);
     
-    behaviorTestHelper.when(command);
+    aggregateTest.when(command);
     
-    assertEquals(asList(resultingEvent), behaviorTestHelper.producedEvents());
-    assertEquals(asList(resultingEvent), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(resultingEvent), aggregateTest.state().appliedEvents());
   }
   
   @Test
@@ -100,12 +93,11 @@ class SimpleBehaviorTest {
     TestCommand1 command = new TestCommand1("Command");
     TestEvent1 resultingEvent = new TestEvent1(command.name);
     
-    behaviorTestHelper
+    aggregateTest
       .givenEvents(givenEvent)
       .when(command);
     
-    assertEquals(asList(resultingEvent), behaviorTestHelper.producedEvents());
-    assertEquals(asList(givenEvent, resultingEvent), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(givenEvent, resultingEvent), aggregateTest.state().appliedEvents());
   }
   
   @Test
@@ -113,15 +105,14 @@ class SimpleBehaviorTest {
     TestEvent1 givenEvent = new TestEvent1("GivenEvent");
     TestCommandForEventList command = new TestCommandForEventList("Command");
     
-    behaviorTestHelper
+    aggregateTest
       .givenEvents(givenEvent)
       .when(command);
     
     TestEvent1 resultingEvent1 = new TestEvent1(command.name);
     TestEvent2 resultingEvent2 = new TestEvent2(command.name);
     
-    assertEquals(asList(resultingEvent1, resultingEvent2), behaviorTestHelper.producedEvents());
-    assertEquals(asList(givenEvent, resultingEvent1, resultingEvent2), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(givenEvent, resultingEvent1, resultingEvent2), aggregateTest.state().appliedEvents());
   }
   
   @Test
@@ -129,7 +120,7 @@ class SimpleBehaviorTest {
     TestEvent1 givenEvent = new TestEvent1("GivenEvent");
     TestCommandForEventList command = new TestCommandForEventList("Command");
     
-    behaviorTestHelper
+    aggregateTest
       .givenEvents(givenEvent)
       .when(command)
       .when(command);
@@ -137,32 +128,28 @@ class SimpleBehaviorTest {
     TestEvent1 resultingEvent1 = new TestEvent1(command.name);
     TestEvent2 resultingEvent2 = new TestEvent2(command.name);
 
-    assertEquals(asList(resultingEvent1, resultingEvent2, resultingEvent1, resultingEvent2), behaviorTestHelper.producedEvents());
-    assertEquals(asList(givenEvent, resultingEvent1, resultingEvent2, resultingEvent1, resultingEvent2), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(givenEvent, resultingEvent1, resultingEvent2, resultingEvent1, resultingEvent2), aggregateTest.state().appliedEvents());
   }
   
   @Test
   public void appliedEventUpdatesState() {
-    behaviorTestHelper.when(new TestUpdateStateCommand());
+    aggregateTest.when(new TestUpdateStateCommand());
 
-    assertEquals(asList(new TestUpdateStateEvent()), behaviorTestHelper.producedEvents());
-    assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT), aggregateTest.state().appliedEvents());
   }
   
   @Test
   public void appliedEventsUpdateState() {
     TestUpdateStateCommand command1 = new TestUpdateStateCommand();
-    TestUpdateStateEvent expectedEvent1 = new TestUpdateStateEvent();
     
     TestCommand1 command2 = new TestCommand1("Command2");
     TestEvent1 expectedEvent2 = new TestEvent1(command2.name);
 
-    behaviorTestHelper
+    aggregateTest
       .when(command1)
       .when(command2);
 
-    assertEquals(asList(expectedEvent1, expectedEvent2), behaviorTestHelper.producedEvents());
-    assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT, expectedEvent2), behaviorTestHelper.state().appliedEvents());
+    assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT, expectedEvent2), aggregateTest.state().appliedEvents());
   }
 
   private static class TestAggregate implements EventSourcedAggregate<TestCommand, TestState1> {
