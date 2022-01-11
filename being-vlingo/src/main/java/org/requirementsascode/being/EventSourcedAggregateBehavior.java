@@ -63,17 +63,10 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers().reactTo(command,state());
 	    logger().info("Handled command: " + command + " -> Events:" + identifiedDomainEvents);
 
-		if(identifiedDomainEvents.isEmpty()) {
-			throw new RuntimeException("Command handler didn't create event for command: " + command);
-		}
-
 		List<Source<DomainEvent>> sourceList = new ArrayList<>(identifiedDomainEvents.size());
 		sourceList.addAll(identifiedDomainEvents);
 		
-		return apply(sourceList, () -> {
-			logger().info("State returned to user: " + state());
-			return state();
-		});
+		return apply(sourceList, () -> state());
 	}
 
 	private EventSourcedAggregate<CMD, STATE> aggregate() {
