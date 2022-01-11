@@ -86,6 +86,15 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 		final RequestHandler0 handler = get(url).handle(this::findAllAggregates);
 		httpRequestHandlers.add(handler);
 	}
+	
+	@SuppressWarnings("rawtypes")
+	private Completes<AggregateBehavior> resolve(final String id) {
+		final Address address = stage.addressFactory().from(id);
+		final Completes<AggregateBehavior> actor = stage.actorOf(AggregateBehavior.class, address,
+				Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id, aggregateSupplier)));
+		stage.world().defaultLogger().info("Resolved actor: " + actor.id());
+		return actor;
+	}
 
 	private Completes<Response> createAggregate(CMD request) {
 		return createAggregateOnStage(stage, request).andThenTo(state -> {
@@ -115,15 +124,6 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 		return findById.andThenTo(data -> Completes.withSuccess(entityResponseOf(Ok, serialized(data))))
 				.otherwise(arg -> Response.of(NotFound))
 				.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
-	}
-
-	@SuppressWarnings("rawtypes")
-	private Completes<AggregateBehavior> resolve(final String id) {
-		final Address address = stage.addressFactory().from(id);
-		final Completes<AggregateBehavior> actor = stage.actorOf(AggregateBehavior.class, address,
-				Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id)));
-		stage.world().defaultLogger().info("Resolved actor: " + actor.id());
-		return actor;
 	}
 
 	@SuppressWarnings("unchecked")
