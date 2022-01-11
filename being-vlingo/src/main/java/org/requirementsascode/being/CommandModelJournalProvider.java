@@ -1,6 +1,7 @@
 package org.requirementsascode.being;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.requirementsascode.being.EventSourcedAggregateBehavior;
 
@@ -39,7 +40,7 @@ public class CommandModelJournalProvider  {
   }
 
   private CommandModelJournalProvider(final Journal<String> journal) {
-    this.journal = journal;
+    this.journal = Objects.requireNonNull(journal, "journal must be non-null!");
     ComponentRegistry.register(getClass(), this);
   }
 
