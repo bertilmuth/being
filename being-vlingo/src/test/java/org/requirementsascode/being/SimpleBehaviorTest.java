@@ -18,12 +18,12 @@ class SimpleBehaviorTest {
   private static final TestEvent1 NEW_AGGREGATE_ROOT_EVENT = new TestEvent1("New aggregate root");
   
   private TestAggregate testAggregate;
-  private AggregateTestHelper<TestCommand, TestState1> behaviorTestHelper;
+  private AggregateTest<TestCommand, TestState1> behaviorTestHelper;
 
   @BeforeEach
   public void setup() {
     testAggregate = new TestAggregate();
-    behaviorTestHelper = AggregateTestHelper.of(testAggregate);
+    behaviorTestHelper = AggregateTest.of(testAggregate);
   }
 
   @Test

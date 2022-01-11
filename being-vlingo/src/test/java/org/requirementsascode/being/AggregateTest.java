@@ -10,25 +10,25 @@ import java.util.UUID;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
-class AggregateTestHelper<CMD,STATE> {
+class AggregateTest<CMD,STATE> {
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private List<Source<?>> events;
 	
 	private STATE state;
 
-	private AggregateTestHelper(EventSourcedAggregate<CMD,STATE> aggregate) {
+	private AggregateTest(EventSourcedAggregate<CMD,STATE> aggregate) {
 		Objects.requireNonNull(aggregate, "aggregate must be non-null!");
 
 		this.commandHandlers = aggregate.commandHandlers();
 		this.eventHandlers = aggregate.eventHandlers();
 
 		clearEvents();
-		createInitialStateOf(aggregate);
+		createInitialStateOf(aggregate, randomId());
 	}
 	
-	private void createInitialStateOf(EventSourcedAggregate<CMD,STATE> aggregate) {
-		STATE initialState = aggregate.initialState(randomId());
+	private void createInitialStateOf(EventSourcedAggregate<CMD,STATE> aggregate, String id) {
+		STATE initialState = aggregate.initialState(id);
 		setState(initialState);
 	}
 	
@@ -40,17 +40,17 @@ class AggregateTestHelper<CMD,STATE> {
 		this.state = state;
 	}
 
-	public static <CMD,STATE> AggregateTestHelper<CMD,STATE> of(EventSourcedAggregate<CMD,STATE> aggregate) {
-		return new AggregateTestHelper<>(aggregate);
+	public static <CMD,STATE> AggregateTest<CMD,STATE> of(EventSourcedAggregate<CMD,STATE> aggregate) {
+		return new AggregateTest<>(aggregate);
 	}
 
-	public AggregateTestHelper<CMD,STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
+	public AggregateTest<CMD,STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
 		Arrays.stream(internalEvents).forEach(ev -> eventHandlers().reactTo(ev, state()));
 		clearEvents();
 		return this;
 	}
 
-	public AggregateTestHelper<CMD,STATE> when(CMD command) {
+	public AggregateTest<CMD,STATE> when(CMD command) {
 		List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().reactTo(command,state());
 		producedEvents().addAll(producedEvents);
 
