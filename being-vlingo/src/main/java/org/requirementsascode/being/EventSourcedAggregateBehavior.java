@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import io.vlingo.xoom.actors.Logger;
 import io.vlingo.xoom.common.Completes;
 import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
@@ -18,7 +17,6 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	private final EventSourcedAggregate<CMD, STATE> aggregate;
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
-	private final Logger logger;
 	
 	private STATE state;
 
@@ -28,14 +26,13 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 		this.aggregate = requireNonNull(aggregateSupplier.get(), "supplied aggregate must be non-null!");
 		this.commandHandlers = requireNonNull(aggregate.commandHandlers(), "command handlers must be non-null!");
 		this.eventHandlers = requireNonNull(aggregate.eventHandlers(), "event handlers must be non-null!");
-		this.logger = super.stage().world().defaultLogger();
 
 	    initializeAggregate(aggregateId, aggregate);
 		registerEventConsumers();
 	}
 
 	private void registerEventConsumers() {
-		aggregate.eventHandlers().eventClasses().stream()
+		aggregate().eventHandlers().eventClasses().stream()
 			.forEach(clazz -> registerConsumerFor(clazz));		
 	}
 
@@ -54,30 +51,22 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 	
 	private Optional<STATE> reactToEvent(IdentifiedDomainEvent event){
-		return eventHandlers.reactTo(event, state());
-	}
-	
-	private STATE state() {
-		return state;
-	}
-	
-	private void setState(STATE state) {
-		this.state = state;
+		return eventHandlers().reactTo(event, state());
 	}
 	
 	private void logInfo(String text) {
-		logger.info(text);
+		logger().info(text);
 	}
 
 	private void initializeAggregate(String aggregateId, EventSourcedAggregate<CMD, STATE> aggregate) {
 		STATE state = aggregate.initialState(aggregateId);
 	    setState(state);
-	    logger.info("Initialized aggregate: " + aggregateId + " -> " + aggregate);
+	    logger().info("Initialized aggregate: " + aggregateId + " -> " + aggregate);
 	}
 
 	public Completes<STATE> reactTo(CMD command){
-		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers.reactTo(command,state());
-	    logger.info("Handled command: " + command + " -> Events:" + identifiedDomainEvents);
+		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers().reactTo(command,state());
+	    logger().info("Handled command: " + command + " -> Events:" + identifiedDomainEvents);
 
 		if(identifiedDomainEvents.isEmpty()) {
 			throw new RuntimeException("Command handler didn't create event for command: " + command);
@@ -91,5 +80,24 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 			return state();
 		});
 	}
+
+	private EventSourcedAggregate<CMD, STATE> aggregate() {
+		return aggregate;
+	}
+
+	private CommandHandlers<CMD, STATE> commandHandlers() {
+		return commandHandlers;
+	}
+
+	private EventHandlers<STATE> eventHandlers() {
+		return eventHandlers;
+	}
 	
+	private STATE state() {
+		return state;
+	}
+	
+	private void setState(STATE state) {
+		this.state = state;
+	}
 }
