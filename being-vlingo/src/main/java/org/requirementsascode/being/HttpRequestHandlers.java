@@ -31,21 +31,20 @@ import io.vlingo.xoom.http.resource.Resource;
 import io.vlingo.xoom.turbo.ComponentRegistry;
 
 public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandler {
-	private final Stage stage;
+	private final Stage currentStage;
 	private final Queries<DATA> queries;
-	private final List<RequestHandler> httpRequestHandlers;
+	private final List<RequestHandler> requestHandlers;
 	private final Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier;
-	private final EventSourcedAggregate<CMD, STATE> aggregate;
 	private final Function<STATE, DATA> dataFromState;
 	private final String resourceName;
 
-	HttpRequestHandlers(final Stage stage, final Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier,
+	HttpRequestHandlers(final Stage currentStage, final Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier,
 			final Function<STATE, DATA> dataFromState) {
-		super(stage.world().stage());
-		this.stage = stage;
-		this.httpRequestHandlers = new ArrayList<>();
+		super(currentStage.world().stage());
+		this.currentStage = currentStage;
+		this.requestHandlers = new ArrayList<>();
 		this.aggregateSupplier = aggregateSupplier;
-		this.aggregate = aggregateSupplier.get();
+		EventSourcedAggregate<CMD, STATE> aggregate = aggregateSupplier.get();
 		this.queries = queriesFor(aggregate, dataFromState);
 		this.resourceName = resourceNameOf(aggregate);
 		this.dataFromState = dataFromState;
@@ -57,8 +56,8 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 
 	@Override
 	public Resource<?> routes() {
-		RequestHandler[] requestHandlerArray = httpRequestHandlers.toArray(new RequestHandler[httpRequestHandlers.size()]);
-		return resource(resourceName, requestHandlerArray);
+		RequestHandler[] requestHandlerArray = requestHandlers().toArray(new RequestHandler[requestHandlers().size()]);
+		return resource(resourceName(), requestHandlerArray);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -68,59 +67,58 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 
 	void createRequest(String url, Class<? extends CMD> createRequestClass) {
 		final RequestHandler1<? extends CMD> handler = post(url).body(createRequestClass).handle(this::createAggregate);
-		httpRequestHandlers.add(handler);
+		requestHandlers().add(handler);
 	}
 
 	void updateRequest(String url, Class<? extends CMD> updateRequestClass) {
 		final RequestHandler2<String, ? extends CMD> handler = patch(url).param(String.class).body(updateRequestClass)
 				.handle(this::updateAggregate);
-		httpRequestHandlers.add(handler);
+		requestHandlers().add(handler);
 	}
 
 	void findByIdRequest(String url) {
 		final RequestHandler1<String> handler = get(url).param(String.class).handle(this::findAggregateById);
-		httpRequestHandlers.add(handler);
+		requestHandlers().add(handler);
 	}
 
 	void findAllRequest(String url) {
 		final RequestHandler0 handler = get(url).handle(this::findAllAggregates);
-		httpRequestHandlers.add(handler);
+		requestHandlers().add(handler);
 	}
 	
 	@SuppressWarnings("rawtypes")
 	private Completes<AggregateBehavior> resolve(final String id) {
-		final Address address = stage.addressFactory().from(id);
-		final Completes<AggregateBehavior> actor = stage.actorOf(AggregateBehavior.class, address,
-				Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id, aggregateSupplier)));
-		stage.world().defaultLogger().info("Resolved actor: " + actor.id());
+		final Address address = currentStage().addressFactory().from(id);
+		final Completes<AggregateBehavior> actor = currentStage().actorOf(AggregateBehavior.class, address,
+				Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id, aggregateSupplier())));
+		logger().info("Resolved actor: " + actor.id());
 		return actor;
 	}
 
 	private Completes<Response> createAggregate(CMD request) {
-		return createAggregateOnStage(stage, request).andThenTo(state -> {
-			return Completes.withSuccess(entityResponseOf(Created, serialized(dataFromState.apply(state))))
+		return createAggregateOnStage(currentStage(), request).andThenTo(state -> {
+			return Completes.withSuccess(entityResponseOf(Created, serialized(dataFromState().apply(state))))
 					.otherwise(arg -> Response.of(NotFound))
 					.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
 		});
-
 	}
 
 	private Completes<Response> updateAggregate(final String id, final CMD request) {
 		return resolve(id).andThenTo(behavior -> reactTo(behavior, request))
-				.andThenTo(state -> Completes.withSuccess(entityResponseOf(Ok, serialized(dataFromState.apply(state)))))
+				.andThenTo(state -> Completes.withSuccess(entityResponseOf(Ok, serialized(dataFromState().apply(state)))))
 				.otherwise(noData -> Response.of(NotFound))
 				.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
 	}
 
 	private Completes<Response> findAllAggregates() {
-		Completes<Collection<DATA>> findAll = queries.findAll();
+		Completes<Collection<DATA>> findAll = queries().findAll();
 		return findAll.andThenTo(data -> Completes.withSuccess(entityResponseOf(Ok, serialized(data))))
 				.otherwise(arg -> Response.of(NotFound))
 				.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
 	}
 
 	private Completes<Response> findAggregateById(final String id) {
-		Completes<DATA> findById = queries.findById(id);
+		Completes<DATA> findById = queries().findById(id);
 		return findById.andThenTo(data -> Completes.withSuccess(entityResponseOf(Ok, serialized(data))))
 				.otherwise(arg -> Response.of(NotFound))
 				.recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
@@ -128,10 +126,10 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 
 	@SuppressWarnings("unchecked")
 	private Completes<STATE> createAggregateOnStage(final Stage stage, final CMD command) {
-		final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("g-");
+		final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("b-");
 		final AggregateBehavior<CMD, STATE> behavior = stage.actorFor(AggregateBehavior.class,
 				Definition.has(EventSourcedAggregateBehavior.class,
-						Definition.parameters(_address.idString(), aggregateSupplier)),
+						Definition.parameters(_address.idString(), aggregateSupplier())),
 				_address);
 		return reactTo(behavior, command);
 	}
@@ -161,5 +159,29 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	private String resourceNameOf(EventSourcedAggregate<CMD, STATE> aggregate) {
 		String resourceName = aggregate.getClass().getSimpleName() + "RequestHandlers";
 		return resourceName;
+	}
+
+	public Stage currentStage() {
+		return currentStage;
+	}
+
+	public List<RequestHandler> requestHandlers() {
+		return requestHandlers;
+	}
+
+	public Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier() {
+		return aggregateSupplier;
+	}
+	
+	public Queries<DATA> queries() {
+		return queries;
+	}
+	
+	public String resourceName() {
+		return resourceName;
+	}
+
+	public Function<STATE, DATA> dataFromState() {
+		return dataFromState;
 	}
 }
