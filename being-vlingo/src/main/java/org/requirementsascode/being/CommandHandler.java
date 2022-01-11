@@ -15,6 +15,19 @@ public class CommandHandler<CMD,STATE>{
 		return new CommandsOf<T>(commandClass);
 	}
 	
+	@SuppressWarnings("unchecked")
+	List<? extends IdentifiedDomainEvent> reactTo(STATE state, Object command) {
+		return commandHandler().apply((CMD)command,state);
+	}
+	
+	Class<CMD> commandClass() {
+		return commandClass;
+	}
+	
+	BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler() {
+		return commandHandler;
+	}
+	
 	public static class CommandsOf<CMD> {
 		private final Class<CMD> commandClass;
 
@@ -41,12 +54,4 @@ public class CommandHandler<CMD,STATE>{
 		this.commandHandler = Objects.requireNonNull(commandHandler, "commandHandler must be non-null!");
 	}
 	
-	@SuppressWarnings("unchecked")
-	List<? extends IdentifiedDomainEvent> reactTo(STATE state, Object command) {
-		return commandHandler.apply((CMD)command,state);
-	}
-	
-	public Class<CMD> getCommandClass() {
-		return commandClass;
-	}
 }

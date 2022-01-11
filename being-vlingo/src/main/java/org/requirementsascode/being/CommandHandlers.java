@@ -26,7 +26,7 @@ public class CommandHandlers<CMD,STATE>{
 		Class<?> commandClass = Objects.requireNonNull(command, "command must be non-null!").getClass();
 		
 		List<? extends IdentifiedDomainEvent> eventList = comandHandlers.stream()
-			.filter(commandHandler -> commandHandler.getCommandClass().equals(commandClass))
+			.filter(commandHandler -> commandHandler.commandClass().equals(commandClass))
 			.findFirst()
 			.map(commandHandler -> commandHandler.reactTo(state, command))
 			.orElse(Collections.emptyList());
@@ -37,7 +37,7 @@ public class CommandHandlers<CMD,STATE>{
 	public List<Class<? extends CMD>> getCommandClasses() {
 		final List<Class<? extends CMD>> commandClasses = 
 			comandHandlers.stream()
-			.map(CommandHandler::getCommandClass)
+			.map(CommandHandler::commandClass)
 			.collect(Collectors.toList());
 		return commandClasses;
 	}
