@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 import io.vlingo.xoom.common.Completes;
 import io.vlingo.xoom.lattice.model.DomainEvent;
-import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+
 import io.vlingo.xoom.lattice.model.sourcing.EventSourced;
 import io.vlingo.xoom.symbio.Source;
 

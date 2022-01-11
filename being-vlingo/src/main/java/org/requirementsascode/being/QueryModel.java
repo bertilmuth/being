@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+
 import io.vlingo.xoom.symbio.Source;
 
 public class QueryModel<DATA> {

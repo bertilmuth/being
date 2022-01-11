@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
-
 public class CommandHandler<CMD,STATE>{
 	private final Class<CMD> commandClass;
 	private final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler;

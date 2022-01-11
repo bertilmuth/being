@@ -1,7 +1,5 @@
 package org.requirementsascode.being;
 
-import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
-
 class EventConsumer<STATE> {
 	private final EventApplier<STATE> eventApplier;
 

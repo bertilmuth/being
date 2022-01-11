@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+
 
 public class EventHandlers<STATE>{
 	private final List<EventHandler<? extends IdentifiedDomainEvent, STATE>> eventHandlers;

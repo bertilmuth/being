@@ -3,8 +3,6 @@ package org.requirementsascode.being;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
-
 public class EventHandler<EVENT extends IdentifiedDomainEvent, STATE>{
 	private final Class<EVENT> eventClass;
 	private final BiFunction<EVENT, STATE, STATE> eventHandler;
