@@ -30,9 +30,9 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 		setInitialState();
 	}
 	
-	public AggregateTest<CMD,STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
+	public AggregateTest<CMD,STATE> givenEvents(IdentifiedDomainEvent... events) {
 		setInitialState();
-		Arrays.stream(internalEvents).forEach(eventConsumer()::consumeEvent);
+		Arrays.stream(events).forEach(eventConsumer()::consumeEvent);
 		return this;
 	}
 
