@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
@@ -14,7 +13,8 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private List<Source<?>> events;
-	
+	private EventConsumer<STATE> eventConsumer;
+
 	private STATE state;
 
 	private AggregateTest(EventSourcedAggregate<CMD,STATE> aggregate) {
@@ -22,6 +22,7 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 
 		this.commandHandlers = aggregate.commandHandlers();
 		this.eventHandlers = aggregate.eventHandlers();
+		this.eventConsumer = new EventConsumer<>(this);
 
 		clearEvents();
 		createInitialStateOf(aggregate, randomId());
@@ -43,13 +44,17 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 	public EventHandlers<STATE> eventHandlers() {
 		return eventHandlers;
 	}
+	
+	public List<Source<?>> producedEvents() {
+		return events;
+	}
 
 	public static <CMD,STATE> AggregateTest<CMD,STATE> of(EventSourcedAggregate<CMD,STATE> aggregate) {
 		return new AggregateTest<>(aggregate);
 	}
 
 	public AggregateTest<CMD,STATE> givenEvents(IdentifiedDomainEvent... internalEvents) {
-		Arrays.stream(internalEvents).forEach(ev -> eventHandlers().reactTo(ev, state()));
+		Arrays.stream(internalEvents).forEach(eventConsumer()::consumeEvent);
 		clearEvents();
 		return this;
 	}
@@ -57,11 +62,8 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 	public AggregateTest<CMD,STATE> when(CMD command) {
 		List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().reactTo(command,state());
 		producedEvents().addAll(producedEvents);
+		producedEvents.stream().forEach(eventConsumer()::consumeEvent);
 
-		Optional<STATE> lastState = producedEvents.stream().map(ev -> eventHandlers().reactTo(ev, state())).filter(Optional::isPresent)
-				.map(state -> state.get()).reduce((first, second) -> second);
-
-		lastState.ifPresent(this::setState);
 		return this;
 	}
 
@@ -73,11 +75,11 @@ class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 		return commandHandlers;
 	}
 
-	public List<Source<?>> producedEvents() {
-		return events;
-	}
-
 	private void clearEvents() {
 		this.events = new ArrayList<>();
+	}
+
+	private EventConsumer<STATE> eventConsumer() {
+		return eventConsumer;
 	}
 }

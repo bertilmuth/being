@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import io.vlingo.xoom.common.Completes;
@@ -17,7 +16,8 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	private final EventSourcedAggregate<CMD, STATE> aggregate;
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
-	
+	private final EventConsumer<STATE> eventConsumer;
+
 	private STATE state;
 
 	public EventSourcedAggregateBehavior(String aggregateId, Supplier<EventSourcedAggregate<CMD, STATE>> aggregateSupplier) {
@@ -26,6 +26,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 		this.aggregate = requireNonNull(aggregateSupplier.get(), "supplied aggregate must be non-null!");
 		this.commandHandlers = requireNonNull(aggregate.commandHandlers(), "command handlers must be non-null!");
 		this.eventHandlers = requireNonNull(aggregate.eventHandlers(), "event handlers must be non-null!");
+		this.eventConsumer = new EventConsumer<>(this);
 
 	    initializeAggregate(aggregateId, aggregate);
 		registerEventConsumers();
@@ -37,23 +38,10 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	}
 
 	private void registerConsumerFor(Class<? extends IdentifiedDomainEvent> eventClass) {
-		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass, EventSourcedAggregateBehavior::consumeEvent);
+		EventSourced.registerConsumer(EventSourcedAggregateBehavior.class, eventClass,
+				(behavior, event) -> behavior.eventConsumer().consumeEvent(event));
 	}
-	
-	private static <CMD, STATE> void consumeEvent(EventSourcedAggregateBehavior<CMD, STATE> aggregateBehavior, IdentifiedDomainEvent event) {
-		Optional<STATE> newState = aggregateBehavior.reactToEvent(event);
-		aggregateBehavior.logInfo("Applied event: " + event);
 
-		newState.ifPresent(state -> {
-			aggregateBehavior.setState(state);
-			aggregateBehavior.logInfo("Updated state to: " + state);
-		});
-	}
-	
-	private Optional<STATE> reactToEvent(IdentifiedDomainEvent event){
-		return eventHandlers().reactTo(event, state());
-	}
-	
 	public EventHandlers<STATE> eventHandlers() {
 		return eventHandlers;
 	}
@@ -65,14 +53,9 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 	public void setState(STATE state) {
 		this.state = state;
 	}
-	
-	private void logInfo(String text) {
-		logger().info(text);
-	}
 
 	private void initializeAggregate(String aggregateId, EventSourcedAggregate<CMD, STATE> aggregate) {
-		STATE state = aggregate.initialState(aggregateId);
-	    setState(state);
+	    setState(aggregate.initialState(aggregateId));
 	    logger().info("Initialized aggregate: " + aggregateId + " -> " + aggregate);
 	}
 
@@ -88,7 +71,7 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 		sourceList.addAll(identifiedDomainEvents);
 		
 		return apply(sourceList, () -> {
-			logInfo("State returned to user: " + state());
+			logger().info("State returned to user: " + state());
 			return state();
 		});
 	}
@@ -99,5 +82,9 @@ public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced impl
 
 	private CommandHandlers<CMD, STATE> commandHandlers() {
 		return commandHandlers;
+	}
+
+	private EventConsumer<STATE> eventConsumer() {
+		return eventConsumer;
 	}
 }
