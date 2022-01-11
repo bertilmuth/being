@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+
 
 
 class EventHandlersTest {
@@ -43,14 +45,28 @@ class EventHandlersTest {
 	}
 
 	private class SampleEvent1 extends IdentifiedDomainEvent{
+		private final String id;
+
 		private SampleEvent1(String id){
-			super(id);
+			this.id = id;
+		}
+
+		@Override
+		public String identity() {
+			return id;
 		}
 	};
 	
 	private class SampleEvent2 extends IdentifiedDomainEvent{
+		private final String id;
+
 		private SampleEvent2(String id){
-			super(id);
+			this.id = id;
+		}
+		
+		@Override
+		public String identity() {
+			return id;
 		}
 	};
 

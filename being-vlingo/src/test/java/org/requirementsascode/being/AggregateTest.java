@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
 class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 	private final CommandHandlers<CMD,STATE> commandHandlers;

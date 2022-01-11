@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
+
 public class CommandHandlers<CMD,STATE>{
 	private final List<CommandHandler<? extends CMD, STATE>> commandHandlers;
 	

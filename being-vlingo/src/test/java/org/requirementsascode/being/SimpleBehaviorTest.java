@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.symbio.Source;
 
 class SimpleBehaviorTest {
@@ -259,7 +260,6 @@ class SimpleBehaviorTest {
 		private final String name;
 
 		public TestEvent1(String name) {
-			super(name);
 			this.name = name;
 		}
 
@@ -303,7 +303,6 @@ class SimpleBehaviorTest {
 		private final String name;
 
 		public TestEvent2(String name) {
-			super(name);
 			this.name = name;
 		}
 
@@ -344,13 +343,14 @@ class SimpleBehaviorTest {
 	}
 
 	private static class TestUpdateStateEvent extends IdentifiedDomainEvent {
-		private TestUpdateStateEvent() {
-			super("TestUpdateAggregateRootEvent");
-		}
-
 		@Override
 		public boolean equals(Object obj) {
 			return obj instanceof TestUpdateStateEvent;
+		}
+
+		@Override
+		public String identity() {
+			return "TestUpdateAggregateRootEvent";
 		}
 	}
 
@@ -361,8 +361,9 @@ class SimpleBehaviorTest {
 	}
 
 	private static class UnhandledEvent extends IdentifiedDomainEvent {
-		private UnhandledEvent() {
-			super("1");
+		@Override
+		public String identity() {
+			return "1";
 		}
 	}
 }
