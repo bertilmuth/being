@@ -17,7 +17,7 @@ By using a convention-over-configuration approach, Being reduces the number of c
 Being is based on [VLINGO XOOM](https://docs.vlingo.io/). VLINGO XOOM provides a powerful framework for building event-sourced services, based on the Actor Model.
 To understand what's going on under Being's hood, or to gain more flexibility, have a look at VLINGO's documentation.
 
-*This project has just recently been made public. The API is likely to change.*
+**This project is currently heavily under construction. Please check back soon, when the library will be available.**
 
 ## Getting started
 The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
