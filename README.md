@@ -30,7 +30,7 @@ You need to define at least:
 
 Then you can run your service.
 
-If you don't know what an aggregate is, please read the [following description](https://www.martinfowler.com/bliki/DDD_Aggregate.html).
+If you don't know what an aggregate is, please read [Martin Fowler's description](https://www.martinfowler.com/bliki/DDD_Aggregate.html).
 
 ## The aggregate for command handling / event-sourcing
 Here's what happens when an aggregate receives a command:
