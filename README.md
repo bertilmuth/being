@@ -227,34 +227,3 @@ Being maps:
 * `findByIdRequest(...)` and `findAllRequest(...)` to a GET request
 
 In the PATCH and POST requests, you use JSON to represent the commands.
-
-
-You send a GET request to the address defined in the service interface, 
-replacing the `:id` part with the id of the aggregate that you want to contact. For example:
-
-Unix: `curl http://localhost:9000/api/greet/Joe`
-
-Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe`
-
-In this example, the aggregate id is used for the name in the greeting, so the response will be *Hello, Joe!*
-
-Where does the response *Hello, Joe!* come from? It's defined in the `responseToGet()` method
-of your aggregate's behavior in the service implementation. [Take a peek](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java), if you want to.
-We'll come back to it.
-
-The class of the response must also be listed in the `responseTypes()`.
-
-### POSTing a command to the aggregate to change aggregate state
-To change the aggregate's state, send a POST request to the same address. Its JSON body must contain a `@type` property with the simple class name of a command, e.g. `ChangeGreetingText`. All commands must be listed by the `commandTypes()` method of the service interface. 
-
-Example: To change the greeting text from *Hello, Joe!* to *Hi, Joe!*, send the following POST request:
-
-Unix: `curl -H "Content-Type: application/json" -X POST -d '{"@type": "ChangeGreetingText", "newText":"Hi"}' http://localhost:9000/api/greet/Joe`
-
-Windows (PowerShell): `iwr http://localhost:9000/api/greet/Joe -Method 'POST' -Headers @{'Content-Type' = 'application/json'} -Body '{"@type": "ChangeGreetingText", "newText":"Hi"}'`
-
-Each POST request is processed by the `commandHandlers()` of the [aggregate behavior](https://github.com/bertilmuth/being-samples/blob/main/greetuser/greetuser-impl/src/main/java/org/requirementsascode/being/greetuser/impl/GreetUserBehavior.java).
-A command handler transforms the command into an internal event. The event causes the state change.
-After the state has changed, further GET requests return the new state, for example the new greeting.
-
-
