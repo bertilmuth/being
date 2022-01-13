@@ -1,5 +1,6 @@
+rootProject.name = 'being'
+
 include 'being-core'
-include 'being-lagom'
 include 'being-test'
 
 
