@@ -13,6 +13,7 @@ import static io.vlingo.xoom.http.resource.ResourceBuilder.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -139,19 +140,27 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 		return ContentType.of("application/json", "charset=UTF-8");
 	}
 
-	private Queries<DATA> queriesFor(EventSourcedAggregate<CMD, STATE> aggregate, Function<STATE, DATA> dataFromState) {
-		Class<? extends Object> dataTypeOfAggregate = dataTypeOfAggregate(aggregate, dataFromState);
-		return queriesByDataType(dataTypeOfAggregate);
+	private Queries<DATA> queriesFor(EventSourcedAggregate<CMD, STATE> aggregate, Function<STATE, DATA> queryDataFromState) {
+		Class<? extends Object> queryDataType = queryDataType(aggregate, queryDataFromState);
+		final Queries<DATA> queries = queriesForDataType(queryDataType);
+		if(queries == null) {
+			throw new IllegalArgumentException("no query model data found for type " + queryDataType.getName() + "!");
+		}
+		
+		return queries;
 	}
 
-	private Class<? extends Object> dataTypeOfAggregate(EventSourcedAggregate<CMD, STATE> aggregate,
-			Function<STATE, DATA> dataFromState) {
-		Class<? extends Object> aggregateDataClass = dataFromState.apply(aggregate.initialState(null)).getClass();
+	private Class<? extends Object> queryDataType(EventSourcedAggregate<CMD, STATE> aggregate,
+			Function<STATE, DATA> queryDataFromState) {
+		final DATA dataFromEmptyState = queryDataFromState.apply(aggregate.initialState(""));
+		Objects.requireNonNull(dataFromEmptyState, "transforming empty aggregate state to query data must be non-null!"); 
+		
+		Class<? extends Object> aggregateDataClass = dataFromEmptyState.getClass();
 		return aggregateDataClass;
 	}
 
 	@SuppressWarnings("unchecked")
-	private Queries<DATA> queriesByDataType(Class<? extends Object> dataType) {
+	private Queries<DATA> queriesForDataType(Class<? extends Object> dataType) {
 		return (Queries<DATA>) ComponentRegistry.withType(QueryModelStateStoreProvider.class).queriesByDataTypeMap
 				.get(dataType);
 	}

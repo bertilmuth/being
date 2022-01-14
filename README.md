@@ -57,7 +57,7 @@ public class Greeting implements EventSourcedAggregate<GreetingCommand, Greeting
 	@Override
 	public CommandHandlers<GreetingCommand, GreetingState> commandHandlers() {
 		return CommandHandlers.handle(
-			commandsOf(CreateGreeting.class).with((cmd,state) -> new GreetingCreated(state.id, "Hello, ", cmd.personName)),
+			commandsOf(CreateGreeting.class).with((cmd,state) -> new GreetingCreated(state.id, "Hello,", cmd.personName)),
 			commandsOf(ChangeSalutation.class).with((cmd, state) -> new SalutationChanged(state.id, cmd.salutation))
 		);
 	}
@@ -65,7 +65,7 @@ public class Greeting implements EventSourcedAggregate<GreetingCommand, Greeting
 	@Override
 	public EventHandlers<GreetingState> eventHandlers() {
 		return EventHandlers.handle(
-			eventsOf(GreetingCreated.class).with((event,state) -> new GreetingState(state.id, event.salutation, event.salutation)),
+			eventsOf(GreetingCreated.class).with((event,state) -> new GreetingState(state.id, event.salutation, event.personName)),
 			eventsOf(SalutationChanged.class).with((event,state) -> new GreetingState(state.id, event.salutation, state.personName))
 		);
 	}
@@ -73,7 +73,7 @@ public class Greeting implements EventSourcedAggregate<GreetingCommand, Greeting
 ```
 
 The first command handler consumes a `CreateGreeting` command that contains the name of the person to greet, and produces a `GreetingCreated` event. 
-The fixed salutation *Hello, * is part of that event, so when you later request to greet *Joe*, the greeting will be *Hello, Joe*. 
+The fixed salutation *Hello, * is part of that event, so when you request a greeting for *Joe*, the greeting text is *Hello, Joe*. 
 
 But a user can also change the salutation via a `ChangeSalutation` command.
 This command contains only the new text for the salutation, not the person's name. The person is identified by the aggregate's id, `state.id`. 
@@ -90,7 +90,6 @@ public final class GreetingState {
 	public final String id;
 	public final String salutation;
 	public final String personName;
-	public final String greetingText;
 
 	public static GreetingState identifiedBy(final String id) {
 		return new GreetingState(id, "", "");
@@ -100,12 +99,11 @@ public final class GreetingState {
 		this.id = id;
 		this.salutation = salutation;
 		this.personName = personName;
-		this.greetingText = salutation + personName;
 	}
 
 	@Override
 	public String toString() {
-		return "GreetingState [id=" + id + ", greetingText=" + greetingText + "]";
+		return "GreetingState [id=" + id + ", salutation=" + salutation + ", personName=" + personName + "]";
 	}
 }
 ```
@@ -182,9 +180,9 @@ each event type that you want to show into the data:
 
 ``` java
 QueryModel<GreetingData> queryModel = 
-	QueryModel.startEmpty(() -> GreetingData.empty()) 
-		.mergeEventsOf(GreetingCreated.class, (previousData, event) -> GreetingData.from(event.id, event.salutation, event.personName))
-		.mergeEventsOf(SalutationChanged.class, (previousData, event) -> GreetingData.from(event.id, event.salutation, previousData.personName));
+	QueryModel.startEmpty(GreetingData.empty()) 
+		.mergeEventsOf(GreetingCreated.class, (event,previousData) -> GreetingData.from(event.id, event.salutation, event.personName))
+		.mergeEventsOf(SalutationChanged.class, (event,previousData) -> GreetingData.from(event.id, event.salutation, previousData.personName));
 ```
 In the same way that you can access the current state of the aggregate in your command/event handlers, you can access the `previousData` in the merge function.
 
@@ -196,11 +194,11 @@ HttpRequestHandlers<GreetingCommand, GreetingState, GreetingData> greetingReques
 	HttpRequestHandlers.builder()
 		.stage(grid)
 		.aggregateSupplier(() -> new Greeting())
-		.dataFromState(GreetingData::from)
-		.createRequest("/greetings", CreateGreeting.class)
-		.updateRequest("/greetings/change/{id}", ChangeSalutation.class)
-		.findByIdRequest("/greetings/{id}")
-		.findAllRequest("/greetings")
+		.queryDataFromState(GreetingData::from)
+		.createRequest(CREATE_PATH, CreateGreeting.class)
+		.updateRequest(UPDATE_PATH, ChangeSalutation.class)
+		.findByIdRequest(FIND_BY_ID_PATH)
+		.findAllRequest(FIND_ALL_PATH)
 		.build();
 ```
 
@@ -208,15 +206,15 @@ The stage/grid is used by VLINGO's cluster management.
 
 The aggregate supplier enables Being to create instances of the aggregate.
 
-The `dataFromState` function transforms the state of the aggregate to the data shown to the user:
+The `queryDataFromState` function transforms the state of the aggregate to the data shown to the user:
 
 ``` java
-public static GreetingData from(final GreetingState greetingState) {
-	return from(greetingState.id, greetingState.salutation, greetingState.personName);
+public static GreetingData from(final GreetingState state) {
+	return from(state.id, state.salutation, state.personName);
 }
 
 public static GreetingData from(final String id, final String salutation, final String personName) {
-	return new GreetingData(id, salutation, personName);
+	return new GreetingData(id, personName, salutation + " " + personName);
 }
 ```
 

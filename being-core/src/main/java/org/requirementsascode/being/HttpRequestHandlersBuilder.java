@@ -32,7 +32,7 @@ public class HttpRequestHandlersBuilder {
 				this.aggregateSupplier = aggregateSupplier;
 			}
 
-			public <DATA> RequestHandlersBuilder<DATA> dataFromState(Function<STATE, DATA> dataFromState) {
+			public <DATA> RequestHandlersBuilder<DATA> queryDataFromState(Function<STATE, DATA> dataFromState) {
 				return new RequestHandlersBuilder<DATA>(dataFromState);
 			}
 
