@@ -17,8 +17,6 @@ By using a convention-over-configuration approach, Being reduces the number of c
 Being is based on [VLINGO XOOM](https://docs.vlingo.io/). VLINGO XOOM provides a powerful framework for building event-sourced services, based on the Actor Model.
 To understand what's going on under Being's hood, or to gain more flexibility, have a look at VLINGO's documentation.
 
-**This project is currently heavily under construction. Please check back soon, when the library will be available.**
-
 ## Getting started
 The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
 
@@ -31,7 +29,7 @@ You need to define at least:
 
 Then you can run your service.
 
-If you don't know what an aggregate is, please read [Martin Fowler's description](https://www.martinfowler.com/bliki/DDD_Aggregate.html).
+If you don't know what an aggregate is, read [Martin Fowler's description](https://www.martinfowler.com/bliki/DDD_Aggregate.html), as an example.
 
 ## The aggregate's command handling behavior
 Here's what happens when an aggregate receives a command:
