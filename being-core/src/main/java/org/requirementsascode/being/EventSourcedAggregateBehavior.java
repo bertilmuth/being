@@ -12,7 +12,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 import io.vlingo.xoom.lattice.model.sourcing.EventSourced;
 import io.vlingo.xoom.symbio.Source;
 
-public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced implements AggregateBehavior<CMD, STATE>, EventApplier<STATE> {
+public class EventSourcedAggregateBehavior<CMD, STATE> extends EventSourced implements Aggregate<CMD, STATE>, EventApplier<STATE> {
 	private final EventSourcedAggregate<CMD, STATE> aggregate;
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;

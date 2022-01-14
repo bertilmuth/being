@@ -11,7 +11,7 @@ public class CommandHandler<CMD,STATE>{
 	private final Class<CMD> commandClass;
 	private final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler;
 
-	public static <T> CommandsOf<T> commandsOf(Class<T> commandClass) {
+	public static <T> CommandsOf<T> commandsOf(final Class<T> commandClass) {
 		return new CommandsOf<T>(commandClass);
 	}
 	
@@ -35,8 +35,8 @@ public class CommandHandler<CMD,STATE>{
 			this.commandClass = commandClass;
 		}
 
-		public <STATE> CommandHandler<CMD, STATE> with(BiFunction<CMD, STATE, ? extends IdentifiedDomainEvent> commandHandler) {
-			BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = (cmd, state) -> {
+		public <STATE> CommandHandler<CMD, STATE> with(final BiFunction<CMD, STATE, ? extends IdentifiedDomainEvent> commandHandler) {			
+			final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = (cmd, state) -> {
 				IdentifiedDomainEvent result = commandHandler.apply(cmd, state);
 				return Collections.singletonList(result);
 			};
@@ -44,12 +44,12 @@ public class CommandHandler<CMD,STATE>{
 			return withSome(eventListProducingHandler);
 		}
 
-		public <STATE> CommandHandler<CMD, STATE> withSome(BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler) {
+		public <STATE> CommandHandler<CMD, STATE> withSome(final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler) {
 			return new CommandHandler<>(commandClass, commandHandler);
 		}
 	}
 	
-	private CommandHandler(Class<CMD> commandClass, BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler) {
+	private CommandHandler(final Class<CMD> commandClass, final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler) {
 		this.commandClass = Objects.requireNonNull(commandClass, "commandClass must be non-null!");
 		this.commandHandler = Objects.requireNonNull(commandHandler, "commandHandler must be non-null!");
 	}

@@ -62,7 +62,7 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Completes<STATE> reactTo(final AggregateBehavior behavior, final CMD command) {
+	private Completes<STATE> reactTo(final Aggregate behavior, final CMD command) {
 		return behavior.reactTo(command);
 	}
 
@@ -88,9 +88,9 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private Completes<AggregateBehavior> resolve(final String id) {
+	private Completes<Aggregate> resolve(final String id) {
 		final Address address = currentStage().addressFactory().from(id);
-		final Completes<AggregateBehavior> actor = currentStage().actorOf(AggregateBehavior.class, address,
+		final Completes<Aggregate> actor = currentStage().actorOf(Aggregate.class, address,
 				Definition.has(EventSourcedAggregateBehavior.class, Definition.parameters(id, aggregateSupplier())));
 		logger().info("Resolved actor: " + actor.id());
 		return actor;
@@ -128,7 +128,7 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	@SuppressWarnings("unchecked")
 	private Completes<STATE> createAggregateOnStage(final Stage stage, final CMD command) {
 		final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("b-");
-		final AggregateBehavior<CMD, STATE> behavior = stage.actorFor(AggregateBehavior.class,
+		final Aggregate<CMD, STATE> behavior = stage.actorFor(Aggregate.class,
 				Definition.has(EventSourcedAggregateBehavior.class,
 						Definition.parameters(_address.idString(), aggregateSupplier())),
 				_address);
