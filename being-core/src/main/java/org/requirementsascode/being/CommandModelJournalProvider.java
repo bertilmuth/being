@@ -20,7 +20,7 @@ import io.vlingo.xoom.turbo.storage.Model;
 import io.vlingo.xoom.turbo.storage.StoreActorBuilder;
 
 @SuppressWarnings("all")
-public class CommandModelJournalProvider {
+class CommandModelJournalProvider {
 
 	public final Journal<String> journal;
 

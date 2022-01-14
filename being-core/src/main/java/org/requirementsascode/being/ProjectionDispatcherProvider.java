@@ -18,11 +18,11 @@ import io.vlingo.xoom.symbio.store.dispatch.Dispatcher;
 import io.vlingo.xoom.turbo.ComponentRegistry;
 
 @SuppressWarnings("all")
-public class ProjectionDispatcherProvider {
+class ProjectionDispatcherProvider {
   public final ProjectionDispatcher projectionDispatcher;
   public final Dispatcher storeDispatcher;
 
-  public static <DATA> ProjectionDispatcherProvider using(final Stage stage, QueryModel<DATA> queryModel) {
+  static <DATA> ProjectionDispatcherProvider using(final Stage stage, QueryModel<DATA> queryModel) {
     if (ComponentRegistry.has(ProjectionDispatcherProvider.class)) {
       return ComponentRegistry.withType(ProjectionDispatcherProvider.class);
     }

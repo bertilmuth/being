@@ -39,11 +39,9 @@ public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 			return currentData;
 
 		DATA dataToMerge = previousData;
-		logger().info("Merging data:" + dataToMerge);
 
 		for (final Source<?> event : sources()) {
 			DATA mergedData = queryModel.mergeDataWithEvent(dataToMerge, event);
-			logger().info("Merged data:" + mergedData);
 			
 			if(dataToMerge == mergedData) {
 				logger().warn("Event of type " + event.typeName() + " was not matched.");

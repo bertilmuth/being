@@ -17,7 +17,7 @@ import io.vlingo.xoom.turbo.storage.Model;
 import io.vlingo.xoom.turbo.storage.StoreActorBuilder;
 
 @SuppressWarnings("all")
-public class QueryModelStateStoreProvider{
+class QueryModelStateStoreProvider{
 	public final StateStore store;
 	public final Map<Class<?>, Queries<?>> queriesByDataTypeMap;
 

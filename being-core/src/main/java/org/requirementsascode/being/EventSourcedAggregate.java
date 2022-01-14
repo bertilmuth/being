@@ -20,7 +20,7 @@ public class EventSourcedAggregate<CMD, STATE> extends EventSourced implements A
 
 	private STATE state;
 
-	public EventSourcedAggregate(String aggregateId, Supplier<AggregateBehavior<CMD, STATE>> behaviorSupplier) {
+	EventSourcedAggregate(String aggregateId, Supplier<AggregateBehavior<CMD, STATE>> behaviorSupplier) {
 		super(aggregateId);
 		requireNonNull(behaviorSupplier, "behaviorSupplier must be non-null");
 		this.aggregate = requireNonNull(behaviorSupplier.get(), "supplied aggregate must be non-null!");
