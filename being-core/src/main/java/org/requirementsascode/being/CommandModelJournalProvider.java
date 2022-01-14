@@ -1,6 +1,8 @@
 package org.requirementsascode.being;
 
 import java.util.Arrays;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Objects;
 
 import org.requirementsascode.being.EventSourcedAggregateBehavior;
@@ -18,30 +20,30 @@ import io.vlingo.xoom.turbo.storage.Model;
 import io.vlingo.xoom.turbo.storage.StoreActorBuilder;
 
 @SuppressWarnings("all")
-public class CommandModelJournalProvider  {
+public class CommandModelJournalProvider {
 
-  public final Journal<String> journal;
+	public final Journal<String> journal;
 
-  public static CommandModelJournalProvider using(final Stage stage, final SourcedTypeRegistry registry) {
-    return using(stage, registry, new NoOpDispatcher());
- }
+	public static CommandModelJournalProvider using(final Stage stage, final SourcedTypeRegistry registry) {
+		return using(stage, registry, new NoOpDispatcher());
+	}
 
-  public static CommandModelJournalProvider using(final Stage stage, final SourcedTypeRegistry registry, final Dispatcher ...dispatchers) {
-    if (ComponentRegistry.has(CommandModelJournalProvider.class)) {
-      return ComponentRegistry.withType(CommandModelJournalProvider.class);
-    }
+	public static CommandModelJournalProvider using(final Stage stage, final SourcedTypeRegistry registry, final Dispatcher... dispatchers) {
+		if (ComponentRegistry.has(CommandModelJournalProvider.class)) {
+			return ComponentRegistry.withType(CommandModelJournalProvider.class);
+		}
 
-    final Journal<String> journal =
-              StoreActorBuilder.from(stage, Model.COMMAND, Arrays.asList(dispatchers), StorageType.JOURNAL, Settings.properties(), true);
+		final Journal<String> journal = StoreActorBuilder.from(stage, Model.COMMAND, Arrays.asList(dispatchers),
+			StorageType.JOURNAL, Settings.properties(), true);
 
-    registry.register(new Info(journal, EventSourcedAggregateBehavior.class, EventSourcedAggregateBehavior.class.getSimpleName()));
+		registry.register(
+			new Info(journal, EventSourcedAggregateBehavior.class, EventSourcedAggregateBehavior.class.getSimpleName()));
 
-    return new CommandModelJournalProvider(journal);
-  }
+		return new CommandModelJournalProvider(journal);
+	}
 
-  private CommandModelJournalProvider(final Journal<String> journal) {
-    this.journal = Objects.requireNonNull(journal, "journal must be non-null!");
-    ComponentRegistry.register(getClass(), this);
-  }
-
+	private CommandModelJournalProvider(final Journal<String> journal) {
+		this.journal = requireNonNull(journal, "journal must be non-null!");
+		ComponentRegistry.register(getClass(), this);
+	}
 }
