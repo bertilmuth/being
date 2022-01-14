@@ -73,7 +73,7 @@ public class Greeting implements EventSourcedAggregate<GreetingCommand, Greeting
 ```
 
 The first command handler consumes a `CreateGreeting` command that contains the name of the person to greet, and produces a `GreetingCreated` event. 
-The fixed salutation *Hello, * is part of that event, so when you request a greeting for *Joe*, the greeting text is *Hello, Joe*. 
+The fixed salutation *Hello,* is part of that event, so when you request a greeting for *Joe*, the greeting text is *Hello, Joe*. 
 
 But a user can also change the salutation via a `ChangeSalutation` command.
 This command contains only the new text for the salutation, not the person's name. The person is identified by the aggregate's id, `state.id`. 
