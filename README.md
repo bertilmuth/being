@@ -183,8 +183,10 @@ each event type that you want to show into the data:
 ``` java
 QueryModel<GreetingData> queryModel = 
 	QueryModel.startEmpty(GreetingData.empty()) 
-		.mergeEventsOf(GreetingCreated.class, (event,previousData) -> GreetingData.from(event.id, event.salutation, event.personName))
-		.mergeEventsOf(SalutationChanged.class, (event,previousData) -> GreetingData.from(event.id, event.salutation, previousData.personName));
+		.mergeEventsOf(GreetingCreated.class, 
+			(event,previousData) -> GreetingData.from(event.id, event.salutation, event.personName))
+		.mergeEventsOf(SalutationChanged.class, 
+			(event,previousData) -> GreetingData.from(event.id, event.salutation, previousData.personName));
 ```
 In the same way that you can access the current state of the aggregate in your command/event handlers, you can access the `previousData` in the merge function.
 
