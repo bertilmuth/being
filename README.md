@@ -230,3 +230,23 @@ Being maps:
 
 ## Sending requests
 In the PATCH and POST requests, you use JSON to represent the commands.
+Here are some example commands, together with example reponses from the server:
+
+Create a greeting for Joe:
+`curl -i -X POST -H "Content-Type: application/json" -d '{"personName":"Joe"}' http://localhost:8081/greetings`
+
+Example response: 
+``` shell
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=UTF-8
+Content-Length: 92
+
+{"id":"898954e3-a886-4352-9283-320fc3a66c09","personName":"Joe","greetingText":"Hello, Joe"}
+```
+
+Afterwards, get Joe's greeting:
+`curl http://localhost:8081/greetings/898954e3-a886-4352-9283-320fc3a66c09`
+
+Example response: 
+`{"id":"898954e3-a886-4352-9283-320fc3a66c09","personName":"Joe","greetingText":"Hello, Joe"}`
+
