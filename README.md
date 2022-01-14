@@ -23,7 +23,8 @@ To understand what's going on under Being's hood, or to gain more flexibility, h
 The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
 
 You need to define at least:
-* The aggregate for command handling / event-sourcing
+* The aggregate's command handling behavior
+* The aggregate's state
 * The query model (a.k.a. read model)
 * HTTP request handlers
 * A few configuration settings
@@ -32,7 +33,7 @@ Then you can run your service.
 
 If you don't know what an aggregate is, please read [Martin Fowler's description](https://www.martinfowler.com/bliki/DDD_Aggregate.html).
 
-## The aggregate for command handling / event-sourcing
+## The aggregate's command handling behavior
 Here's what happens when an aggregate receives a command:
 * Being looks for a handler for the command
 * If there's a handler, Being executes it: the handler transforms the commands into one or several events
@@ -45,10 +46,10 @@ So you need to define the command handlers: which types of commands the aggregat
 
 You also need to define the event handlers: for each of the event types, which new aggregate state to create as a reaction to it.
 
-As a Hello World style example, the `Greeting` aggregate looks like this:
+As a Hello World style example, the `Greeting` aggregate behavior looks like this:
 
 ``` java
-public class Greeting implements EventSourcedAggregate<GreetingCommand, GreetingState> {
+public class Greeting implements AggregateBehavior<GreetingCommand, GreetingState> {
 	@Override
 	public GreetingState initialState(final String id) {
 		return GreetingState.identifiedBy(id);
@@ -83,6 +84,7 @@ So when a `SalutationChanged` event is applied, the person name is not taken fro
 `(event,state) -> new GreetingState(state.id, event.salutation, state.personName)`.
 In other words: aggregates are stateful, and keep their state between requests (or recreate the state transparently).
 
+## The aggregate's state
 Here's the code for the `GreetingState` class that represents the state of the aggregate:
 
 ``` java
@@ -193,7 +195,7 @@ Use a builder to create the HTTP request handlers:
 HttpRequestHandlers<GreetingCommand, GreetingState, GreetingData> greetingRequestHandlers = 
 	HttpRequestHandlers.builder()
 		.stage(grid)
-		.aggregateSupplier(() -> new Greeting())
+		.behaviorSupplier(() -> new Greeting())
 		.queryDataFromState(GreetingData::from)
 		.createRequest(CREATE_PATH, CreateGreeting.class)
 		.updateRequest(UPDATE_PATH, ChangeSalutation.class)
@@ -224,4 +226,5 @@ Being maps:
 *  `updateRequest(...)` to a PATCH request
 * `findByIdRequest(...)` and `findAllRequest(...)` to a GET request
 
+## Sending requests
 In the PATCH and POST requests, you use JSON to represent the commands.
