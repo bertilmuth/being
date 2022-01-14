@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.requirementsascode.being.QueryModel;
-
 import io.vlingo.xoom.actors.Definition;
 import io.vlingo.xoom.actors.Protocols;
 import io.vlingo.xoom.actors.Stage;
@@ -18,11 +16,11 @@ import io.vlingo.xoom.symbio.store.dispatch.Dispatcher;
 import io.vlingo.xoom.turbo.ComponentRegistry;
 
 @SuppressWarnings("all")
-class ProjectionDispatcherProvider {
+public class ProjectionDispatcherProvider {
   public final ProjectionDispatcher projectionDispatcher;
   public final Dispatcher storeDispatcher;
 
-  static <DATA> ProjectionDispatcherProvider using(final Stage stage, QueryModel<DATA> queryModel) {
+  public static <DATA> ProjectionDispatcherProvider using(final Stage stage, QueryModel<DATA> queryModel) {
     if (ComponentRegistry.has(ProjectionDispatcherProvider.class)) {
       return ComponentRegistry.withType(ProjectionDispatcherProvider.class);
     }

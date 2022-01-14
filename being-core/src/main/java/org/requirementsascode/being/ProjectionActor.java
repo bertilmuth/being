@@ -18,7 +18,7 @@ public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 	private final QueryModel<DATA> queryModel;
 	private final DATA emptyData;
 
-	<U> ProjectionActor(QueryModel<DATA> queryModel) {
+	public <U> ProjectionActor(QueryModel<DATA> queryModel) {
 		this(ComponentRegistry.withType(QueryModelStateStoreProvider.class).store, queryModel);
 	}
 
