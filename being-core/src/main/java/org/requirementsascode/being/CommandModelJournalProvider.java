@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Objects;
 
-import org.requirementsascode.being.EventSourcedAggregateBehavior;
+import org.requirementsascode.being.EventSourcedAggregate;
 
 import io.vlingo.xoom.actors.Stage;
 import io.vlingo.xoom.lattice.model.sourcing.SourcedTypeRegistry;
@@ -37,7 +37,7 @@ public class CommandModelJournalProvider {
 			StorageType.JOURNAL, Settings.properties(), true);
 
 		registry.register(
-			new Info(journal, EventSourcedAggregateBehavior.class, EventSourcedAggregateBehavior.class.getSimpleName()));
+			new Info(journal, EventSourcedAggregate.class, EventSourcedAggregate.class.getSimpleName()));
 
 		return new CommandModelJournalProvider(journal);
 	}

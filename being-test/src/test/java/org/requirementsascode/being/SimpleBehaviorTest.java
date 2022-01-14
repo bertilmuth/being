@@ -17,13 +17,13 @@ import io.vlingo.xoom.symbio.Source;
 class SimpleBehaviorTest {
 	private static final TestEvent1 NEW_AGGREGATE_ROOT_EVENT = new TestEvent1("New aggregate root");
 
-	private TestAggregate testAggregate;
+	private TestAggregateBehavior testAggregateBehavior;
 	private AggregateTest<TestCommand, TestState1> aggregateTest;
 
 	@BeforeEach
 	public void setup() {
-		testAggregate = new TestAggregate();
-		aggregateTest = AggregateTest.of(testAggregate);
+		testAggregateBehavior = new TestAggregateBehavior();
+		aggregateTest = AggregateTest.of(testAggregateBehavior);
 	}
 
 	@Test
@@ -138,7 +138,7 @@ class SimpleBehaviorTest {
 		assertEquals(asList(NEW_AGGREGATE_ROOT_EVENT, expectedEvent2), aggregateTest.state().appliedEvents());
 	}
 
-	private static class TestAggregate implements EventSourcedAggregate<TestCommand, TestState1> {
+	private static class TestAggregateBehavior implements AggregateBehavior<TestCommand, TestState1> {
 		@Override
 		public CommandHandlers<TestCommand, TestState1> commandHandlers() {
 			return CommandHandlers.handle(commandsOf(TestCommand1.class).with((cmd, state) -> new TestEvent1(cmd.name)),
