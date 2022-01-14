@@ -20,10 +20,10 @@ public class EventSourcedAggregate<CMD, STATE> extends EventSourced implements A
 
 	private STATE state;
 
-	public EventSourcedAggregate(String aggregateId, Supplier<AggregateBehavior<CMD, STATE>> aggregateSupplier) {
+	public EventSourcedAggregate(String aggregateId, Supplier<AggregateBehavior<CMD, STATE>> behaviorSupplier) {
 		super(aggregateId);
-		requireNonNull(aggregateSupplier, "aggregateSupplier must be non-null");
-		this.aggregate = requireNonNull(aggregateSupplier.get(), "supplied aggregate must be non-null!");
+		requireNonNull(behaviorSupplier, "behaviorSupplier must be non-null");
+		this.aggregate = requireNonNull(behaviorSupplier.get(), "supplied aggregate must be non-null!");
 		this.commandHandlers = requireNonNull(aggregate.commandHandlers(), "command handlers must be non-null!");
 		this.eventHandlers = requireNonNull(aggregate.eventHandlers(), "event handlers must be non-null!");
 		this.eventConsumer = new EventConsumer<>(this);
@@ -58,12 +58,10 @@ public class EventSourcedAggregate<CMD, STATE> extends EventSourced implements A
 	    setState(aggregate.initialState(aggregateId));
 	}
 
-	public Completes<STATE> reactTo(final CMD command){
-		requireNonNull(command, "command must be non-null!");
-		
-		final List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers().reactTo(command,state());
+	public Completes<STATE> reactTo(final CMD command){		
+		List<? extends IdentifiedDomainEvent> identifiedDomainEvents = commandHandlers().reactTo(command,state());
 
-		final List<Source<DomainEvent>> sourceList = new ArrayList<>(identifiedDomainEvents.size());
+		List<Source<DomainEvent>> sourceList = new ArrayList<>(identifiedDomainEvents.size());
 		sourceList.addAll(identifiedDomainEvents);
 		
 		return apply(sourceList, () -> state());

@@ -9,6 +9,7 @@ import static io.vlingo.xoom.http.resource.ResourceBuilder.get;
 import static io.vlingo.xoom.http.resource.ResourceBuilder.patch;
 import static io.vlingo.xoom.http.resource.ResourceBuilder.post;
 import static io.vlingo.xoom.http.resource.ResourceBuilder.resource;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,6 @@ import io.vlingo.xoom.http.resource.RequestHandler1;
 import io.vlingo.xoom.http.resource.RequestHandler2;
 import io.vlingo.xoom.http.resource.Resource;
 import io.vlingo.xoom.turbo.ComponentRegistry;
-import static java.util.Objects.*;
 
 public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandler {
 	private final Stage currentStage;
@@ -46,11 +46,11 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 		this.currentStage = requireNonNull(currentStage, "currentStage must be non-null!");
 		this.behaviorSupplier = requireNonNull(behaviorSupplier, "behaviorSupplier must be non-null!");
 		
-		final AggregateBehavior<CMD, STATE> aggregate = behaviorSupplier.get();
+		final AggregateBehavior<CMD, STATE> aggregate = requireNonNull(behaviorSupplier.get(), "behaviorSupplier must return non-null value!");
 		this.queries = queriesFor(aggregate, dataFromState);
 		this.resourceName = resourceNameOf(aggregate);
 		
-		this.dataFromState = dataFromState;
+		this.dataFromState = requireNonNull(dataFromState, "dataFromState must be non-null!");
 		this.requestHandlers = new ArrayList<>();
 	}
 
@@ -60,64 +60,47 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 
 	@Override
 	public Resource<?> routes() {
-		final RequestHandler[] requestHandlerArray = requestHandlers()
+		RequestHandler[] requestHandlerArray = requestHandlers()
 			.toArray(new RequestHandler[requestHandlers().size()]);
 		return resource(resourceName(), requestHandlerArray);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Completes<STATE> reactTo(final Aggregate behavior, final CMD command) {
-		requireNonNull(behavior, "behavior must be non-null!");
-		requireNonNull(command, "command must be non-null!");
-
 		return behavior.reactTo(command);
 	}
 
 	void createRequest(final String url, final Class<? extends CMD> createRequestClass) {
-		requireNonNull(url, "url must be non-null!");
-		requireNonNull(createRequestClass, "createRequestClass must be non-null!");
-
 		final RequestHandler1<? extends CMD> handler = post(url).body(createRequestClass).handle(this::createAggregate);
 		requestHandlers().add(handler);
 	}
 
 	void updateRequest(final String url, final Class<? extends CMD> updateRequestClass) {
-		requireNonNull(url, "url must be non-null!");
-		requireNonNull(updateRequestClass, "updateRequestClass must be non-null!");
-
-		final RequestHandler2<String, ? extends CMD> handler = patch(url).param(String.class).body(updateRequestClass)
+		RequestHandler2<String, ? extends CMD> handler = patch(url).param(String.class).body(updateRequestClass)
 			.handle(this::updateAggregate);
 		requestHandlers().add(handler);
 	}
 
 	void findByIdRequest(final String url) {
-		requireNonNull(url, "url must be non-null!");
-
-		final RequestHandler1<String> handler = get(url).param(String.class).handle(this::findAggregateById);
+		RequestHandler1<String> handler = get(url).param(String.class).handle(this::findAggregateById);
 		requestHandlers().add(handler);
 	}
 
 	void findAllRequest(final String url) {
-		requireNonNull(url, "url must be non-null!");
-
-		final RequestHandler0 handler = get(url).handle(this::findAllAggregates);
+		RequestHandler0 handler = get(url).handle(this::findAllAggregates);
 		requestHandlers().add(handler);
 	}
 
 	@SuppressWarnings("rawtypes")
 	private Completes<Aggregate> resolve(final String id) {
-		requireNonNull(id, "id must be non-null!");
-
-		final Address address = currentStage().addressFactory().from(id);
-		final Completes<Aggregate> actor = currentStage().actorOf(Aggregate.class, address,
+		Address address = currentStage().addressFactory().from(id);
+		Completes<Aggregate> actor = currentStage().actorOf(Aggregate.class, address,
 			Definition.has(EventSourcedAggregate.class, Definition.parameters(id, behaviorSupplier())));
 		logger().info("Resolved actor: " + actor.id());
 		return actor;
 	}
 
 	private Completes<Response> createAggregate(final CMD request) {
-		requireNonNull(request, "request must be non-null!");
-
 		return createAggregateOnStage(currentStage(), request).andThenTo(state -> {
 			return Completes.withSuccess(entityResponseOf(Created, serialized(dataFromState().apply(state))))
 				.otherwise(arg -> Response.of(NotFound)).recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
@@ -125,34 +108,27 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	}
 
 	private Completes<Response> updateAggregate(final String id, final CMD request) {
-		requireNonNull(id, "id must be non-null!");
-		requireNonNull(request, "request must be non-null!");
-
 		return resolve(id).andThenTo(behavior -> reactTo(behavior, request))
 			.andThenTo(state -> Completes.withSuccess(entityResponseOf(Ok, serialized(dataFromState().apply(state)))))
 			.otherwise(noData -> Response.of(NotFound)).recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
 	}
 
 	private Completes<Response> findAllAggregates() {
-		final Completes<Collection<DATA>> findAll = queries().findAll();
+		Completes<Collection<DATA>> findAll = queries().findAll();
 		return findAll.andThenTo(data -> Completes.withSuccess(entityResponseOf(Ok, serialized(data))))
 			.otherwise(arg -> Response.of(NotFound)).recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
 	}
 
 	private Completes<Response> findAggregateById(final String id) {
-
-		final Completes<DATA> findById = queries().findById(id);
+		Completes<DATA> findById = queries().findById(id);
 		return findById.andThenTo(data -> Completes.withSuccess(entityResponseOf(Ok, serialized(data))))
 			.otherwise(arg -> Response.of(NotFound)).recoverFrom(e -> Response.of(InternalServerError, e.getMessage()));
 	}
 
 	@SuppressWarnings("unchecked")
 	private Completes<STATE> createAggregateOnStage(final Stage stage, final CMD command) {
-		requireNonNull(stage, "stage must be non-null!");
-		requireNonNull(command, "command must be non-null!");
-
-		final io.vlingo.xoom.actors.Address _address = stage.addressFactory().uniquePrefixedWith("b-");
-		final Aggregate<CMD, STATE> behavior = stage.actorFor(Aggregate.class,
+		Address _address = stage.addressFactory().uniquePrefixedWith("b-");
+		Aggregate<CMD, STATE> behavior = stage.actorFor(Aggregate.class,
 			Definition.has(EventSourcedAggregate.class, Definition.parameters(_address.idString(), behaviorSupplier())),
 			_address);
 		return reactTo(behavior, command);
@@ -164,11 +140,8 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	}
 
 	private Queries<DATA> queriesFor(final AggregateBehavior<CMD, STATE> aggregate, final Function<STATE, DATA> queryDataFromState) {
-		requireNonNull(aggregate, "aggregate must be non-null!");
-		requireNonNull(queryDataFromState, "queryDataFromState must be non-null!");
-
-		final Class<? extends Object> queryDataType = queryDataType(aggregate, queryDataFromState);
-		final Queries<DATA> queries = queriesForDataType(queryDataType);
+		Class<? extends Object> queryDataType = queryDataType(aggregate, queryDataFromState);
+		Queries<DATA> queries = queriesForDataType(queryDataType);
 		if (queries == null) {
 			throw new IllegalArgumentException("no query model data found for type " + queryDataType.getName() + "!");
 		}
@@ -177,28 +150,21 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	}
 
 	private Class<? extends Object> queryDataType(final AggregateBehavior<CMD, STATE> aggregate, final Function<STATE, DATA> queryDataFromState) {
-		requireNonNull(aggregate, "aggregate must be non-null!");
-		requireNonNull(queryDataFromState, "queryDataFromState must be non-null!");
-
-		final DATA dataFromEmptyState = queryDataFromState.apply(aggregate.initialState(""));
+		DATA dataFromEmptyState = queryDataFromState.apply(aggregate.initialState(""));
 		requireNonNull(dataFromEmptyState, "transforming empty aggregate state to query data must be non-null!");
 
-		final Class<? extends Object> aggregateDataClass = dataFromEmptyState.getClass();
+		Class<? extends Object> aggregateDataClass = dataFromEmptyState.getClass();
 		return aggregateDataClass;
 	}
 
 	@SuppressWarnings("unchecked")
 	private Queries<DATA> queriesForDataType(final Class<? extends Object> dataType) {
-		requireNonNull(dataType, "dataType must be non-null!");
-
 		return (Queries<DATA>) ComponentRegistry.withType(QueryModelStateStoreProvider.class).queriesByDataTypeMap
 			.get(dataType);
 	}
 
 	private String resourceNameOf(AggregateBehavior<CMD, STATE> aggregate) {
-		requireNonNull(aggregate, "aggregate must be non-null!");
-
-		final String resourceName = aggregate.getClass().getSimpleName() + "RequestHandlers";
+		String resourceName = aggregate.getClass().getSimpleName() + "RequestHandlers";
 		return resourceName;
 	}
 

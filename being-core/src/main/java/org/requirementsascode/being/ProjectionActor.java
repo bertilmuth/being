@@ -24,9 +24,8 @@ public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 
 	public ProjectionActor(StateStore store, QueryModel<DATA> queryModel) {
 		super(store);
-		logger().info("Created projection actor:" + this + " with queryModel: "+ queryModel);
 		this.queryModel = Objects.requireNonNull(queryModel, "queryModel must be non-null!");
-		this.emptyData = queryModel.emptyData();
+		this.emptyData = Objects.requireNonNull(queryModel.emptyData(), "emptyData(...) must return a non-null value!");
 	}
 
 	@Override

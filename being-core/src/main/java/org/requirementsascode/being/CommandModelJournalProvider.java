@@ -33,7 +33,7 @@ public class CommandModelJournalProvider {
 			return ComponentRegistry.withType(CommandModelJournalProvider.class);
 		}
 
-		final Journal<String> journal = StoreActorBuilder.from(stage, Model.COMMAND, Arrays.asList(dispatchers),
+		Journal<String> journal = StoreActorBuilder.from(stage, Model.COMMAND, Arrays.asList(dispatchers),
 			StorageType.JOURNAL, Settings.properties(), true);
 
 		registry.register(

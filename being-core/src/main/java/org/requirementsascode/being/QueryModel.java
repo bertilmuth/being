@@ -1,8 +1,9 @@
 package org.requirementsascode.being;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
@@ -16,21 +17,21 @@ public class QueryModel<DATA> {
 		return new QueryModel<>(emptyData);
 	}
 	
-	private QueryModel(DATA emptyData) {
-		this.emptyData = Objects.requireNonNull(emptyData, "emptyData must be non-null!");
+	private QueryModel(final DATA emptyData) {
+		this.emptyData = requireNonNull(emptyData, "emptyData must be non-null!");
 		this.eventClassToMergeFunctionMap = new HashMap<>();
 	}
 	
-	public <EVENT extends IdentifiedDomainEvent> QueryModel<DATA> mergeEventsOf(Class<EVENT> eventClass, Merge<EVENT,DATA> mergeFunction) {
-		Objects.requireNonNull(eventClass, "eventClass must be non-null!");
-		Objects.requireNonNull(mergeFunction, "mergeFunction must be non-null!");
+	public <EVENT extends IdentifiedDomainEvent> QueryModel<DATA> mergeEventsOf(final Class<EVENT> eventClass, final Merge<EVENT,DATA> mergeFunction) {
+		requireNonNull(eventClass, "eventClass must be non-null!");
+		requireNonNull(mergeFunction, "mergeFunction must be non-null!");
 		
 		eventClassToMergeFunctionMap().put(eventClass, mergeFunction);
 		return this;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	<EVENT extends Source<?>> DATA mergeDataWithEvent(EVENT event, DATA dataToMerge) {		
+	<EVENT extends Source<?>> DATA mergeDataWithEvent(final EVENT event, final DATA dataToMerge) {		
 		Class<? extends Source> eventClass = event.getClass();
 		DATA mergedData;
 		

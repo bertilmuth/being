@@ -1,8 +1,9 @@
 package org.requirementsascode.being;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
 
 import io.vlingo.xoom.common.Completes;
 import io.vlingo.xoom.lattice.query.StateStoreQueryActor;
@@ -13,14 +14,14 @@ public class QueriesActor<DATA> extends StateStoreQueryActor implements Queries 
 	private final Class<DATA> dataType;
 	private final DATA emptyData;
 
-	public QueriesActor(StateStore store, Class<DATA> dataType, DATA emptyData) {
+	public QueriesActor(final StateStore store, final Class<DATA> dataType, final DATA emptyData) {
 		super(store);
-		this.dataType = Objects.requireNonNull(dataType, "dataType must be non-null!");
-		this.emptyData = Objects.requireNonNull(emptyData, "emptyData must be non-null!");
+		this.dataType = requireNonNull(dataType, "dataType must be non-null!");
+		this.emptyData = requireNonNull(emptyData, "emptyData must be non-null!");
 	}
 
 	@Override
-	public Completes<DATA> findById(String id) {
+	public Completes<DATA> findById(final String id) {
 		return queryStateFor(id, dataType(), emptyData());
 	}
 

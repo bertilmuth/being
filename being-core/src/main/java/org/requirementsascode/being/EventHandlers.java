@@ -18,12 +18,9 @@ public class EventHandlers<STATE> {
 	}
 
 	public Optional<STATE> reactTo(final IdentifiedDomainEvent event, final STATE state) {
-		requireNonNull(event, "event must be non-null!");
-		requireNonNull(state, "state must be non-null!");
+		Class<? extends IdentifiedDomainEvent> eventClass = event.getClass();
 
-		final Class<? extends IdentifiedDomainEvent> eventClass = event.getClass();
-
-		final Optional<STATE> optionalState = eventHandlers().stream()
+		Optional<STATE> optionalState = eventHandlers().stream()
 			.filter(eventHandler -> eventHandler.eventClass().equals(eventClass))
 			.map(eventHandler -> eventHandler.reactTo(event, state)).findFirst();
 
@@ -31,7 +28,7 @@ public class EventHandlers<STATE> {
 	}
 
 	public List<Class<? extends IdentifiedDomainEvent>> eventClasses() {
-		final List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers().stream()
+		List<Class<? extends IdentifiedDomainEvent>> eventClasses = eventHandlers().stream()
 			.map(EventHandler::eventClass)
 			.collect(Collectors.toList());
 		return eventClasses;

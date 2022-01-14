@@ -18,12 +18,9 @@ public class CommandHandlers<CMD, STATE> {
 	}
 
 	public List<? extends IdentifiedDomainEvent> reactTo(final CMD command, final STATE state) {
-		requireNonNull(state, "state must be non-null!");
-		requireNonNull(command, "command must be non-null!");
+		Class<?> commandClass = command.getClass();
 
-		final Class<?> commandClass = command.getClass();
-
-		final List<? extends IdentifiedDomainEvent> eventList = commandHandlers().stream()
+		List<? extends IdentifiedDomainEvent> eventList = commandHandlers().stream()
 			.filter(commandHandler -> commandHandler.commandClass().equals(commandClass))
 			.findFirst()
 			.map(commandHandler -> commandHandler.reactTo(state, command))
@@ -33,7 +30,7 @@ public class CommandHandlers<CMD, STATE> {
 	}
 
 	public List<Class<? extends CMD>> commandClasses() {
-		final List<Class<? extends CMD>> commandClasses = commandHandlers().stream().map(CommandHandler::commandClass)
+		List<Class<? extends CMD>> commandClasses = commandHandlers().stream().map(CommandHandler::commandClass)
 			.collect(Collectors.toList());
 		return commandClasses;
 	}

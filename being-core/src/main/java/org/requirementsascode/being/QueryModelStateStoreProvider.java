@@ -21,7 +21,7 @@ public class QueryModelStateStoreProvider{
 	public final StateStore store;
 	public final Map<Class<?>, Queries<?>> queriesByDataTypeMap;
 
-	public static QueryModelStateStoreProvider using(final Stage stage, QueryModel<?>... queryModels) {
+	public static QueryModelStateStoreProvider using(final Stage stage, final QueryModel<?>... queryModels) {
 		if (ComponentRegistry.has(QueryModelStateStoreProvider.class)) {
 			return ComponentRegistry.withType(QueryModelStateStoreProvider.class);
 		}

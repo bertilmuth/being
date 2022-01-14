@@ -18,8 +18,6 @@ public class CommandHandler<CMD, STATE> {
 
 	@SuppressWarnings("unchecked")
 	List<? extends IdentifiedDomainEvent> reactTo(final STATE state, final Object command) {
-		requireNonNull(state, "state must be non-null!");
-		requireNonNull(command, "command must be non-null!");
 		return commandHandler().apply((CMD) command, state);
 	}
 
@@ -40,7 +38,8 @@ public class CommandHandler<CMD, STATE> {
 
 		public <STATE> CommandHandler<CMD, STATE> with(
 				final BiFunction<CMD, STATE, ? extends IdentifiedDomainEvent> commandHandler) {
-			final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = (cmd, state) -> {
+			
+			BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> eventListProducingHandler = (cmd, state) -> {
 				IdentifiedDomainEvent result = commandHandler.apply(cmd, state);
 				return Collections.singletonList(result);
 			};
