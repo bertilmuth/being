@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.requirementsascode.being.EventSourcedAggregate.Instantiator;
+
 import io.vlingo.xoom.actors.Address;
 import io.vlingo.xoom.actors.Definition;
 import io.vlingo.xoom.actors.Stage;
@@ -94,9 +96,11 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	@SuppressWarnings("rawtypes")
 	private Completes<Aggregate> resolve(final String id) {
 		Address address = currentStage().addressFactory().from(id);
+
+		Instantiator<CMD, STATE> instantiator = new EventSourcedAggregate.Instantiator<>(id, behaviorSupplier());
+
 		Completes<Aggregate> actor = currentStage().actorOf(Aggregate.class, address,
-			Definition.has(EventSourcedAggregate.class, Definition.parameters(id, behaviorSupplier())));
-		logger().info("Resolved actor: " + actor.id());
+			Definition.has(EventSourcedAggregate.class, instantiator));
 		return actor;
 	}
 
@@ -128,9 +132,10 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 	@SuppressWarnings("unchecked")
 	private Completes<STATE> createAggregateOnStage(final Stage stage, final CMD command) {
 		Address _address = stage.addressFactory().uniquePrefixedWith("b-");
+		Instantiator<CMD, STATE> instantiator = new EventSourcedAggregate.Instantiator<>(_address.idString(),
+			behaviorSupplier());
 		Aggregate<CMD, STATE> behavior = stage.actorFor(Aggregate.class,
-			Definition.has(EventSourcedAggregate.class, Definition.parameters(_address.idString(), behaviorSupplier())),
-			_address);
+			Definition.has(EventSourcedAggregate.class, instantiator));
 		return reactTo(behavior, command);
 	}
 

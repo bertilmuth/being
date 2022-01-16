@@ -13,14 +13,13 @@ repositories {
         url = uri('https://repo.maven.apache.org/maven2/')
     }
 }
+dependencies {
+	testImplementation 'io.rest-assured:rest-assured:4.4.0'
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     options.compilerArgs << "-parameters"
-}
-
-test {
-    useJUnitPlatform()
 }
 
 jar {

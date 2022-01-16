@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import io.vlingo.xoom.actors.ActorInstantiator;
 import io.vlingo.xoom.common.Completes;
 import io.vlingo.xoom.lattice.model.DomainEvent;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
@@ -77,5 +78,27 @@ public class EventSourcedAggregate<CMD, STATE> extends EventSourced implements A
 
 	private EventConsumer<STATE> eventConsumer() {
 		return eventConsumer;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static class Instantiator<CMD, STATE> implements ActorInstantiator<EventSourcedAggregate>{
+		private static final long serialVersionUID = 1L;
+		private final String aggregateId;
+		private final Supplier<AggregateBehavior<CMD, STATE>> behaviorSupplier;
+
+		public Instantiator(final String aggregateId, final Supplier<AggregateBehavior<CMD, STATE>> behaviorSupplier) {
+			this.aggregateId = requireNonNull(aggregateId, "aggregateId must be non-null");
+			this.behaviorSupplier = requireNonNull(behaviorSupplier, "behaviorSupplier must be non-null");
+		}
+
+		@Override
+		public EventSourcedAggregate instantiate() {
+			return new EventSourcedAggregate<>(aggregateId, behaviorSupplier);
+		}
+		
+		@Override
+		public Class<EventSourcedAggregate> type() {
+			return EventSourcedAggregate.class;
+		}
 	}
 }
