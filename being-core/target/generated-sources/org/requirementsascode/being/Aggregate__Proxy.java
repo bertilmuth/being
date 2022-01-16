@@ -55,10 +55,10 @@ public class Aggregate__Proxy<I, O> extends ActorProxyBase<org.requirementsascod
   }
 
 
-  public io.vlingo.xoom.common.Completes<O> reactTo(I arg0) {
+  public io.vlingo.xoom.common.Completes<O> reactTo(I input) {
     if (!actor.isStopped()) {
       ActorProxyBase<Aggregate> self = this;
-      final SerializableConsumer<Aggregate> consumer = (actor) -> actor.reactTo(ActorProxyBase.thunk(self, (Actor)actor, arg0));
+      final SerializableConsumer<Aggregate> consumer = (actor) -> actor.reactTo(ActorProxyBase.thunk(self, (Actor)actor, input));
       final io.vlingo.xoom.common.Completes<O> returnValue = Completes.using(actor.scheduler());
       if (mailbox.isPreallocated()) { mailbox.send(actor, Aggregate.class, consumer, Returns.value(returnValue), reactToRepresentation1); }
       else { mailbox.send(new LocalMessage<Aggregate>(actor, Aggregate.class, consumer, Returns.value(returnValue), reactToRepresentation1)); }

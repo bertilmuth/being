@@ -80,9 +80,8 @@ public class EventSourcedAggregate<CMD, STATE> extends EventSourced implements A
 		return eventConsumer;
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "serial" })
 	public static class Instantiator<CMD, STATE> implements ActorInstantiator<EventSourcedAggregate>{
-		private static final long serialVersionUID = 1L;
 		private final String aggregateId;
 		private final Supplier<AggregateBehavior<CMD, STATE>> behaviorSupplier;
 

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.requirementsascode.being.EventSourcedAggregate.Instantiator;
+
+import io.vlingo.xoom.actors.Definition;
 import io.vlingo.xoom.actors.Stage;
 import io.vlingo.xoom.symbio.EntryAdapterProvider;
 import io.vlingo.xoom.symbio.store.dispatch.NoOpDispatcher;
@@ -52,7 +55,10 @@ public class QueryModelStateStoreProvider{
 
 	private void mapDataTypeToQueries(final Stage stage, final StateStore store, QueryModel<?> queryModel) {
 		final Class<?> datatype = datatypeOf(queryModel);
-		Queries<?> queriesActor = stage.actorFor(Queries.class, QueriesActor.class, store, datatype, queryModel.emptyData());
+		
+		QueriesActor.Instantiator<?> instantiator = new QueriesActor.Instantiator(store, datatype, queryModel.emptyData());
+		Queries<?> queriesActor = stage.actorFor(Queries.class, Definition.has(QueriesActor.class, instantiator));
+		
 		queriesByDataTypeMap.put(datatype, queriesActor);
 	}
 	
