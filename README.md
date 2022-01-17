@@ -44,7 +44,26 @@ dependencies {
 }
 ```
 
+If you want to use the testing support of Being, you need it as a dependency as well:
+
+Maven:
+
+``` XML
+<dependency>
+  <groupId>org.requirementsascode.being</groupId>
+  <artifactId>being-core</artifactId>
+  <version>0.1.2</version>
+  <scope>compile</scope>
+</dependency>
+```
+
+Gradle:
+`testImplementation 'org.requirementsascode.being:being-test:0.1.2'`
+
+
 But since you have to make some configuration settings as well, the easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
+
+## What you need to do to implement event sourcing
 
 You need to define at least:
 * The aggregate's command handling behavior
@@ -53,7 +72,7 @@ You need to define at least:
 * HTTP request handlers
 * A few configuration settings
 
-Then you can run your service.
+Then you can run and test your service.
 
 If you don't know what an aggregate is, read [Martin Fowler's description](https://www.martinfowler.com/bliki/DDD_Aggregate.html), as an example.
 
@@ -254,7 +273,36 @@ Being maps:
 *  `updateRequest(...)` to a PATCH request
 * `findByIdRequest(...)` and `findAllRequest(...)` to a GET request
 
-## Sending requests
+## Configuration
+Further things you need to do:
+* Adapt the [Bootstrap](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/main/java/org/requirementsascode/being/samples/greeting/infrastructure/Bootstrap.java) class that wires everything together
+
+* If necessary, adapt the resource files [xoom-actors.properties](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/main/resources/xoom-actors.properties), [xoom-cluster.properties](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/main/resources/xoom-cluster.properties) and [xoom-turbo.properties](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/main/resources/xoom-turbo.properties). 
+
+Have a look at the [VLINGO documentation](https://docs.vlingo.io/) for details.
+
+## Test the aggregate
+Here's an example of what a test can look like.
+Have a look at its [source code](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/test/java/org/requirementsascode/being/samples/greeting/model/GreetingTest.java) for more details.
+
+``` java
+void updatesGreetingOnce() {
+	behaviorTest
+		.givenEvents(new GreetingCreated("#1", "Hi", "Jill"))
+		.when(new ChangeSalutation("Hello"));
+	
+	final GreetingState expectedState = new GreetingState("#1", "Hello", "Jill");
+	assertThat(behaviorTest.state(), is(expectedState));
+}
+```
+
+## Start the server
+Follow these steps:
+1. Open a shell and change to the root directory of the application
+2. Run the server with `./gradlew run`
+3. Open a second shell. Now you can start sending requests.
+
+## Send requests to the aggregate
 In POST requests (for creating) and PATCH requests (for updating), use JSON to represent the commands.
 
 Here are some example commands, together with example reponses from the server.
@@ -308,18 +356,3 @@ Get all greetings:
 Example response: 
 
 `[{"id":"898954e3-a886-4352-9283-320fc3a66c09","personName":"Joe","greetingText":"Howdy Joe"},{"id":"c37bfde8-4247-4c63-8607-d0453182859f","personName":"Jill","greetingText":"Hello, Jill"}]`
-
-## Testing the aggregate
-Here's an example of what a test can look like.
-Have a look at its [source code](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/test/java/org/requirementsascode/being/samples/greeting/model/GreetingTest.java) for more details.
-
-``` java
-void updatesGreetingOnce() {
-	behaviorTest
-		.givenEvents(new GreetingCreated("#1", "Hi", "Jill"))
-		.when(new ChangeSalutation("Hello"));
-	
-	final GreetingState expectedState = new GreetingState("#1", "Hello", "Jill");
-	assertThat(behaviorTest.state(), is(expectedState));
-}
-```
