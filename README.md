@@ -30,7 +30,7 @@ If you are using Maven, include the following in your POM, to use Being and VLIN
 <dependency>
   <groupId>io.vlingo.xoom</groupId>
   <artifactId>xoom-turbo</artifactId>
-  <version>${vlingo.xoom.version}</version>
+  <version>1.9.0</version>
   <scope>compile</scope>
 </dependency>
 ```
