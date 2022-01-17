@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
-public class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
+public class AggregateBehaviorTest<CMD,STATE> implements EventApplier<STATE>{
 	private final CommandHandlers<CMD,STATE> commandHandlers;
 	private final EventHandlers<STATE> eventHandlers;
 	private EventConsumer<STATE> eventConsumer;
@@ -15,11 +15,11 @@ public class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 
 	private STATE state;
 
-	public static <CMD,STATE> AggregateTest<CMD,STATE> of(AggregateBehavior<CMD,STATE> aggregateBehavior) {
-		return new AggregateTest<>(aggregateBehavior);
+	public static <CMD,STATE> AggregateBehaviorTest<CMD,STATE> of(AggregateBehavior<CMD,STATE> aggregateBehavior) {
+		return new AggregateBehaviorTest<>(aggregateBehavior);
 	}
 	
-	private AggregateTest(AggregateBehavior<CMD,STATE> aggregateBehavior) {
+	private AggregateBehaviorTest(AggregateBehavior<CMD,STATE> aggregateBehavior) {
 		requireNonNull(aggregateBehavior, "aggregate must be non-null!");
 
 		this.commandHandlers = requireNonNull(aggregateBehavior.commandHandlers(), "commandHandlers(...) must return non-null value!");
@@ -30,7 +30,7 @@ public class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 		setInitialState();
 	}
 	
-	public AggregateTest<CMD,STATE> givenEvents(final IdentifiedDomainEvent... events) {
+	public AggregateBehaviorTest<CMD,STATE> givenEvents(final IdentifiedDomainEvent... events) {
 		requireNonNull(events, "events must be non-null!");
 		
 		setInitialState();
@@ -38,8 +38,8 @@ public class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 		return this;
 	}
 
-	public AggregateTest<CMD,STATE> when(final CMD command) {
-		requireNonNull(command, "events must be non-null!");
+	public AggregateBehaviorTest<CMD,STATE> when(final CMD command) {
+		requireNonNull(command, "command must be non-null!");
 
 		final List<? extends IdentifiedDomainEvent> producedEvents = commandHandlers().reactTo(command,state());
 		producedEvents.stream().forEach(eventConsumer()::consumeEvent);
@@ -47,10 +47,12 @@ public class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 		return this;
 	}
 	
+	@Override
 	public STATE state() {
 		return state;
 	}
 
+	@Override
 	public void setState(STATE state) {
 		requireNonNull(state, "state must be non-null!");
 
@@ -61,6 +63,7 @@ public class AggregateTest<CMD,STATE> implements EventApplier<STATE>{
 		return commandHandlers;
 	}
 	
+	@Override
 	public EventHandlers<STATE> eventHandlers() {
 		return eventHandlers;
 	}
