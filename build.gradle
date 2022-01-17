@@ -1,6 +1,6 @@
 allprojects{
 	group = 'org.requirementsascode.being'
-	version = '0.1.1-SNAPSHOT'
+	version = '0.1.1'
 	
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
@@ -20,7 +20,7 @@ allprojects{
 	}
 	
 	dependencies {
-	    implementation 'io.vlingo.xoom:xoom-turbo:1.8.9-SNAPSHOT'
+	    implementation 'io.vlingo.xoom:xoom-turbo:1.9.0'
 		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 		testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 	}
