@@ -1,9 +1,9 @@
 # Being
 [![Gitter](https://badges.gitter.im/requirementsascode/community.svg)](https://gitter.im/requirementsascode/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-The goal of Being is to maximize developer joy and productivity when building event-sourced services with Command Query Responsibility Segregation (CQRS).
+The goal of Being is to shorten the development time when building event-sourced applications with Command Query Responsibility Segregation (CQRS).
 
-In short, [event sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) is about persisting events instead of (just) the current state.
+In short, [event sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) is about persisting events instead of the current state.
 State can be recreated by applying the events in sequence.
 Event sourcing can be helpful for auditing purposes, to analyze or rebuild previous system states from a business perspective.
 CQRS can be used to build highly scalable applications.
@@ -18,7 +18,33 @@ Being is based on [VLINGO XOOM](https://docs.vlingo.io/). VLINGO XOOM provides a
 To understand what's going on under Being's hood, or to gain more flexibility, have a look at VLINGO's documentation.
 
 ## Getting started
-The easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
+If you are using Maven, include the following in your POM, to use Being and VLINGO XOOM:
+
+``` XML
+<dependency>
+  <groupId>org.requirementsascode.being</groupId>
+  <artifactId>being-core</artifactId>
+  <version>0.1.1</version>
+  <scope>compile</scope>
+</dependency>
+<dependency>
+  <groupId>io.vlingo.xoom</groupId>
+  <artifactId>xoom-turbo</artifactId>
+  <version>${vlingo.xoom.version}</version>
+  <scope>compile</scope>
+</dependency>
+```
+
+If you are using Gradle, include the following in your build.gradle, to use Being and VLINGO XOOM:
+
+``` Groovy
+dependencies {
+  implementation 'io.vlingo.xoom:xoom-turbo:1.9.0'
+  implementation 'org.requirementsascode.being:being-core:0.1.1'
+}
+```
+
+But since you have to make some configuration settings as well, the easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
 
 You need to define at least:
 * The aggregate's command handling behavior
