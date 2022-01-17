@@ -227,9 +227,10 @@ Being maps:
 * `findByIdRequest(...)` and `findAllRequest(...)` to a GET request
 
 ## Sending requests
-In the PATCH and POST requests, use JSON to represent the commands.
+In POST requests (for creating) and PATCH requests (for updating), use JSON to represent the commands.
 
-Here are some example commands, together with example reponses from the server:
+Here are some example commands, together with example reponses from the server.
+NOTE: On Windows 10 systems, use `curl.exe` instead of `curl`.
 
 Create a greeting for Joe:
 `curl -i -X POST -H "Content-Type: application/json" -d '{"personName":"Joe"}' http://localhost:8081/greetings`
@@ -267,5 +268,3 @@ Get all greetings: `curl.exe http://localhost:8081/greetings`
 
 Example response: 
 `[{"id":"898954e3-a886-4352-9283-320fc3a66c09","personName":"Joe","greetingText":"Howdy Joe"},{"id":"c37bfde8-4247-4c63-8607-d0453182859f","personName":"Jill","greetingText":"Hello, Jill"}]`
-
-
