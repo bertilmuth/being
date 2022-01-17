@@ -51,9 +51,9 @@ Maven:
 ``` XML
 <dependency>
   <groupId>org.requirementsascode.being</groupId>
-  <artifactId>being-core</artifactId>
+  <artifactId>being-test</artifactId>
   <version>0.1.2</version>
-  <scope>compile</scope>
+  <scope>test</scope>
 </dependency>
 ```
 
