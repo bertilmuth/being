@@ -58,6 +58,7 @@ Maven:
 ```
 
 Gradle:
+
 `testImplementation 'org.requirementsascode.being:being-test:0.1.2'`
 
 
