@@ -90,8 +90,8 @@ public class Greeting implements AggregateBehavior<GreetingCommand, GreetingStat
 	@Override
 	public EventHandlers<GreetingState> eventHandlers() {
 		return EventHandlers.handle(
-			eventsOf(GreetingCreated.class).with((event,state) -> new GreetingState(state.id, event.salutation, event.personName)),
-			eventsOf(SalutationChanged.class).with((event,state) -> new GreetingState(state.id, event.salutation, state.personName))
+			eventsOf(GreetingCreated.class).with((event,state) -> new GreetingState(event.id, event.salutation, event.personName)),
+			eventsOf(SalutationChanged.class).with((event,state) -> new GreetingState(event.id, event.salutation, state.personName))
 		);
 	}
 }
@@ -105,7 +105,7 @@ This command contains only the new text for the salutation, not the person's nam
 
 Both the command handlers and the event handlers can use the current state of the aggregate.
 So when a `SalutationChanged` event is applied, the person name is not taken from the event, but from the current state of the aggregate:
-`(event,state) -> new GreetingState(state.id, event.salutation, state.personName)`.
+`(event,state) -> new GreetingState(event.id, event.salutation, state.personName)`.
 In other words: aggregates are stateful, and keep their state between requests (or recreate the state transparently).
 
 ## The aggregate's state
