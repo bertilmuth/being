@@ -24,7 +24,7 @@ If you are using Maven, include the following in your POM, to use Being and VLIN
 <dependency>
   <groupId>org.requirementsascode.being</groupId>
   <artifactId>being-core</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <scope>compile</scope>
 </dependency>
 <dependency>
@@ -40,7 +40,7 @@ If you are using Gradle, include the following in your build.gradle, to use Bein
 ``` Groovy
 dependencies {
   implementation 'io.vlingo.xoom:xoom-turbo:1.9.0'
-  implementation 'org.requirementsascode.being:being-core:0.1.1'
+  implementation 'org.requirementsascode.being:being-core:0.1.2'
 }
 ```
 
@@ -131,6 +131,8 @@ public final class GreetingState {
 	public String toString() {
 		return "GreetingState [id=" + id + ", salutation=" + salutation + ", personName=" + personName + "]";
 	}
+	
+	// hashCode() and equals() omitted for brevity
 }
 ```
 As you can see, objects of the state class are immutable. 
@@ -306,3 +308,18 @@ Get all greetings:
 Example response: 
 
 `[{"id":"898954e3-a886-4352-9283-320fc3a66c09","personName":"Joe","greetingText":"Howdy Joe"},{"id":"c37bfde8-4247-4c63-8607-d0453182859f","personName":"Jill","greetingText":"Hello, Jill"}]`
+
+## Testing the aggregate
+Here's an example of what a test can look like.
+Have a look at its [source code](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/test/java/org/requirementsascode/being/samples/greeting/model/GreetingTest.java) for more details.
+
+``` java
+void updatesGreetingOnce() {
+	behaviorTest
+		.givenEvents(new GreetingCreated("#1", "Hi", "Jill"))
+		.when(new ChangeSalutation("Hello"));
+	
+	final GreetingState expectedState = new GreetingState("#1", "Hello", "Jill");
+	assertThat(behaviorTest.state(), is(expectedState));
+}
+```
