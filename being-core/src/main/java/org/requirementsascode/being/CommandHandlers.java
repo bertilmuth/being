@@ -10,12 +10,13 @@ import java.util.stream.Collectors;
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
 /**
- * Create an instance of this class to define which command type is handled
- * by which command handler.
+ * Create an instance of this class to define which command type is handled by
+ * which command handler. A command handler transforms an input command into one
+ * or several events.
  * 
  * @author b_muth
  *
- * @param <CMD> the base type of all handled command types
+ * @param <CMD>   the base type of all handled command types
  * @param <STATE> the type of the state passed in as input to the handlers
  */
 public class CommandHandlers<CMD, STATE> {
@@ -24,8 +25,9 @@ public class CommandHandlers<CMD, STATE> {
 	/**
 	 * Define the command handlers that handle the incoming commands.
 	 * 
-	 * @param <CMD> the base type of all handled command types
-	 * @param <STATE> the type of the state passed in as input to the handlers
+	 * @param <CMD>           the base type of all handled command types
+	 * @param <STATE>         the type of the state passed in as input to the
+	 *                        handlers
 	 * @param commandHandlers the command handlers
 	 * @return an instance of this class
 	 */
@@ -35,28 +37,29 @@ public class CommandHandlers<CMD, STATE> {
 	}
 
 	/**
-	 * Reacts to the specified command, i.e. looks if there is a command handler
-	 * for the command's type, and if yes, uses it to transform the command and state into events.
-	 * If there is more than one handler, this method picks the first one.
+	 * Reacts to the specified command, i.e. looks if there is a command handler for
+	 * the command's type, and if yes, uses it to transform the command and state
+	 * into events. If there is more than one handler, this method picks the first
+	 * one.
 	 * 
 	 * @param command the command to handle
-	 * @param state the state used as input to the command handler
-	 * @return the list of events produces by the handler, or the empty list if no handler was found
+	 * @param state   the state used as input to the command handler
+	 * @return the list of events produces by the handler, or the empty list if no
+	 *         handler was found
 	 */
 	public List<? extends IdentifiedDomainEvent> reactTo(final CMD command, final STATE state) {
 		Class<?> commandClass = command.getClass();
 
 		List<? extends IdentifiedDomainEvent> eventList = commandHandlers().stream()
-			.filter(commandHandler -> commandHandler.commandClass().equals(commandClass))
-			.findFirst()
-			.map(commandHandler -> commandHandler.reactTo(state, command))
-			.orElse(Collections.emptyList());
+			.filter(commandHandler -> commandHandler.commandClass().equals(commandClass)).findFirst()
+			.map(commandHandler -> commandHandler.reactTo(state, command)).orElse(Collections.emptyList());
 
 		return eventList;
 	}
 
 	/**
-	 * Returns the classes of commands (i.e. the command types) that this instance handles.
+	 * Returns the classes of commands (i.e. the command types) that this instance
+	 * handles.
 	 * 
 	 * @return the command types
 	 */

@@ -10,6 +10,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
 /**
  * Create an instance of this class to define a handler for a specific command type.
+ * A command handler transforms an input command into one or several events.
  * 
  * @author b_muth
  *
@@ -24,7 +25,7 @@ public class CommandHandler<CMD, STATE> {
 	 * Define the specific command type handled by this handler.
 	 * 
 	 * @param <T> the specific command type handled by this handler
-	 * @param commandClass the class of command type handled by this handler
+	 * @param commandClass the class of the command type handled by this handler
 	 * @return a builder for the command handler
 	 */
 	public static <T> CommandsOf<T> commandsOf(final Class<T> commandClass) {
