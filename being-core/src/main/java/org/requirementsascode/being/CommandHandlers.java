@@ -15,7 +15,7 @@ import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
  * 
  * @author b_muth
  *
- * @param <CMD> the handled command type (use a base interface)
+ * @param <CMD> the base type of all handled command types
  * @param <STATE> the type of the state passed in as input to the handlers
  */
 public class CommandHandlers<CMD, STATE> {
@@ -24,7 +24,7 @@ public class CommandHandlers<CMD, STATE> {
 	/**
 	 * Define the command handlers that handle the incoming commands.
 	 * 
-	 * @param <CMD> the handled command type (use a base interface)
+	 * @param <CMD> the base type of all handled command types
 	 * @param <STATE> the type of the state passed in as input to the handlers
 	 * @param commandHandlers the command handlers
 	 * @return an instance of this class

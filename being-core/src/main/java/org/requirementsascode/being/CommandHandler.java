@@ -8,10 +8,25 @@ import java.util.function.BiFunction;
 
 import io.vlingo.xoom.lattice.model.IdentifiedDomainEvent;
 
+/**
+ * Create an instance of this class to define a handler for a specific command type.
+ * 
+ * @author b_muth
+ *
+ * @param <CMD> the specific command type handled by this handler
+ * @param <STATE> the type of the state passed in as input to the handler
+ */
 public class CommandHandler<CMD, STATE> {
 	private final Class<CMD> commandClass;
 	private final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler;
 
+	/**
+	 * Define the specific command type handled by this handler.
+	 * 
+	 * @param <T> the specific command type handled by this handler
+	 * @param commandClass the class of command type handled by this handler
+	 * @return a builder for the command handler
+	 */
 	public static <T> CommandsOf<T> commandsOf(final Class<T> commandClass) {
 		return new CommandsOf<T>(commandClass);
 	}
@@ -36,6 +51,13 @@ public class CommandHandler<CMD, STATE> {
 			this.commandClass = commandClass;
 		}
 
+		/**
+		 * Define a command handling function that consumes the command and state, and produces a single event.
+		 * 
+		 * @param <STATE> the type of the state passed in as input to the handler
+		 * @param commandHandler the command handling function
+		 * @return the command handler instance
+		 */
 		public <STATE> CommandHandler<CMD, STATE> with(
 				final BiFunction<CMD, STATE, ? extends IdentifiedDomainEvent> commandHandler) {
 			
@@ -47,6 +69,13 @@ public class CommandHandler<CMD, STATE> {
 			return withSome(eventListProducingHandler);
 		}
 
+		/**
+		 * Define a command handling function that consumes the command and state, and produces a list of events.
+		 * 
+		 * @param <STATE> the type of the state passed in as input to the handler
+		 * @param commandHandler the command handling function
+		 * @return the command handler instance
+		 */
 		public <STATE> CommandHandler<CMD, STATE> withSome(
 				final BiFunction<CMD, STATE, List<? extends IdentifiedDomainEvent>> commandHandler) {
 			return new CommandHandler<>(commandClass, commandHandler);

@@ -30,9 +30,9 @@ import io.vlingo.xoom.actors.Actor;
 public class GridActorControlInbound__Proxy extends ActorProxyBase<io.vlingo.xoom.lattice.grid.application.GridActorControl.Inbound> implements io.vlingo.xoom.lattice.grid.application.GridActorControl.Inbound, Proxy {
 
   private static final String startRepresentation1 = "start(io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.wire.node.Id, java.lang.Class<T>, io.vlingo.xoom.actors.Address, io.vlingo.xoom.actors.Definition.SerializationProxy)";
-  private static final String informNodeIsHealthyRepresentation2 = "informNodeIsHealthy(io.vlingo.xoom.wire.node.Id, boolean)";
-  private static final String relocateRepresentation3 = "relocate(io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.actors.Definition.SerializationProxy, io.vlingo.xoom.actors.Address, java.lang.Object, java.util.List<? extends io.vlingo.xoom.actors.Message>)";
-  private static final String gridDeliverRepresentation4 = "gridDeliver(io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.actors.Returns<?>, java.lang.Class<T>, io.vlingo.xoom.actors.Address, io.vlingo.xoom.actors.Definition.SerializationProxy, io.vlingo.xoom.common.SerializableConsumer<T>, java.lang.String)";
+  private static final String gridDeliverRepresentation2 = "gridDeliver(io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.actors.Returns<?>, java.lang.Class<T>, io.vlingo.xoom.actors.Address, io.vlingo.xoom.actors.Definition.SerializationProxy, io.vlingo.xoom.common.SerializableConsumer<T>, java.lang.String)";
+  private static final String informNodeIsHealthyRepresentation3 = "informNodeIsHealthy(io.vlingo.xoom.wire.node.Id, boolean)";
+  private static final String relocateRepresentation4 = "relocate(io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.actors.Definition.SerializationProxy, io.vlingo.xoom.actors.Address, java.lang.Object, java.util.List<? extends io.vlingo.xoom.actors.Message>)";
   private static final String answerRepresentation5 = "answer(io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.lattice.grid.application.message.Answer<T>)";
   private static final String actorDeliverRepresentation6 = "actorDeliver(io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.actors.Returns<?>, java.lang.Class<T>, java.util.function.Function<io.vlingo.xoom.lattice.grid.Grid, io.vlingo.xoom.actors.Actor>, io.vlingo.xoom.common.SerializableConsumer<T>, java.lang.String)";
   private static final String forwardRepresentation7 = "forward(io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.wire.node.Id, io.vlingo.xoom.lattice.grid.application.message.Message)";
@@ -84,14 +84,25 @@ public class GridActorControlInbound__Proxy extends ActorProxyBase<io.vlingo.xoo
     }
   }
 
+  public <T>void gridDeliver(io.vlingo.xoom.wire.node.Id arg0, io.vlingo.xoom.wire.node.Id arg1, io.vlingo.xoom.actors.Returns<?> arg2, java.lang.Class<T> arg3, io.vlingo.xoom.actors.Address arg4, io.vlingo.xoom.actors.Definition.SerializationProxy arg5, io.vlingo.xoom.common.SerializableConsumer<T> arg6, java.lang.String arg7) {
+    if (!actor.isStopped()) {
+      ActorProxyBase<Inbound> self = this;
+      final SerializableConsumer<Inbound> consumer = (actor) -> actor.gridDeliver(ActorProxyBase.thunk(self, (Actor)actor, arg0), ActorProxyBase.thunk(self, (Actor)actor, arg1), ActorProxyBase.thunk(self, (Actor)actor, arg2), ActorProxyBase.thunk(self, (Actor)actor, arg3), ActorProxyBase.thunk(self, (Actor)actor, arg4), ActorProxyBase.thunk(self, (Actor)actor, arg5), ActorProxyBase.thunk(self, (Actor)actor, arg6), ActorProxyBase.thunk(self, (Actor)actor, arg7));
+      if (mailbox.isPreallocated()) { mailbox.send(actor, Inbound.class, consumer, null, gridDeliverRepresentation2); }
+      else { mailbox.send(new LocalMessage<Inbound>(actor, Inbound.class, consumer, gridDeliverRepresentation2)); }
+    } else {
+      actor.deadLetters().failedDelivery(new DeadLetter(actor, gridDeliverRepresentation2));
+    }
+  }
+
   public void informNodeIsHealthy(io.vlingo.xoom.wire.node.Id arg0, boolean arg1) {
     if (!actor.isStopped()) {
       ActorProxyBase<Inbound> self = this;
       final SerializableConsumer<Inbound> consumer = (actor) -> actor.informNodeIsHealthy(ActorProxyBase.thunk(self, (Actor)actor, arg0), ActorProxyBase.thunk(self, (Actor)actor, arg1));
-      if (mailbox.isPreallocated()) { mailbox.send(actor, Inbound.class, consumer, null, informNodeIsHealthyRepresentation2); }
-      else { mailbox.send(new LocalMessage<Inbound>(actor, Inbound.class, consumer, informNodeIsHealthyRepresentation2)); }
+      if (mailbox.isPreallocated()) { mailbox.send(actor, Inbound.class, consumer, null, informNodeIsHealthyRepresentation3); }
+      else { mailbox.send(new LocalMessage<Inbound>(actor, Inbound.class, consumer, informNodeIsHealthyRepresentation3)); }
     } else {
-      actor.deadLetters().failedDelivery(new DeadLetter(actor, informNodeIsHealthyRepresentation2));
+      actor.deadLetters().failedDelivery(new DeadLetter(actor, informNodeIsHealthyRepresentation3));
     }
   }
 
@@ -99,21 +110,10 @@ public class GridActorControlInbound__Proxy extends ActorProxyBase<io.vlingo.xoo
     if (!actor.isStopped()) {
       ActorProxyBase<Inbound> self = this;
       final SerializableConsumer<Inbound> consumer = (actor) -> actor.relocate(ActorProxyBase.thunk(self, (Actor)actor, arg0), ActorProxyBase.thunk(self, (Actor)actor, arg1), ActorProxyBase.thunk(self, (Actor)actor, arg2), ActorProxyBase.thunk(self, (Actor)actor, arg3), ActorProxyBase.thunk(self, (Actor)actor, arg4), ActorProxyBase.thunk(self, (Actor)actor, arg5));
-      if (mailbox.isPreallocated()) { mailbox.send(actor, Inbound.class, consumer, null, relocateRepresentation3); }
-      else { mailbox.send(new LocalMessage<Inbound>(actor, Inbound.class, consumer, relocateRepresentation3)); }
+      if (mailbox.isPreallocated()) { mailbox.send(actor, Inbound.class, consumer, null, relocateRepresentation4); }
+      else { mailbox.send(new LocalMessage<Inbound>(actor, Inbound.class, consumer, relocateRepresentation4)); }
     } else {
-      actor.deadLetters().failedDelivery(new DeadLetter(actor, relocateRepresentation3));
-    }
-  }
-
-  public <T>void gridDeliver(io.vlingo.xoom.wire.node.Id arg0, io.vlingo.xoom.wire.node.Id arg1, io.vlingo.xoom.actors.Returns<?> arg2, java.lang.Class<T> arg3, io.vlingo.xoom.actors.Address arg4, io.vlingo.xoom.actors.Definition.SerializationProxy arg5, io.vlingo.xoom.common.SerializableConsumer<T> arg6, java.lang.String arg7) {
-    if (!actor.isStopped()) {
-      ActorProxyBase<Inbound> self = this;
-      final SerializableConsumer<Inbound> consumer = (actor) -> actor.gridDeliver(ActorProxyBase.thunk(self, (Actor)actor, arg0), ActorProxyBase.thunk(self, (Actor)actor, arg1), ActorProxyBase.thunk(self, (Actor)actor, arg2), ActorProxyBase.thunk(self, (Actor)actor, arg3), ActorProxyBase.thunk(self, (Actor)actor, arg4), ActorProxyBase.thunk(self, (Actor)actor, arg5), ActorProxyBase.thunk(self, (Actor)actor, arg6), ActorProxyBase.thunk(self, (Actor)actor, arg7));
-      if (mailbox.isPreallocated()) { mailbox.send(actor, Inbound.class, consumer, null, gridDeliverRepresentation4); }
-      else { mailbox.send(new LocalMessage<Inbound>(actor, Inbound.class, consumer, gridDeliverRepresentation4)); }
-    } else {
-      actor.deadLetters().failedDelivery(new DeadLetter(actor, gridDeliverRepresentation4));
+      actor.deadLetters().failedDelivery(new DeadLetter(actor, relocateRepresentation4));
     }
   }
 
