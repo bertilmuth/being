@@ -36,7 +36,7 @@ public class CommandHandlers<CMD, STATE> {
 
 	/**
 	 * Reacts to the specified command, i.e. looks if there is a command handler
-	 * for the command's type, and if yes, uses it to transform the command into event(s).
+	 * for the command's type, and if yes, uses it to transform the command and state into events.
 	 * If there is more than one handler, this method picks the first one.
 	 * 
 	 * @param command the command to handle

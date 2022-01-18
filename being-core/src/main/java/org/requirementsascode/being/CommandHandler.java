@@ -31,6 +31,13 @@ public class CommandHandler<CMD, STATE> {
 		return new CommandsOf<T>(commandClass);
 	}
 
+	/**
+	 * Reacts to the specified command by transforming the command and state into events.
+	 * 
+	 * @param command the command to handle
+	 * @param state the state used as input to the command handler
+	 * @return the list of events produces by the handler
+	 */
 	@SuppressWarnings("unchecked")
 	List<? extends IdentifiedDomainEvent> reactTo(final STATE state, final Object command) {
 		return commandHandler().apply((CMD) command, state);
