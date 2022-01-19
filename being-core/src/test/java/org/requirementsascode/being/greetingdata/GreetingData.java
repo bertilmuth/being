@@ -26,6 +26,6 @@ public class GreetingData {
 
 	@Override
 	public String toString() {
-		return "GreetingText [id=" + id + ", personName=" + personName + ", greetingText=" + greetingText + "]";
+		return "GreetingData [id=" + id + ", personName=" + personName + ", greetingText=" + greetingText + "]";
 	}
 }

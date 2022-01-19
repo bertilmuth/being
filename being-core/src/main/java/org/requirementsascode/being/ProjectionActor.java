@@ -36,7 +36,7 @@ public class ProjectionActor<DATA> extends StateStoreProjectionActor<DATA> {
 	@Override
 	protected DATA merge(final DATA previousData, final int previousVersion,
 			final DATA currentData, final int currentVersion) {
-		DATA dataToMerge = previousData;
+		DATA dataToMerge = previousData != null? previousData : currentData;
 
 		for (final Source<?> event : sources()) {
 			DATA mergedData = queryModel.mergeDataWithEvent(event, dataToMerge);

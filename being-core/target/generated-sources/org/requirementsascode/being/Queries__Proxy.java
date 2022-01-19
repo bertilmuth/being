@@ -58,10 +58,10 @@ public class Queries__Proxy<DATA> extends ActorProxyBase<org.requirementsascode.
   }
 
 
-  public io.vlingo.xoom.common.Completes<DATA> findById(java.lang.String id) {
+  public io.vlingo.xoom.common.Completes<DATA> findById(java.lang.String arg0) {
     if (!actor.isStopped()) {
       ActorProxyBase<Queries> self = this;
-      final SerializableConsumer<Queries> consumer = (actor) -> actor.findById(ActorProxyBase.thunk(self, (Actor)actor, id));
+      final SerializableConsumer<Queries> consumer = (actor) -> actor.findById(ActorProxyBase.thunk(self, (Actor)actor, arg0));
       final io.vlingo.xoom.common.Completes<DATA> returnValue = Completes.using(actor.scheduler());
       if (mailbox.isPreallocated()) { mailbox.send(actor, Queries.class, consumer, Returns.value(returnValue), findByIdRepresentation1); }
       else { mailbox.send(new LocalMessage<Queries>(actor, Queries.class, consumer, Returns.value(returnValue), findByIdRepresentation1)); }
