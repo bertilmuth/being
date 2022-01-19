@@ -254,7 +254,7 @@ HttpRequestHandlers<GreetingCommand, GreetingState, GreetingData> greetingReques
 
 The stage/grid is used by VLINGO's cluster management.
 
-The aggregate supplier enables Being to create instances of the aggregate.
+The behavior supplier enables Being to create instances of the aggregate behavior.
 
 The `queryDataFromState` function transforms the state of the aggregate to the data shown to the user:
 
