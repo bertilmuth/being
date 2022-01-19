@@ -316,13 +316,13 @@ assertThat(json(greetingData, "greetingText"), is(expectedGreetingText));
 
 Have a look at the [source code](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/test/java/org/requirementsascode/being/samples/greeting/infrastructure/HttpTest.java) for more details.
 
-## Start the server
+## Starting the server
 Follow these steps:
 1. Open a shell and change to the root directory of the application
 2. Run the server with `./gradlew run`
 3. Open a second shell. Now you can start sending requests.
 
-## Send requests to the aggregate
+## Sending requests to the aggregate
 In POST requests (for creating) and PATCH requests (for updating), use JSON to represent the commands.
 
 Here are some example commands, together with example reponses from the server.
