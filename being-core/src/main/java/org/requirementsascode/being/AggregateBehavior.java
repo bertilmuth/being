@@ -6,7 +6,8 @@ package org.requirementsascode.being;
  * and how events are applied to an aggregate to change state.
  * </p>
  * @author b_muth
- *
+ * 
+ * @param <CMD>   the base type of all handled command types
  * @param <STATE> the state of the aggregate
  */
 public interface AggregateBehavior<CMD, STATE>{  

@@ -34,13 +34,13 @@ import io.vlingo.xoom.http.resource.Resource;
 import io.vlingo.xoom.turbo.ComponentRegistry;
 
 /**
- * This class defines the HTTP routes that accept POST, PATCH and GET HTTP requests for an aggregate,
- * creates the necessary infrastructure and calls the command handlers of the aggregate
- * and query handlers of a query model, to handle the requests.
+ * This class defines the HTTP routes that accept POST, PATCH and GET HTTP requests for an aggregate.
+ * It creates the necessary infrastructure and calls the command handlers of the aggregate
+ * and accesses the data of the query model.
  * 
  * @author b_muth
  *
- * @param <CMD> the type of command handled by the request handlers
+ * @param <CMD>   the base type of the handled command types
  * @param <STATE> the type of state of the aggregate
  * @param <DATA> the type of data of the query model
  */
