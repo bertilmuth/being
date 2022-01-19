@@ -24,7 +24,7 @@ If you are using Maven, include the following in your POM, to use Being and VLIN
 <dependency>
   <groupId>org.requirementsascode.being</groupId>
   <artifactId>being-core</artifactId>
-  <version>0.1.4</version>
+  <version>0.1.5</version>
   <scope>compile</scope>
 </dependency>
 <dependency>
@@ -40,7 +40,7 @@ If you are using Gradle, include the following in your build.gradle, to use Bein
 ``` Groovy
 dependencies {
   implementation 'io.vlingo.xoom:xoom-turbo:1.9.0'
-  implementation 'org.requirementsascode.being:being-core:0.1.4'
+  implementation 'org.requirementsascode.being:being-core:0.1.5'
 }
 ```
 
@@ -52,14 +52,14 @@ Maven:
 <dependency>
   <groupId>org.requirementsascode.being</groupId>
   <artifactId>being-test</artifactId>
-  <version>0.1.4</version>
+  <version>0.1.5</version>
   <scope>test</scope>
 </dependency>
 ```
 
 Gradle:
 
-`testImplementation 'org.requirementsascode.being:being-test:0.1.4'`
+`testImplementation 'org.requirementsascode.being:being-test:0.1.5'`
 
 
 But since you have to make some configuration settings as well, the easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
