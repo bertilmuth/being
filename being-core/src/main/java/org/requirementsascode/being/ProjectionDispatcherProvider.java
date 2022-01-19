@@ -17,38 +17,36 @@ import io.vlingo.xoom.turbo.ComponentRegistry;
 
 @SuppressWarnings("all")
 public class ProjectionDispatcherProvider {
-  public final ProjectionDispatcher projectionDispatcher;
-  public final Dispatcher storeDispatcher;
+	public final ProjectionDispatcher projectionDispatcher;
+	public final Dispatcher storeDispatcher;
 
-  public static <DATA> ProjectionDispatcherProvider using(final Stage stage, QueryModel<DATA> queryModel) {
-    if (ComponentRegistry.has(ProjectionDispatcherProvider.class)) {
-      return ComponentRegistry.withType(ProjectionDispatcherProvider.class);
-    }
-    
-    final List<ProjectToDescription> descriptions =
-            Arrays.asList(
-                    ProjectToDescription.with(ProjectionActor.class, Optional.of(queryModel), eventClassesOf(queryModel))
-                    );
+	public static <DATA> ProjectionDispatcherProvider using(final Stage stage, QueryModel<DATA> queryModel) {
+		if (ComponentRegistry.has(ProjectionDispatcherProvider.class)) {
+			return ComponentRegistry.withType(ProjectionDispatcherProvider.class);
+		}
 
-    final Protocols dispatcherProtocols =
-            stage.actorFor(
-                    new Class<?>[] { Dispatcher.class, ProjectionDispatcher.class },
-                    Definition.has(TextProjectionDispatcherActor.class, Definition.parameters(descriptions)));
+		final List<ProjectToDescription> descriptions = Arrays
+			.asList(ProjectToDescription.with(ProjectionActor.class, Optional.of(queryModel), eventClassesOf(queryModel)));
 
-    final Protocols.Two<Dispatcher, ProjectionDispatcher> dispatchers = Protocols.two(dispatcherProtocols);
+		final Protocols dispatcherProtocols = stage.actorFor(
+			new Class<?>[] { Dispatcher.class, ProjectionDispatcher.class },
+			Definition.has(TextProjectionDispatcherActor.class, Definition.parameters(descriptions)));
 
-    return new ProjectionDispatcherProvider(dispatchers._1, dispatchers._2);
-  }
+		final Protocols.Two<Dispatcher, ProjectionDispatcher> dispatchers = Protocols.two(dispatcherProtocols);
 
-  private ProjectionDispatcherProvider(final Dispatcher storeDispatcher, final ProjectionDispatcher projectionDispatcher) {
-    this.storeDispatcher = storeDispatcher;
-    this.projectionDispatcher = projectionDispatcher;
-    ComponentRegistry.register(getClass(), this);
-  }
-  
-  private static <DATA> Class<? extends Source<?>>[] eventClassesOf(QueryModel<DATA> queryModel) {
-	Set<Class<? extends Source<?>>> eventClasses = queryModel.eventClasses();
-	Class<? extends Source<?>>[] eventClassesArray = eventClasses.toArray(new Class[eventClasses.size()]);
-	return eventClassesArray;
-  }
+		return new ProjectionDispatcherProvider(dispatchers._1, dispatchers._2);
+	}
+
+	private ProjectionDispatcherProvider(final Dispatcher storeDispatcher,
+		final ProjectionDispatcher projectionDispatcher) {
+		this.storeDispatcher = storeDispatcher;
+		this.projectionDispatcher = projectionDispatcher;
+		ComponentRegistry.register(getClass(), this);
+	}
+
+	private static <DATA> Class<? extends Source<?>>[] eventClassesOf(QueryModel<DATA> queryModel) {
+		Set<Class<? extends Source<?>>> eventClasses = queryModel.eventClasses();
+		Class<? extends Source<?>>[] eventClassesArray = eventClasses.toArray(new Class[eventClasses.size()]);
+		return eventClassesArray;
+	}
 }

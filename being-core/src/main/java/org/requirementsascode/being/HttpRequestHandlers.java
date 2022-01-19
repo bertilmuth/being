@@ -33,6 +33,17 @@ import io.vlingo.xoom.http.resource.RequestHandler2;
 import io.vlingo.xoom.http.resource.Resource;
 import io.vlingo.xoom.turbo.ComponentRegistry;
 
+/**
+ * This class defines the HTTP routes that accept POST, PATCH and GET HTTP requests for an aggregate,
+ * creates the necessary infrastructure and calls the command handlers of the aggregate
+ * and query handlers of a query model, to handle the requests.
+ * 
+ * @author b_muth
+ *
+ * @param <CMD> the type of command handled by the request handlers
+ * @param <STATE> the type of state of the aggregate
+ * @param <DATA> the type of data of the query model
+ */
 public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandler {
 	private final Stage currentStage;
 	private final Queries<DATA> queries;
@@ -56,10 +67,21 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 		this.requestHandlers = new ArrayList<>();
 	}
 
+	/**
+	 * Create a builder for HTTP request handlers.
+	 * 
+	 * @return the builder
+	 */
 	public static HttpRequestHandlersBuilder builder() {
 		return new HttpRequestHandlersBuilder();
 	}
 
+	/**
+	 * Returns the HTTP routes that have been built.
+	 * You can use the to configure a VLINGO server.
+	 * 
+	 * @return the HTTP routes
+	 */
 	@Override
 	public Resource<?> routes() {
 		RequestHandler[] requestHandlerArray = requestHandlers()
@@ -173,27 +195,27 @@ public class HttpRequestHandlers<CMD, STATE, DATA> extends DynamicResourceHandle
 		return resourceName;
 	}
 
-	public Stage currentStage() {
+	private Stage currentStage() {
 		return currentStage;
 	}
 
-	public List<RequestHandler> requestHandlers() {
+	private List<RequestHandler> requestHandlers() {
 		return requestHandlers;
 	}
 
-	public Supplier<AggregateBehavior<CMD, STATE>> behaviorSupplier() {
+	private Supplier<AggregateBehavior<CMD, STATE>> behaviorSupplier() {
 		return behaviorSupplier;
 	}
 
-	public Queries<DATA> queries() {
+	private Queries<DATA> queries() {
 		return queries;
 	}
 
-	public String resourceName() {
+	private String resourceName() {
 		return resourceName;
 	}
 
-	public Function<STATE, DATA> dataFromState() {
+	private Function<STATE, DATA> dataFromState() {
 		return dataFromState;
 	}
 }
