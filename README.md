@@ -24,7 +24,7 @@ If you are using Maven, include the following in your POM, to use Being and VLIN
 <dependency>
   <groupId>org.requirementsascode.being</groupId>
   <artifactId>being-core</artifactId>
-  <version>0.1.2</version>
+  <version>0.1.3</version>
   <scope>compile</scope>
 </dependency>
 <dependency>
@@ -40,7 +40,7 @@ If you are using Gradle, include the following in your build.gradle, to use Bein
 ``` Groovy
 dependencies {
   implementation 'io.vlingo.xoom:xoom-turbo:1.9.0'
-  implementation 'org.requirementsascode.being:being-core:0.1.2'
+  implementation 'org.requirementsascode.being:being-core:0.1.3'
 }
 ```
 
@@ -52,14 +52,14 @@ Maven:
 <dependency>
   <groupId>org.requirementsascode.being</groupId>
   <artifactId>being-test</artifactId>
-  <version>0.1.2</version>
+  <version>0.1.3</version>
   <scope>test</scope>
 </dependency>
 ```
 
 Gradle:
 
-`testImplementation 'org.requirementsascode.being:being-test:0.1.2'`
+`testImplementation 'org.requirementsascode.being:being-test:0.1.3'`
 
 
 But since you have to make some configuration settings as well, the easiest way to get started is by [cloning the samples](https://github.com/bertilmuth/being-samples), and adapting them.
@@ -282,9 +282,8 @@ Further things you need to do:
 
 Have a look at the [VLINGO documentation](https://docs.vlingo.io/) for details.
 
-## Test the aggregate
-Here's an example of what a test can look like.
-Have a look at its [source code](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/test/java/org/requirementsascode/being/samples/greeting/model/GreetingTest.java) for more details.
+## Testing the aggregate
+For fast running unit tests, here's an example of what a test can look like:
 
 ``` java
 void updatesGreetingOnce() {
@@ -296,6 +295,26 @@ void updatesGreetingOnce() {
 	assertThat(behaviorTest.state(), is(expectedState));
 }
 ```
+These kinds of tests run outside of any infrastructure. 
+They simply check if applying the command handlers and event handlers in sequence yield the expected result.
+Have a look at the [source code](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/test/java/org/requirementsascode/being/samples/greeting/model/GreetingTest.java) for more details.
+
+Of course, you can also run integration tests with a library such as [REST Assured](https://github.com/rest-assured/rest-assured) that
+directly work with the HTTP endpoints:
+
+``` java
+Response greetingData = 
+	givenJsonClient()
+		.body("{\"personName\":\"" + personName + "\"}")
+		.post(CREATE_PATH);
+
+final String expectedGreetingText = salutation + " " + personName;
+
+assertThat(json(greetingData, "personName"), is(personName));
+assertThat(json(greetingData, "greetingText"), is(expectedGreetingText));
+```
+
+Have a look at the [source code](https://github.com/bertilmuth/being-samples/blob/main/greetings/src/test/java/org/requirementsascode/being/samples/greeting/infrastructure/HttpTest.java) for more details.
 
 ## Start the server
 Follow these steps:

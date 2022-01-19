@@ -19,8 +19,8 @@ import java.lang.String;
 
 public class Queries__Proxy<DATA> extends ActorProxyBase<org.requirementsascode.being.Queries> implements org.requirementsascode.being.Queries<DATA>, Proxy {
 
-  private static final String findAllRepresentation1 = "findAll()";
-  private static final String findByIdRepresentation2 = "findById(java.lang.String)";
+  private static final String findByIdRepresentation1 = "findById(java.lang.String)";
+  private static final String findAllRepresentation2 = "findAll()";
 
   private final Actor actor;
   private final Mailbox mailbox;
@@ -58,30 +58,30 @@ public class Queries__Proxy<DATA> extends ActorProxyBase<org.requirementsascode.
   }
 
 
-  public io.vlingo.xoom.common.Completes<java.util.Collection<DATA>> findAll() {
-    if (!actor.isStopped()) {
-      ActorProxyBase<Queries> self = this;
-      final SerializableConsumer<Queries> consumer = (actor) -> actor.findAll();
-      final io.vlingo.xoom.common.Completes<java.util.Collection<DATA>> returnValue = Completes.using(actor.scheduler());
-      if (mailbox.isPreallocated()) { mailbox.send(actor, Queries.class, consumer, Returns.value(returnValue), findAllRepresentation1); }
-      else { mailbox.send(new LocalMessage<Queries>(actor, Queries.class, consumer, Returns.value(returnValue), findAllRepresentation1)); }
-      return returnValue;
-    } else {
-      actor.deadLetters().failedDelivery(new DeadLetter(actor, findAllRepresentation1));
-    }
-    return null;
-  }
-
   public io.vlingo.xoom.common.Completes<DATA> findById(java.lang.String id) {
     if (!actor.isStopped()) {
       ActorProxyBase<Queries> self = this;
       final SerializableConsumer<Queries> consumer = (actor) -> actor.findById(ActorProxyBase.thunk(self, (Actor)actor, id));
       final io.vlingo.xoom.common.Completes<DATA> returnValue = Completes.using(actor.scheduler());
-      if (mailbox.isPreallocated()) { mailbox.send(actor, Queries.class, consumer, Returns.value(returnValue), findByIdRepresentation2); }
-      else { mailbox.send(new LocalMessage<Queries>(actor, Queries.class, consumer, Returns.value(returnValue), findByIdRepresentation2)); }
+      if (mailbox.isPreallocated()) { mailbox.send(actor, Queries.class, consumer, Returns.value(returnValue), findByIdRepresentation1); }
+      else { mailbox.send(new LocalMessage<Queries>(actor, Queries.class, consumer, Returns.value(returnValue), findByIdRepresentation1)); }
       return returnValue;
     } else {
-      actor.deadLetters().failedDelivery(new DeadLetter(actor, findByIdRepresentation2));
+      actor.deadLetters().failedDelivery(new DeadLetter(actor, findByIdRepresentation1));
+    }
+    return null;
+  }
+
+  public io.vlingo.xoom.common.Completes<java.util.Collection<DATA>> findAll() {
+    if (!actor.isStopped()) {
+      ActorProxyBase<Queries> self = this;
+      final SerializableConsumer<Queries> consumer = (actor) -> actor.findAll();
+      final io.vlingo.xoom.common.Completes<java.util.Collection<DATA>> returnValue = Completes.using(actor.scheduler());
+      if (mailbox.isPreallocated()) { mailbox.send(actor, Queries.class, consumer, Returns.value(returnValue), findAllRepresentation2); }
+      else { mailbox.send(new LocalMessage<Queries>(actor, Queries.class, consumer, Returns.value(returnValue), findAllRepresentation2)); }
+      return returnValue;
+    } else {
+      actor.deadLetters().failedDelivery(new DeadLetter(actor, findAllRepresentation2));
     }
     return null;
   }
