@@ -85,9 +85,11 @@ public class HttpRequestHandlersBuilder {
 				/**
 				 * Specifies a request handler for updating an aggregate instance.
 				 * The request handler will accept HTTP PATCH requests containing JSON that represents an update command.
+				 * The URL must literally contain the substring {id} for representing the id part.
 				 * 
 				 * @param url the URL at which PATCH requests are received
 				 * @param updateRequestClass the class of the command used for updating
+				 * @throws IllegalArgumentException if a URL without a {id} substring has been specified
 				 * @return this builder instance, for method chaining
 				 */
 				public AggregateBuilder<CMD, STATE>.RequestHandlersBuilder<DATA> updateRequest(String url, Class<? extends CMD> updateRequestClass) {
@@ -98,10 +100,11 @@ public class HttpRequestHandlersBuilder {
 				/**
 				 * Specifies a request handler for getting the data of a single aggregate instance 
 				 * (of the aggregate provided by the behavior supplier).
-				 * The request handler will accept HTTP GET requests with an id parameter for the id of the aggregate.
-				 * The URL must contain the substring {id} for representing the id part.
+				 * The request handler will accept HTTP GET requests.
+				 * The URL must literally contain the substring {id} for representing the id part.
 				 * 
 				 * @param url the URL at which GET requests are received. Must contain an {id} substring to represent the id parameter.
+				 * @throws IllegalArgumentException if a URL without a {id} substring has been specified
 				 * @return this builder instance, for method chaining
 				 */
 				public AggregateBuilder<CMD, STATE>.RequestHandlersBuilder<DATA> findByIdRequest(String url) {
